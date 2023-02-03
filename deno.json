@@ -1,0 +1,34 @@
+{
+  "tasks": {
+    "check": "deno fmt --check && deno lint",
+    "lock": "deno cache --lock-write ./run.ts"
+  },
+  "importMap": "./imports.json",
+  "compilerOptions": {
+    "strict": true,
+    "emitDecoratorMetadata": true
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ],
+      "exclude": [
+        "no-explicit-any",
+        "no-inferrable-types"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "useTabs": false,
+      "lineWidth": 240,
+      "indentWidth": 2,
+      "singleQuote": true,
+      "proseWrap": "preserve"
+    }
+  }
+}

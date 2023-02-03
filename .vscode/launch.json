@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Server",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "-A",
+        "--inspect-brk",
+        "run.ts"
+      ],
+      "attachSimplePort": 9229
+    }
+  ]
+}

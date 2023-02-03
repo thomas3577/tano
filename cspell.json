@@ -1,0 +1,19 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "allowCompoundWords": true,
+  "ignoreRegExpList": [
+    "/0x[0-9A-F]+/g"
+  ],
+  "ignorePaths": [
+    ".vscode",
+    ".git"
+  ],
+  "words": [
+    "adrianwilczynski",
+    "Cascadia",
+    "Consolas",
+    "deno",
+    "denoland"
+  ]
+}

@@ -1,5 +1,5 @@
-import { task } from './src/task.ts';
+import { Task, task } from './src/task.ts';
 
-await task('task1', () => {});
-
-await task('task2', ['task1'], () => {});
+const task1: Task = task('task1', () => {});
+const task2: Task = task('task2', ['task1'], () => {});
+const task3: Task = task('task3', [task2], () => {});

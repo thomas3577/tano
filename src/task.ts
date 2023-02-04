@@ -1,5 +1,6 @@
 export interface IOptionsBase {
-  description: string;
+  description?: string;
+  condition?: Condition;
 }
 
 export interface IExecutorOptions extends IOptionsBase {
@@ -7,8 +8,8 @@ export interface IExecutorOptions extends IOptionsBase {
 }
 
 export interface ICommandOptions extends IOptionsBase {
-  cwd: string;
-  executor: <T>(command: string, ...args: any[]) => void | T | Promise<void | T>;
+  cwd?: string;
+  executor?: <T>(command: string, ...args: any[]) => void | T | Promise<void | T>;
 }
 
 export interface ITask {
@@ -17,36 +18,71 @@ export interface ITask {
   command?: Command;
   executor?: Executor;
   options?: Options;
+  run(...args: any[]): void;
 }
 
-export type Task = null | ITask;
 export type Options = IExecutorOptions | ICommandOptions;
+export type Condition = (...args: any[]) => (boolean | Promise<boolean>) | boolean;
 export type Command = string;
 export type Executor = <T>(...args: any[]) => void | T | Promise<void | T>;
-export type Required = string | Array<string> | Task | Array<Task> | Array<string | Task>;
+export type Required = string | Array<string> | ITask | Array<ITask> | Array<string | ITask>;
 export type CommandOrExecutorOrOptions = Command | Executor | Options;
 export type RequiredOrCommandOrExecutor = Required | Executor;
 
 export type TaskDefinition = {
-  (name: string, required?: string): Task;
-  (name: string, required?: Array<string>): Task;
-  (name: string, required?: Task): Task;
-  (name: string, required?: Array<Task>): Task;
-  (name: string, required?: Array<string | Task>): Task;
-  (name: string, command?: Command, options?: ICommandOptions): Task;
-  (name: string, executor?: Executor, options?: IExecutorOptions): Task;
-  (name: string, required?: string, command?: Command, options?: ICommandOptions): Task;
-  (name: string, required?: Array<string>, command?: Command, options?: ICommandOptions): Task;
-  (name: string, required?: Task, command?: Command, options?: ICommandOptions): Task;
-  (name: string, required?: Array<Task>, command?: Command, options?: ICommandOptions): Task;
-  (name: string, required?: Array<string | Task>, command?: Command, options?: ICommandOptions): Task;
-  (name: string, required?: string, executor?: Executor, options?: IExecutorOptions): Task;
-  (name: string, required?: Array<string>, executor?: Executor, options?: IExecutorOptions): Task;
-  (name: string, required?: Task, executor?: Executor, options?: IExecutorOptions): Task;
-  (name: string, required?: Array<Task>, executor?: Executor, options?: IExecutorOptions): Task;
-  (name: string, required?: Array<string | Task>, executor?: Executor, options?: IExecutorOptions): Task;
+  (name: string, required?: string): ITask;
+  (name: string, required?: Array<string>): ITask;
+  (name: string, required?: ITask): ITask;
+  (name: string, required?: Array<ITask>): ITask;
+  (name: string, required?: Array<string | ITask>): ITask;
+  (name: string, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, required?: string, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, required?: Array<string>, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, required?: ITask, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, required?: Array<ITask>, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, required?: Array<string | ITask>, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, required?: string, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, required?: Array<string>, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, required?: ITask, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, required?: Array<ITask>, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, required?: Array<string | ITask>, executor?: Executor, options?: IExecutorOptions): ITask;
 };
 
-export const task: TaskDefinition = (name: string, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): Task => {
-  return null;
+export class Task implements ITask {
+  constructor(
+    private readonly _name: string,
+    private readonly _required: Required,
+    private readonly _command: Command,
+    private readonly _executor: Executor,
+    private readonly _options: Options,
+  ) {}
+
+  public get name(): string {
+    return this._name;
+  }
+
+  public get required(): Required {
+    return this._required;
+  }
+
+  public get command(): Command {
+    return this._command;
+  }
+
+  public get executor(): Executor {
+    return this._executor;
+  }
+
+  public get options(): Options {
+    return this._options;
+  }
+
+  public run(...args: any[]): void {
+    throw new Error('Method not implemented.');
+  }
+}
+
+export const task: TaskDefinition = (name: string, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
+  return null as unknown as ITask;
 };

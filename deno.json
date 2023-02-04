@@ -8,6 +8,9 @@
     "strict": true,
     "emitDecoratorMetadata": true
   },
+  "imports": {
+    "std/": "https://deno.land/std@0.176.0/"
+  },
   "lint": {
     "rules": {
       "tags": [

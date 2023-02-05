@@ -1,12 +1,13 @@
-import { Command, CommandOrExecutorOrOptions, Executor, ITask, Options, RequiredOrCommandOrExecutor, TaskDefinition } from './definitions.ts';
+import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, ITask, ITaskMethods, Options, RequiredOrCommandOrExecutor, TaskDefinition } from './definitions.ts';
 import { getCommand, getExecutor, getOptions, getRequired } from './utils.ts';
 
-export class Task implements ITask {
+export class Task implements ITask, ITaskMethods {
   private readonly _name: string;
   private readonly _required: Array<string>;
   private readonly _command: Command;
   private readonly _executor: Executor;
   private readonly _options: Options;
+  private _process: Deno.Process | null = null;
 
   constructor(nameOrTask: string | ITask, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
     if (typeof nameOrTask === 'object') {
@@ -47,8 +48,31 @@ export class Task implements ITask {
     return this._options;
   }
 
-  public run(..._args: any[]): void {
-    throw new Error('Method not implemented.');
+  public async run(): Promise<void> {
+    if (this._command) {
+      return await this._runCommand(this._command, this._options);
+    }
+  }
+
+  private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
+    this._process = Deno.run({
+      cwd: options?.cwd || Deno.cwd(),
+      cmd: command.split(' '),
+      stdout: 'piped',
+      stderr: 'piped',
+    });
+
+    const status: Deno.ProcessStatus = await this._process.status();
+    const rawOutput: Uint8Array = await this._process.output();
+    const rawError: Uint8Array = await this._process.stderrOutput();
+
+    if (status.code === 0) {
+      await Deno.stdout.write(rawOutput);
+      this._process.close();
+    } else {
+      await Promise.reject(new TextDecoder().decode(rawError));
+      this._process.kill();
+    }
   }
 }
 

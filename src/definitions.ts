@@ -1,6 +1,8 @@
 export interface IOptionsBase {
+  cwd?: string;
   description?: string;
   condition?: Condition;
+  abortOnError?: boolean;
 }
 
 export interface IExecutorOptions extends IOptionsBase {
@@ -8,8 +10,7 @@ export interface IExecutorOptions extends IOptionsBase {
 }
 
 export interface ICommandOptions extends IOptionsBase {
-  cwd?: string;
-  executor?: <T>(command: string, ..._args: any[]) => void | T | Promise<void | T>;
+  [key: string]: any;
 }
 
 export interface ITask {
@@ -18,7 +19,10 @@ export interface ITask {
   command?: Command;
   executor?: Executor;
   options?: Options;
-  run(..._args: any[]): void;
+}
+
+export interface ITaskMethods {
+  run<T>(): Promise<void>;
 }
 
 export type Options = IExecutorOptions | ICommandOptions;

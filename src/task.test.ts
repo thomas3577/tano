@@ -25,16 +25,6 @@ describe(task.name, () => {
   });
 
   it(`Task Var 03`, () => {
-    const myTask: ITask = task('my-task', 'my-pretask');
-
-    assertEquals(myTask.name, 'my-task');
-    assertEquals(myTask.required, ['my-pretask']);
-    assertEquals(myTask.command, undefined);
-    assertEquals(myTask.executor, undefined);
-    assertEquals(myTask.options, undefined);
-  });
-
-  it(`Task Var 04`, () => {
     const myTask: ITask = task('my-task', ['my-pretask-one', 'my-pretask-two']);
 
     assertEquals(myTask.name, 'my-task');
@@ -44,18 +34,7 @@ describe(task.name, () => {
     assertEquals(myTask.options, undefined);
   });
 
-  it(`Task Var 05`, () => {
-    const myPreTaskOne: ITask = task('my-pretask-one', ['my-pre-pretask-one']);
-    const myTask: ITask = task('my-task', myPreTaskOne);
-
-    assertEquals(myTask.name, 'my-task');
-    assertEquals(myTask.required, ['my-pretask-one']);
-    assertEquals(myTask.command, undefined);
-    assertEquals(myTask.executor, undefined);
-    assertEquals(myTask.options, undefined);
-  });
-
-  it(`Task Var 06`, () => {
+  it(`Task Var 04`, () => {
     const myPreTaskOne: ITask = task('my-pretask-one', ['my-pre-pretask-one']);
     const myPreTaskTwo: ITask = task('my-pretask-two', ['my-pre-pretask-two']);
     const myTask: ITask = task('my-task', [myPreTaskOne, myPreTaskTwo]);
@@ -67,8 +46,8 @@ describe(task.name, () => {
     assertEquals(myTask.options, undefined);
   });
 
-  it(`Task Var 07`, () => {
-    const myPreTaskOne: ITask = task('my-pretask-one', ['my-pre-pretask-one']);
+  it(`Task Var 05`, () => {
+    const myPreTaskOne: ITask = task('my-pretask-one', ['my-pretask-one', 'my-pretask-two']);
     const myTask: ITask = task('my-task', [myPreTaskOne, 'my-pretask-two']);
 
     assertEquals(myTask.name, 'my-task');
@@ -78,17 +57,7 @@ describe(task.name, () => {
     assertEquals(myTask.options, undefined);
   });
 
-  it(`Task Var 08`, () => {
-    const myTask: ITask = task('my-task', 'my-pretask-one', () => {});
-
-    assertEquals(myTask.name, 'my-task');
-    assertEquals(myTask.required, ['my-pretask-one']);
-    assertEquals(myTask.command, undefined);
-    assertEquals(typeof myTask.executor, 'function');
-    assertEquals(myTask.options, undefined);
-  });
-
-  it(`Task Var 09`, () => {
+  it(`Task Var 06`, () => {
     const myTask: ITask = task('my-task', ['my-pretask-one', 'my-pretask-two'], () => {});
 
     assertEquals(myTask.name, 'my-task');
@@ -98,18 +67,7 @@ describe(task.name, () => {
     assertEquals(myTask.options, undefined);
   });
 
-  it(`Task Var 10`, () => {
-    const myPreTaskOne: ITask = task('my-pretask-one', ['my-pre-pretask-one']);
-    const myTask: ITask = task('my-task', myPreTaskOne, () => {});
-
-    assertEquals(myTask.name, 'my-task');
-    assertEquals(myTask.required, ['my-pretask-one']);
-    assertEquals(myTask.command, undefined);
-    assertEquals(typeof myTask.executor, 'function');
-    assertEquals(myTask.options, undefined);
-  });
-
-  it(`Task Var 11`, () => {
+  it(`Task Var 07`, () => {
     const myPreTaskOne: ITask = task('my-pretask-one', ['my-pre-pretask-one']);
     const myPreTaskTwo: ITask = task('my-pretask-two', ['my-pre-pretask-two']);
     const myTask: ITask = task('my-task', [myPreTaskOne, myPreTaskTwo], () => {});
@@ -121,8 +79,8 @@ describe(task.name, () => {
     assertEquals(myTask.options, undefined);
   });
 
-  it(`Task Var 12`, () => {
-    const myPreTaskOne: ITask = task('my-pretask-one', ['my-pre-pretask-one']);
+  it(`Task Var 08`, () => {
+    const myPreTaskOne: ITask = task('my-pretask-one', ['my-pretask-one', 'my-pretask-two']);
     const myTask: ITask = task('my-task', [myPreTaskOne, 'my-pretask-two'], () => {});
 
     assertEquals(myTask.name, 'my-task');
@@ -132,11 +90,11 @@ describe(task.name, () => {
     assertEquals(myTask.options, undefined);
   });
 
-  it(`Task Var 13`, () => {
+  it(`Task Var 09`, () => {
     const myTask: ITask = task('my-task', 'My Command');
 
     assertEquals(myTask.name, 'my-task');
-    assertEquals(myTask.required, ['My Command']); // TODO(thu): Needs a solution for this :-(
+    assertEquals(myTask.required, []);
     assertEquals(myTask.command, 'My Command');
     assertEquals(myTask.executor, undefined);
     assertEquals(myTask.options, undefined);

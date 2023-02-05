@@ -51,7 +51,7 @@ export class Task implements ITask {
   private readonly _executor: Executor;
   private readonly _options: Options;
 
-  constructor(nameOrTask: string | ITask, required?: Array<string>, command?: Command, executor?: Executor, options?: Options) {
+  constructor(nameOrTask: string | ITask, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
     if (typeof nameOrTask === 'object') {
       const task: ITask = nameOrTask as ITask;
       this._name = task.name;

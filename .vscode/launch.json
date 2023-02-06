@@ -10,7 +10,7 @@
         "run",
         "-A",
         "--inspect-brk",
-        "run.ts"
+        "tanofile.ts"
       ],
       "attachSimplePort": 9229
     }

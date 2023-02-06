@@ -25,7 +25,7 @@
     "deno.unstable": true,
     "deno.config": "./deno.json",
     "deno.enablePaths": [
-      "./run.ts",
+      "./tanofile.ts",
       "./src"
     ],
     "deno.codeLens.references": false,

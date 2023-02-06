@@ -15,6 +15,7 @@
     "Consolas",
     "deno",
     "denoland",
-    "tano"
+    "tano",
+    "tanofile"
   ]
 }

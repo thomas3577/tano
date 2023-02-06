@@ -15,11 +15,11 @@ deno task check
 ## Run
 
 ```bash
-deno run -A run.ts
+deno task start
 ```
 
-## Publish
+## Compile
 
 ```bash
-git push
+git task compile
 ```

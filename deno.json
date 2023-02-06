@@ -1,8 +1,9 @@
 {
   "tasks": {
-    "start": "deno run -A run.ts",
+    "start": "deno run -A tanofile.ts",
     "check": "deno fmt --check && deno lint",
-    "lock": "deno cache --lock-write ./run.ts"
+    "lock": "deno cache --lock-write ./tanofile.ts",
+    "compile": "deno compile --unstable --allow-env --output=bin/tano src/index.ts"
   },
   "compilerOptions": {
     "strict": true,

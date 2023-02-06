@@ -10,22 +10,19 @@ export class Task implements ITask, ITaskMethods {
   private _process: Deno.Process | null = null;
 
   constructor(nameOrTask: string | ITask, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
-    if (typeof nameOrTask === 'object') {
-      const task: ITask = nameOrTask as ITask;
-      this._name = task.name;
-      this._required = task.required as Array<string>;
-      this._command = task.command as Command;
-      this._executor = task.executor as Executor;
-      this._options = task.options as Options;
-    } else if (typeof nameOrTask === 'string') {
-      this._name = nameOrTask;
-      this._required = required as Array<string>;
-      this._command = command as Command;
-      this._executor = executor as Executor;
-      this._options = options as Options;
-    } else {
-      throw new Error(`Wrong type of first argument.`);
-    }
+    const task: ITask = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITask : {
+      name: nameOrTask as string,
+      required,
+      command,
+      executor,
+      options,
+    };
+
+    this._name = task.name;
+    this._required = task.required as Array<string>;
+    this._command = task.command as Command;
+    this._executor = task.executor as Executor;
+    this._options = task.options as Options;
   }
 
   public get name(): string {

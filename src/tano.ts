@@ -5,6 +5,6 @@ try {
   const importPath: string = join('file:', Deno.cwd(), importFile);
 
   await import(importPath);
-} catch (err) {
+} catch (err: unknown) {
   console.error(err);
 }

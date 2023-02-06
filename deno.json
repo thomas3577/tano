@@ -3,7 +3,7 @@
     "start": "deno run -A tanofile.ts",
     "check": "deno fmt --check && deno lint",
     "lock": "deno cache --lock-write ./tanofile.ts",
-    "compile": "deno compile --unstable --allow-env --output=bin/tano src/index.ts"
+    "compile": "deno compile --unstable --allow-env --output=bin/tano src/tano.ts"
   },
   "compilerOptions": {
     "strict": true,

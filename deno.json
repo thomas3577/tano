@@ -1,16 +1,17 @@
 {
   "tasks": {
-    "start": "deno run -A tanofile.ts",
+    "go": "./bin/tano.exe",
+    "start": "deno run -A ./src/tano.ts",
     "check": "deno fmt --check && deno lint",
     "lock": "deno cache --lock-write ./tanofile.ts",
-    "compile": "deno compile --unstable --allow-env --output=bin/tano src/tano.ts"
+    "compile": "deno compile --unstable -A --output=bin/tano src/tano.ts"
   },
   "compilerOptions": {
     "strict": true,
     "emitDecoratorMetadata": true
   },
   "imports": {
-    "std/": "https://deno.land/std@0.176.0/"
+    "std/": "https://deno.land/std@0.177.0/"
   },
   "lint": {
     "rules": {

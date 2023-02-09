@@ -1,7 +1,7 @@
 export interface IHandler {
   createdAt: null | Date;
   add(task: ITaskParams): void;
-  run(): void;
+  run(): Promise<void>;
 }
 
 export interface IOptionsBase {

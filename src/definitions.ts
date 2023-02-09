@@ -1,3 +1,9 @@
+export interface IHandler {
+  createdAt: null | Date;
+  add(task: ITask): void;
+  run(): void;
+}
+
 export interface IOptionsBase {
   cwd?: string;
   description?: string;

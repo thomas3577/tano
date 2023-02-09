@@ -1,10 +1,8 @@
 {
   "tasks": {
-    "go": "./bin/tano.exe",
     "start": "deno run -A ./src/tano.ts",
     "check": "deno fmt --check && deno lint",
-    "lock": "deno cache --lock-write ./tanofile.ts",
-    "compile": "deno compile --unstable -A --output=bin/tano src/tano.ts"
+    "lock": "deno cache --lock-write ./tanofile.ts"
   },
   "compilerOptions": {
     "strict": true,

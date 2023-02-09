@@ -1,6 +1,8 @@
-import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, ITask, ITaskMethods, Options, RequiredOrCommandOrExecutor, TaskDefinition } from './definitions.ts';
+import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IHandler, ITask, ITaskMethods, Options, RequiredOrCommandOrExecutor, TaskDefinition } from './definitions.ts';
+import { handler } from './handler.ts';
 
 export class Task implements ITask, ITaskMethods {
+  private readonly _handler: IHandler = handler;
   private readonly _name: string;
   private readonly _required: Array<string>;
   private readonly _command: Command;
@@ -22,6 +24,7 @@ export class Task implements ITask, ITaskMethods {
     this._command = task.command as Command;
     this._executor = task.executor as Executor;
     this._options = task.options as Options;
+    this._handler.add(this);
   }
 
   public get name(): string {

@@ -1,9 +1,9 @@
-import { IHandler, ITask } from './definitions.ts';
+import { IHandler, ITaskParams } from './definitions.ts';
 import { Task } from './task.ts';
 
 class Handler implements IHandler {
   private readonly _createdAt: null | Date = null;
-  private _cache: Map<string, ITask> = new Map();
+  private _cache: Map<string, ITaskParams> = new Map();
 
   constructor() {
     this._createdAt = new Date();
@@ -13,7 +13,7 @@ class Handler implements IHandler {
     return this._createdAt;
   }
 
-  public add(task: ITask): void {
+  public add(task: ITaskParams): void {
     if (this._cache.has(task.name)) {
       throw new Error(`Task with the name '${task.name}' already exists.`);
     }

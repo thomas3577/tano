@@ -1,17 +1,20 @@
-import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IHandler, ITask, ITaskMethods, Options, RequiredOrCommandOrExecutor, TaskDefinition } from './definitions.ts';
+import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IHandler, ITask, ITaskParams, Options, RequiredOrCommandOrExecutor, TaskDefinition, TaskStatus } from './definitions.ts';
 import { handler } from './handler.ts';
 
-export class Task implements ITask, ITaskMethods {
+export class Task implements ITask, ITaskParams {
   private readonly _handler: IHandler = handler;
   private readonly _name: string;
   private readonly _required: Array<string>;
   private readonly _command: Command;
   private readonly _executor: Executor;
   private readonly _options: Options;
-  private _process: Deno.Process | null = null;
+  private _status: TaskStatus = 'ready';
+  private _started: null | Date = null;
+  private _finished: null | Date = null;
+  private _process: null | Deno.Process = null;
 
-  constructor(nameOrTask: string | ITask, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
-    const task: ITask = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITask : {
+  constructor(nameOrTask: string | ITaskParams, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
+    const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
       name: nameOrTask as string,
       required,
       command,
@@ -29,6 +32,18 @@ export class Task implements ITask, ITaskMethods {
 
   public get name(): string {
     return this._name;
+  }
+
+  public get status(): TaskStatus {
+    return this._status;
+  }
+
+  public get started(): null | Date {
+    return this._started;
+  }
+
+  public get finished(): null | Date {
+    return this._finished;
   }
 
   public get required(): Array<string> {
@@ -54,6 +69,8 @@ export class Task implements ITask, ITaskMethods {
   }
 
   private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
+    this._started = new Date();
+    this._status = 'running';
     this._process = Deno.run({
       cwd: options?.cwd || Deno.cwd(),
       cmd: command.split(' '),
@@ -68,14 +85,18 @@ export class Task implements ITask, ITaskMethods {
     if (status.code === 0) {
       await Deno.stdout.write(rawOutput);
       this._process.close();
+      this._status = 'success';
     } else {
       await Promise.reject(new TextDecoder().decode(rawError));
       this._process.kill();
+      this._status = 'failed';
     }
+
+    this._finished = new Date();
   }
 }
 
-export const task: TaskDefinition = (name: string | ITask, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
+export const task: TaskDefinition = (name: string | ITaskParams, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
   let required: Array<string> = [];
   if (Array.isArray(param1)) {
     required = param1.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);

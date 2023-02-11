@@ -1,25 +1,19 @@
 # tano
 
-## Cache and lock
+Just another task runner.
 
-```bash
-deno task lock
+## Usage
+
+Create a TypeScript file with the name `tanofile.ts`, import the 'task' function and create your tasks.
+
+```TypeScript
+import { task } from './src/task.ts';
+
+task('myTask', 'ls', { cwd: 'C:\\' });
 ```
 
-## Check
+Execute it.
 
 ```bash
-deno task check
-```
-
-## Run
-
-```bash
-deno task start
-```
-
-## Compile
-
-```bash
-git task compile
+deno run --allow-read --allow-run ./src/tano.ts
 ```

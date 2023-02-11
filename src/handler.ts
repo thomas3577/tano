@@ -16,9 +16,9 @@ export class Handler implements IHandler {
     this._cache.set(task.name, task);
   }
 
-  public async run(): Promise<void> {
-    for (const task of this._cache.values()) {
-      await task.run();
+  public async run(taskName: string = 'default'): Promise<void> {
+    if (this._cache.has(taskName)) {
+      await this._cache.get(taskName)?.run();
     }
   }
 }

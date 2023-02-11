@@ -1,7 +1,7 @@
 import { assertEquals } from 'std/testing/asserts.ts';
 import { describe, it } from 'std/testing/bdd.ts';
-import { ITask } from './definitions.ts';
 
+import { ITask } from './definitions.ts';
 import { Task, task } from './task.ts';
 
 describe(task.name, () => {

@@ -2,6 +2,12 @@
 
 Just another task runner.
 
+## Install
+
+```bash
+deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/tano.ts
+```
+
 ## Preparation
 
 Create a TypeScript file with the name `tanofile.ts`, import the 'task' function and create your tasks.
@@ -11,20 +17,6 @@ import { task } from './src/task.ts';
 
 task('my-task', 'ls', { cwd: 'C:\\' });
 task('default', 'ls', { cwd: 'C:\\' });
-```
-
-## Using with deno run
-
-**Execute default task:**
-
-```bash
-deno run --allow-read --allow-run ./src/tano.ts
-```
-
-**Execute my-task:**
-
-```bash
-deno run --allow-read --allow-run ./src/tano.ts --task my-task
 ```
 
 ## Using with tano cli

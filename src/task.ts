@@ -9,8 +9,8 @@ export class Task implements ITask, ITaskParams {
   private readonly _executor: Executor;
   private readonly _options: Options;
   private _status: TaskStatus = 'ready';
-  private _started: null | Date = null;
-  private _finished: null | Date = null;
+  private _startsAt: null | Date = null;
+  private _endsAt: null | Date = null;
   private _process: null | Deno.Process = null;
 
   constructor(nameOrTask: string | ITaskParams, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
@@ -38,12 +38,12 @@ export class Task implements ITask, ITaskParams {
     return this._status;
   }
 
-  public get started(): null | Date {
-    return this._started;
+  public get startsAt(): null | Date {
+    return this._startsAt;
   }
 
-  public get finished(): null | Date {
-    return this._finished;
+  public get endsAt(): null | Date {
+    return this._endsAt;
   }
 
   public get required(): Array<string> {
@@ -63,13 +63,24 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async run(): Promise<void> {
-    if (this._command) {
+    if (this._command !== undefined) {
       return await this._runCommand(this._command, this._options);
+    }
+
+    if (this._executor !== undefined) {
+      // TODO(thu): Execute the Function!
     }
   }
 
+  public reset(): void {
+    this._startsAt = null;
+    this._endsAt = null;
+    this._process = null;
+    this._status = 'ready';
+  }
+
   private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
-    this._started = new Date();
+    this._startsAt = new Date();
     this._status = 'running';
     this._process = Deno.run({
       cwd: options?.cwd || Deno.cwd(),
@@ -92,7 +103,7 @@ export class Task implements ITask, ITaskParams {
       this._status = 'failed';
     }
 
-    this._finished = new Date();
+    this._endsAt = new Date();
   }
 }
 

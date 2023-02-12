@@ -3,6 +3,8 @@ export interface IHandler {
   count: number;
   add(task: ITaskParams): void;
   run(taskName?: string): Promise<void>;
+  reset(): void;
+  clear(): void;
 }
 
 export interface IOptionsBase {
@@ -30,9 +32,10 @@ export interface ITaskParams {
 
 export interface ITask extends ITaskParams {
   status: TaskStatus;
-  started: null | Date;
-  finished: null | Date;
-  run<T>(): Promise<void>;
+  startsAt: null | Date;
+  endsAt: null | Date;
+  run(): Promise<void>;
+  reset(): void;
 }
 
 export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';

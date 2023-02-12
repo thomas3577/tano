@@ -1,5 +1,6 @@
 export interface IHandler {
   createdAt: null | Date;
+  count: number;
   add(task: ITaskParams): void;
   run(taskName?: string): Promise<void>;
 }
@@ -44,6 +45,7 @@ export type CommandOrExecutorOrOptions = Command | Executor | Options;
 export type RequiredOrCommandOrExecutor = Required | Command | Executor;
 
 export type TaskDefinition = {
+  (task: ITask): ITask;
   (task: ITaskParams): ITask;
   (name: string, required?: Array<string>): ITask;
   (name: string, required?: Array<ITaskParams>): ITask;

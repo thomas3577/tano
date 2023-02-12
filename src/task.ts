@@ -96,7 +96,15 @@ export class Task implements ITask, ITaskParams {
   }
 }
 
-export const task: TaskDefinition = (name: string | ITaskParams, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
+export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
+  if (nameOrTask instanceof Task) {
+    return nameOrTask;
+  }
+
+  if (typeof nameOrTask === 'object') {
+    return new Task(nameOrTask.name, nameOrTask.required, nameOrTask.command, nameOrTask.executor, nameOrTask.options);
+  }
+
   let required: Array<string> = [];
   if (Array.isArray(param1)) {
     required = param1.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
@@ -123,7 +131,7 @@ export const task: TaskDefinition = (name: string | ITaskParams, param1?: Requir
     options = param3;
   }
 
-  const instance: ITask = new Task(name, required, command, executor, options);
+  const instance: ITask = new Task(nameOrTask, required, command, executor, options);
 
   return instance;
 };

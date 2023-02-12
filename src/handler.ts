@@ -8,6 +8,10 @@ export class Handler implements IHandler {
     return this._createdAt;
   }
 
+  public get count(): number {
+    return this._cache.size;
+  }
+
   public add(task: ITask): void {
     if (this._cache.has(task.name)) {
       throw new Error(`Task with the name '${task.name}' already exists.`);

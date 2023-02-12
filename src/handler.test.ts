@@ -10,6 +10,6 @@ describe(Handler.name, () => {
 
     handler.add(task('myTask', 'ls', { cwd: 'C:\\' }));
 
-    assertEquals((handler as any)._cache.keys().length, 1);
+    assertEquals(handler.count, 1);
   });
 });

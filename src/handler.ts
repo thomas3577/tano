@@ -1,30 +1,38 @@
 import { IHandler, ITask } from './definitions.ts';
 
 export class Handler implements IHandler {
-  private readonly _createdAt: Date = new Date();
+  private readonly _created: Date = new Date();
   private readonly _cache: Map<string, ITask> = new Map();
-  private _startsAt: null | Date = null;
-  private _endsAt: null | Date = null;
+  private _starting: null | PerformanceMark = null;
+  private _finished: null | PerformanceMark = null;
+  private _measure: null | PerformanceMeasure = null;
 
   /**
    * Timestamp when the handler was created.
    */
-  public get createdAt(): Date {
-    return this._createdAt;
+  public get created(): Date {
+    return this._created;
   }
 
   /**
-   * Timestamp when the last run starts.
+   * Performance mark when the last run starts.
    */
-  public get startsAt(): null | Date {
-    return this._startsAt;
+  public get starting(): null | PerformanceMark {
+    return this._starting;
   }
 
   /**
-   * Timestamp when the last run ends.
+   * Performance mark when the last run ends.
    */
-  public get endsAt(): null | Date {
-    return this._endsAt;
+  public get finished(): null | PerformanceMark {
+    return this._finished;
+  }
+
+  /**
+   * Performance measure of the last run.
+   */
+  public get measure(): null | PerformanceMeasure {
+    return this._measure;
   }
 
   /**
@@ -53,8 +61,10 @@ export class Handler implements IHandler {
    * @param taskName - Name of the task.
    */
   public async run(taskName: string = 'default'): Promise<void> {
-    this._endsAt = null;
-    this._startsAt = new Date();
+    this._finished = null;
+    this._starting = performance.mark('starting', {
+      startTime: Date.now(),
+    });
 
     const taskNames: string[] = this._createPlan(taskName);
 
@@ -62,7 +72,11 @@ export class Handler implements IHandler {
       await this._cache.get(tn)?.run();
     }
 
-    this._endsAt = new Date();
+    this._finished = performance.mark('finished', {
+      startTime: Date.now(),
+    });
+
+    this._measure = performance.measure('run', 'starting', 'finished');
   }
 
   /**

@@ -1,5 +1,7 @@
 export interface IHandler {
-  createdAt: null | Date;
+  created: Date;
+  starting: null | PerformanceMark;
+  finished: null | PerformanceMark;
   count: number;
   add(task: ITaskParams): void;
   run(taskName?: string): Promise<void>;
@@ -32,8 +34,9 @@ export interface ITaskParams {
 
 export interface ITask extends ITaskParams {
   status: TaskStatus;
-  startsAt: null | Date;
-  endsAt: null | Date;
+  created: Date;
+  starting: null | PerformanceMark;
+  finished: null | PerformanceMark;
   run(): Promise<void>;
   reset(): void;
 }

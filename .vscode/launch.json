@@ -2,15 +2,29 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Server",
+      "name": "Run",
       "request": "launch",
       "type": "node",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "-A",
+        "--allow-read",
+        "--allow-run",
         "--inspect-brk",
-        "tanofile.ts"
+        "./src/tano.ts"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "Test",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--allow-read",
+        "--allow-run",
+        "--inspect-brk"
       ],
       "attachSimplePort": 9229
     }

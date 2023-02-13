@@ -1,7 +1,11 @@
-import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IHandler, ITask, ITaskParams, Options, RequiredOrCommandOrExecutor, TaskDefinition, TaskStatus } from './definitions.ts';
+import * as log from 'std/log/mod.ts';
+import { format } from 'std/datetime/format.ts';
+
+import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IExecutorOptions, IHandler, ITask, ITaskParams, Options, RequiredOrCommandOrExecutor, TaskDefinition, TaskStatus } from './definitions.ts';
 import { handler } from './handler.ts';
 
 export class Task implements ITask, ITaskParams {
+  private readonly _created: Date = new Date();
   private readonly _handler: IHandler = handler;
   private readonly _name: string;
   private readonly _required: Array<string>;
@@ -9,8 +13,9 @@ export class Task implements ITask, ITaskParams {
   private readonly _executor: Executor;
   private readonly _options: Options;
   private _status: TaskStatus = 'ready';
-  private _startsAt: null | Date = null;
-  private _endsAt: null | Date = null;
+  private _starting: null | PerformanceMark = null;
+  private _finished: null | PerformanceMark = null;
+  private _measure: null | PerformanceMeasure = null;
   private _process: null | Deno.Process = null;
 
   constructor(nameOrTask: string | ITaskParams, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
@@ -30,22 +35,51 @@ export class Task implements ITask, ITaskParams {
     this._handler.add(this);
   }
 
+  /**
+   * Unique name of the task.
+   */
   public get name(): string {
     return this._name;
   }
 
+  /**
+   * Status of the task.
+   */
   public get status(): TaskStatus {
     return this._status;
   }
 
-  public get startsAt(): null | Date {
-    return this._startsAt;
+  /**
+   * Timestamp when the handler was created.
+   */
+  public get created(): Date {
+    return this._created;
   }
 
-  public get endsAt(): null | Date {
-    return this._endsAt;
+  /**
+   * Performance mark when the last run starts.
+   */
+  public get starting(): null | PerformanceMark {
+    return this._starting;
   }
 
+  /**
+   * Performance mark when the last run ends.
+   */
+  public get finished(): null | PerformanceMark {
+    return this._finished;
+  }
+
+  /**
+   * Performance measure of the last run.
+   */
+  public get measure(): null | PerformanceMeasure {
+    return this._measure;
+  }
+
+  /**
+   * Task that must be executed before this task is executed.
+   */
   public get required(): Array<string> {
     return this._required;
   }
@@ -63,25 +97,38 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async run(): Promise<void> {
+    this._finished = null;
+    this._starting = performance.mark('starting', {
+      startTime: Date.now(),
+    });
+
+    this._status = 'running';
+
+    log.info(`[${format(new Date(this._starting.startTime), 'HH:mm:ss')}] Starting '${this._name}'...`);
+
     if (this._command !== undefined) {
-      return await this._runCommand(this._command, this._options);
+      await this._runCommand(this._command, this._options);
+    } else if (this._executor !== undefined) {
+      await this._runExecutor(this._executor, this._options);
     }
 
-    if (this._executor !== undefined) {
-      // TODO(thu): Execute the Function!
-    }
+    this._finished = performance.mark('finished', {
+      startTime: Date.now(),
+    });
+
+    this._measure = performance.measure(this._name, 'starting', 'finished');
+
+    log.info(`[${format(new Date(this._finished.startTime), 'HH:mm:ss')}] Finished '${this._name}' after ${this._measure.duration} ms`);
   }
 
   public reset(): void {
-    this._startsAt = null;
-    this._endsAt = null;
+    this._starting = null;
+    this._finished = null;
     this._process = null;
     this._status = 'ready';
   }
 
   private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
-    this._startsAt = new Date();
-    this._status = 'running';
     this._process = Deno.run({
       cwd: options?.cwd || Deno.cwd(),
       cmd: command.split(' '),
@@ -102,8 +149,32 @@ export class Task implements ITask, ITaskParams {
       this._process.kill();
       this._status = 'failed';
     }
+  }
 
-    this._endsAt = new Date();
+  // TODO(thu): DO I really use options for executors?
+  // deno-lint-ignore no-unused-vars
+  private async _runExecutor(executor: Executor, options: IExecutorOptions): Promise<void> {
+    if (this._returnsPromise(executor)) {
+      if (this._isAsync(executor)) {
+        return await executor();
+      } else {
+        return await new Promise((resolve, reject) => {
+          (executor as () => Promise<void | any>)()
+            .then(() => resolve())
+            .catch((err: unknown) => reject(err));
+        });
+      }
+    } else {
+      return executor();
+    }
+  }
+
+  private _returnsPromise(fn: () => void | any): boolean {
+    return fn() instanceof Promise;
+  }
+
+  private _isAsync(fn: () => void | any): boolean {
+    return fn.constructor.name === 'AsyncFunction';
   }
 }
 

@@ -16,7 +16,7 @@ describe(Handler.name, () => {
 
     assertEquals(handler.count, 1);
 
-    await handler.run(); // TODO(thu): Evaluation after the run.
+    await handler.run();
   });
 
   it(`Should have two task.`, async () => {
@@ -27,6 +27,6 @@ describe(Handler.name, () => {
 
     assertEquals(handler.count, 2);
 
-    await handler.run(); // TODO(thu): Evaluation after the run.
+    await handler.run();
   });
 });

@@ -26,6 +26,9 @@
     }
   },
   "fmt": {
+    "files": {
+      "exclude": [".vscode/"]
+    },
     "options": {
       "useTabs": false,
       "lineWidth": 240,

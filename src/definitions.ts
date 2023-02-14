@@ -9,8 +9,9 @@ export interface IHandler {
   clear(): void;
 }
 
-export interface IOptionsBase {
-  cwd?: string;
+export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
+
+export interface IOptionsBase extends RunOptions {
   description?: string;
   condition?: Condition;
   abortOnError?: boolean;
@@ -26,7 +27,7 @@ export interface ICommandOptions extends IOptionsBase {
 
 export interface ITaskParams {
   name: string;
-  required?: Array<string>;
+  needs?: Array<string>;
   command?: Command;
   executor?: Executor;
   options?: Options;
@@ -41,27 +42,29 @@ export interface ITask extends ITaskParams {
   reset(): void;
 }
 
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Options = IExecutorOptions | ICommandOptions;
 export type Condition = (..._args: any[]) => (boolean | Promise<boolean>) | boolean;
-export type Command = string;
+export type Command = string | Array<string>;
 export type Executor = <T>(..._args: any[]) => void | T | Promise<void | T>;
-export type Required = Array<string | ITaskParams>;
+export type Needs = Array<string | ITaskParams>;
 export type CommandOrExecutorOrOptions = Command | Executor | Options;
-export type RequiredOrCommandOrExecutor = Required | Command | Executor;
+export type NeedsOrCommandOrExecutor = Needs | Command | Executor;
 
 export type TaskDefinition = {
   (task: ITask): ITask;
   (task: ITaskParams): ITask;
-  (name: string, required?: Array<string>): ITask;
-  (name: string, required?: Array<ITaskParams>): ITask;
-  (name: string, required?: Array<string | ITaskParams>): ITask;
-  (name: string, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, needs?: Array<string>): ITask;
+  (name: string, needs?: Array<ITaskParams>): ITask;
+  (name: string, needs?: Array<string | ITaskParams>): ITask;
+  (name: string, command?: Command, options?: ICommandOptions): ITask; // TODO(thu): Still in conflict with "needs"
   (name: string, executor?: Executor, options?: IExecutorOptions): ITask;
-  (name: string, required?: Array<string>, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, required?: Array<ITaskParams>, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, required?: Array<string | ITaskParams>, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, required?: Array<string>, executor?: Executor, options?: IExecutorOptions): ITask;
-  (name: string, required?: Array<ITaskParams>, executor?: Executor, options?: IExecutorOptions): ITask;
-  (name: string, required?: Array<string | ITaskParams>, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, needs?: Array<string>, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, needs?: Array<ITaskParams>, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, needs?: Array<string | ITaskParams>, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, needs?: Array<string>, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, needs?: Array<ITaskParams>, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, needs?: Array<string | ITaskParams>, executor?: Executor, options?: IExecutorOptions): ITask;
 };

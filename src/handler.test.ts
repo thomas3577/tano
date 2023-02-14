@@ -12,7 +12,7 @@ describe(Handler.name, () => {
   it(`Should have one task.`, async () => {
     const handler = new Handler();
 
-    handler.add(task('myTask', 'echo "First Task"'));
+    handler.add(task('myTask', `echo 'First Task'`));
 
     assertEquals(handler.count, 1);
 
@@ -22,8 +22,8 @@ describe(Handler.name, () => {
   it(`Should have two task.`, async () => {
     const handler = new Handler();
 
-    handler.add(task('default', ['pre-task'], 'echo "Second Task"'));
-    handler.add(task('pre-task', 'echo "First Task"'));
+    handler.add(task('default', ['pre-task'], `echo 'Second Task'`));
+    handler.add(task('pre-task', `echo 'First Task'`));
 
     assertEquals(handler.count, 2);
 

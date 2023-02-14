@@ -1,14 +1,14 @@
 import * as log from 'std/log/mod.ts';
 import { format } from 'std/datetime/format.ts';
 
-import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IExecutorOptions, IHandler, ITask, ITaskParams, Options, RequiredOrCommandOrExecutor, TaskDefinition, TaskStatus } from './definitions.ts';
+import { Command, CommandOrExecutorOrOptions, Executor, ICommandOptions, IExecutorOptions, IHandler, ITask, ITaskParams, NeedsOrCommandOrExecutor, Options, TaskDefinition, TaskStatus } from './definitions.ts';
 import { handler } from './handler.ts';
 
 export class Task implements ITask, ITaskParams {
   private readonly _created: Date = new Date();
   private readonly _handler: IHandler = handler;
   private readonly _name: string;
-  private readonly _required: Array<string>;
+  private readonly _needs: Array<string>;
   private readonly _command: Command;
   private readonly _executor: Executor;
   private readonly _options: Options;
@@ -18,17 +18,17 @@ export class Task implements ITask, ITaskParams {
   private _measure: null | PerformanceMeasure = null;
   private _process: null | Deno.Process = null;
 
-  constructor(nameOrTask: string | ITaskParams, required: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
+  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
     const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
       name: nameOrTask as string,
-      required,
+      needs,
       command,
       executor,
       options,
     };
 
     this._name = task.name;
-    this._required = task.required as Array<string>;
+    this._needs = task.needs as Array<string>;
     this._command = task.command as Command;
     this._executor = task.executor as Executor;
     this._options = task.options as Options;
@@ -80,8 +80,8 @@ export class Task implements ITask, ITaskParams {
   /**
    * Task that must be executed before this task is executed.
    */
-  public get required(): Array<string> {
-    return this._required;
+  public get needs(): Array<string> {
+    return this._needs;
   }
 
   public get command(): Command {
@@ -130,10 +130,12 @@ export class Task implements ITask, ITaskParams {
 
   private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
     this._process = Deno.run({
+      cmd: Array.isArray(command) ? command : command.split(' '), // TODO(thu): It's a bad idea to split. But [command] won't work.
       cwd: options?.cwd || Deno.cwd(),
-      cmd: command.split(' '),
-      stdout: 'piped',
-      stderr: 'piped',
+      env: options?.env,
+      stdout: options?.stdout || 'piped',
+      stderr: options?.stderr || 'piped',
+      stdin: options?.stdin || 'null',
     });
 
     const status: Deno.ProcessStatus = await this._process.status();
@@ -178,18 +180,18 @@ export class Task implements ITask, ITaskParams {
   }
 }
 
-export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, param1?: RequiredOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
+export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, param1?: NeedsOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: Options): ITask => {
   if (nameOrTask instanceof Task) {
     return nameOrTask;
   }
 
   if (typeof nameOrTask === 'object') {
-    return new Task(nameOrTask.name, nameOrTask.required, nameOrTask.command, nameOrTask.executor, nameOrTask.options);
+    return new Task(nameOrTask.name, nameOrTask.needs, nameOrTask.command, nameOrTask.executor, nameOrTask.options);
   }
 
-  let required: Array<string> = [];
+  let needs: Array<string> = [];
   if (Array.isArray(param1)) {
-    required = param1.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
+    needs = param1.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
   }
 
   let command: Command = undefined as unknown as Command;
@@ -213,7 +215,7 @@ export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, p
     options = param3;
   }
 
-  const instance: ITask = new Task(nameOrTask, required, command, executor, options);
+  const instance: ITask = new Task(nameOrTask, needs, command, executor, options);
 
   return instance;
 };

@@ -97,8 +97,8 @@ export class Handler implements IHandler {
     if (this._cache.has(taskName)) {
       const task: ITask = this._cache.get(taskName) as ITask;
 
-      if (task && task.required && task.required?.length > 0) {
-        task.required.forEach((tn) => this._createPlan(tn, taskNames));
+      if (task && task.needs && task.needs?.length > 0) {
+        task.needs.forEach((tn) => this._createPlan(tn, taskNames));
       }
 
       taskNames.push(taskName);

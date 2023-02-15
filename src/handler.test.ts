@@ -2,6 +2,7 @@ import { assertEquals } from 'std/testing/asserts.ts';
 import { beforeEach, describe, it } from 'std/testing/bdd.ts';
 
 import { Handler, handler } from './handler.ts';
+import { needs } from './needs.ts';
 import { task } from './task.ts';
 
 describe(Handler.name, () => {
@@ -22,7 +23,7 @@ describe(Handler.name, () => {
   it(`Should have two task.`, async () => {
     const handler = new Handler();
 
-    handler.add(task('default', ['pre-task'], `echo 'Second Task'`));
+    handler.add(task('default', needs('pre-task'), `echo 'Second Task'`));
     handler.add(task('pre-task', `echo 'First Task'`));
 
     assertEquals(handler.count, 2);

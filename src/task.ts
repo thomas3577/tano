@@ -3,7 +3,7 @@ import { format } from 'std/datetime/format.ts';
 
 import { handler } from './handler.ts';
 
-import type { Command, CommandOrExecutorOrOptions, Executor, IHandler, ITask, ITaskParams, NeedsOrCommandOrExecutor, TaskDefinition, TaskOptions, TaskStatus } from './definitions.ts';
+import type { Command, CommandOrExecutorOrOptions, Executor, IHandler, ITask, ITaskOptions, ITaskParams, NeedsOrCommandOrExecutor, TaskDefinition, TaskStatus } from './definitions.ts';
 
 export class Task implements ITask, ITaskParams {
   private readonly _created: Date = new Date();
@@ -12,14 +12,14 @@ export class Task implements ITask, ITaskParams {
   private readonly _needs: Array<string>;
   private readonly _command: Command;
   private readonly _executor: Executor;
-  private readonly _options: TaskOptions;
+  private readonly _options: ITaskOptions;
   private _status: TaskStatus = 'ready';
   private _starting: null | PerformanceMark = null;
   private _finished: null | PerformanceMark = null;
   private _measure: null | PerformanceMeasure = null;
   private _process: null | Deno.Process = null;
 
-  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], command?: Command, executor?: Executor, options?: TaskOptions) {
+  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], command?: Command, executor?: Executor, options?: ITaskOptions) {
     const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
       name: nameOrTask as string,
       needs,
@@ -32,7 +32,7 @@ export class Task implements ITask, ITaskParams {
     this._needs = task.needs as Array<string>;
     this._command = task.command as Command;
     this._executor = task.executor as Executor;
-    this._options = task.options as TaskOptions;
+    this._options = task.options as ITaskOptions;
     this._handler.add(this);
   }
 
@@ -93,7 +93,7 @@ export class Task implements ITask, ITaskParams {
     return this._executor;
   }
 
-  public get options(): TaskOptions {
+  public get options(): ITaskOptions {
     return this._options;
   }
 
@@ -129,7 +129,7 @@ export class Task implements ITask, ITaskParams {
     this._status = 'ready';
   }
 
-  private async _runCommand(command: Command, options: TaskOptions): Promise<void> {
+  private async _runCommand(command: Command, options: ITaskOptions): Promise<void> {
     this._process = Deno.run({
       cmd: Array.isArray(command) ? command : command.split(' '), // TODO(thu): It's a bad idea to split. But [command] won't work.
       cwd: options?.cwd || Deno.cwd(),
@@ -155,9 +155,8 @@ export class Task implements ITask, ITaskParams {
     }
   }
 
-  // TODO(thu): DO I really use options for executors?
   // deno-lint-ignore no-unused-vars
-  private async _runExecutor(executor: Executor, options: TaskOptions): Promise<void> {
+  private async _runExecutor(executor: Executor, options: ITaskOptions): Promise<void> {
     if (this._returnsPromise(executor)) {
       if (this._isAsync(executor)) {
         return await executor();
@@ -182,7 +181,7 @@ export class Task implements ITask, ITaskParams {
   }
 }
 
-export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, param1?: NeedsOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: TaskOptions): ITask => {
+export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, param1?: NeedsOrCommandOrExecutor, param2?: CommandOrExecutorOrOptions, param3?: ITaskOptions): ITask => {
   if (nameOrTask instanceof Task) {
     return nameOrTask;
   }
@@ -192,8 +191,8 @@ export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, p
   }
 
   let needs: Array<string> = [];
-  if (Array.isArray(param1)) {
-    needs = param1.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
+  if (typeof param1 === 'object' && Array.isArray(param1?.values)) {
+    needs = param1.values.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
   }
 
   let command: Command = undefined as unknown as Command;
@@ -210,9 +209,9 @@ export const task: TaskDefinition = (nameOrTask: string | ITask | ITaskParams, p
     executor = param2;
   }
 
-  let options: TaskOptions = undefined as unknown as TaskOptions;
+  let options: ITaskOptions = undefined as unknown as ITaskOptions;
   if (typeof param2 === 'object') {
-    options = param2 as TaskOptions;
+    options = param2 as ITaskOptions;
   } else if (typeof param3 === 'object') {
     options = param3;
   }

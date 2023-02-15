@@ -1,5 +1,7 @@
 import { isAbsolute, join } from 'std/path/mod.ts';
+import { format } from 'std/datetime/format.ts';
 import { parse } from 'std/flags/mod.ts';
+import { error } from 'std/log/mod.ts';
 
 import { handler } from './handler.ts';
 
@@ -17,13 +19,12 @@ const cli = async () => {
     const taskName: string = flags.task || flags._[0] as string;
 
     await import(importPath);
-
-    handler.run(taskName);
+    await handler.run(taskName);
   } catch (err: unknown) {
-    console.error(err);
+    error(`[${format(new Date(), 'HH:mm:ss')}] ${err}`);
   }
 };
 
 if (import.meta.main) {
-  cli();
+  await cli();
 }

@@ -1,9 +1,10 @@
 import { assertEquals } from 'std/testing/asserts.ts';
 import { afterAll, describe, it } from 'std/testing/bdd.ts';
 
-import { ITask, ITaskParams } from './definitions.ts';
 import { handler } from './handler.ts';
 import { Task, task } from './task.ts';
+
+import type { ITask, ITaskParams } from './definitions.ts';
 
 describe(task.name, () => {
   describe('create tasks', () => {

@@ -1,4 +1,4 @@
-import { IHandler, ITask } from './definitions.ts';
+import type { IHandler, ITask } from './definitions.ts';
 
 export class Handler implements IHandler {
   private readonly _created: Date = new Date();

@@ -157,6 +157,8 @@ export class Task implements ITask, ITaskParams {
 
   // deno-lint-ignore no-unused-vars
   private async _runExecutor(executor: Executor, options: ITaskOptions): Promise<void> {
+    // TODO(thu): Instead of this, better you call _runCommand here and use 'deno run'-Command
+    // Note! You need options for permission like '-A' or '--allow-write'.
     if (this._returnsPromise(executor)) {
       if (this._isAsync(executor)) {
         return await executor();

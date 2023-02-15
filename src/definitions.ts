@@ -16,6 +16,14 @@ export interface ITaskOptions extends RunOptions {
   condition?: Condition;
 }
 
+export interface IExecutorOptions extends ITaskOptions {
+  args?: Array<string>;
+}
+
+export interface ICommandOptions extends ITaskOptions {
+  [key: string]: any;
+}
+
 export interface ITaskParams {
   name: string;
   needs?: Array<string>;
@@ -43,16 +51,17 @@ export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Condition = (..._args: any[]) => (boolean | Promise<boolean>) | boolean;
 export type Command = string | Array<string>;
 export type Executor = <T>(..._args: any[]) => void | T | Promise<void | T>;
+export type Options = IExecutorOptions | ICommandOptions;
 export type Needs = INeeds;
-export type CommandOrExecutorOrOptions = Command | Executor | ITaskOptions;
+export type CommandOrExecutorOrOptions = Command | Executor | Options;
 export type NeedsOrCommandOrExecutor = Needs | Command | Executor;
 
 export type TaskDefinition = {
   (task: ITask): ITask;
   (task: ITaskParams): ITask;
   (name: string, needs?: INeeds): ITask;
-  (name: string, command?: Command, options?: ITaskOptions): ITask;
-  (name: string, executor?: Executor, options?: ITaskOptions): ITask;
-  (name: string, needs?: INeeds, command?: Command, options?: ITaskOptions): ITask;
-  (name: string, needs?: INeeds, executor?: Executor, options?: ITaskOptions): ITask;
+  (name: string, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, needs?: INeeds, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, needs?: INeeds, executor?: Executor, options?: IExecutorOptions): ITask;
 };

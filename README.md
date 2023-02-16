@@ -19,7 +19,7 @@ task('my-task', 'ls', { cwd: 'C:\\' });
 task('default', 'ls', { cwd: 'C:\\' });
 ```
 
-## Using with tano cli
+## Using
 
 **Execute default task:**
 

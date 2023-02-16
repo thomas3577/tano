@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from 'std/testing/bdd.ts';
 
 import { Handler, handler } from './handler.ts';
 import { needs } from './needs.ts';
-import { task } from './task.ts';
+import { task } from './task.factory.ts';
 
 describe(Handler.name, () => {
   beforeEach(() => {

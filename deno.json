@@ -2,7 +2,7 @@
   "tasks": {
     "run": "deno run --allow-read --allow-run ./src/tano.ts",
     "check": "deno fmt --check && deno lint",
-    "lock": "deno cache --lock-write ./tanofile.ts"
+    "lock": "deno cache --lock-write ./example/tanofile.ts"
   },
   "compilerOptions": {
     "strict": true

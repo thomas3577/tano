@@ -1,3 +1,3 @@
-import { task } from './src/mod.ts';
+import { task } from '../mod.ts';
 
 task('default', 'ls', { cwd: 'C:\\' });

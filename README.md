@@ -13,7 +13,7 @@ deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/tano.ts
 Create a TypeScript file with the name `tanofile.ts`, import the 'task' function and create your tasks.
 
 ```TypeScript
-import { task } from './src/task.ts';
+import { task } from 'https://deno.land/x/install@v0.0.1/tano.ts';
 
 task('my-task', 'ls', { cwd: 'C:\\' });
 task('default', 'ls', { cwd: 'C:\\' });

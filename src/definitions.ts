@@ -58,7 +58,7 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Condition = (..._args: any[]) => (boolean | Promise<boolean>) | boolean;
 export type Command = string | Array<string>;
-export type CodeFunction = <T>(..._args: any[]) => void | T | Promise<void | T>;
+export type CodeFunction = <T>(done: () => void) => void | T | Promise<void | T>;
 export type CodeFile = ICodeFile;
 export type Code = CodeFunction | CodeFile;
 export type Options = ICodeOptions | ICommandOptions;

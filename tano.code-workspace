@@ -25,7 +25,7 @@
     "deno.unstable": true,
     "deno.config": "./deno.json",
     "deno.enablePaths": [
-      "./example/tanofile.ts",
+      "./examples/tanofile.ts",
       "./mod.ts",
       "./src"
     ],

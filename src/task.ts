@@ -164,7 +164,12 @@ export class Task implements ITask, ITaskParams {
         return await this._runCommand(command, options);
       }
 
-      return await Promise.resolve((code as CodeFunction)());
+      const func: CodeFunction = code as CodeFunction;
+      if (func.length > 0) {
+        return await new Promise((resolve) => func(() => resolve()));
+      } else {
+        return await Promise.resolve(func(() => {}));
+      }
     }
 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;

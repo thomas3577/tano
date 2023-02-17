@@ -13,10 +13,10 @@ deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/mod.ts
 Create a TypeScript file with the name `tanofile.ts`, import the 'task' function and create your tasks.
 
 ```TypeScript
-import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task, needs } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
-task('my-task', 'ls', { cwd: 'C:\\' });
-task('default', 'ls', { cwd: 'C:\\' });
+task('pre-task', `echo 'These were ...'`);
+task('default' needs('pre-task'), `echo '...two tasks.'`);
 ```
 
 ## Using
@@ -38,3 +38,10 @@ tano --task my-task
 ```bash
 tano my-task
 ```
+
+## Todo
+
+- Documentation & Examples
+- Conditions
+- Modify Log output.
+- More tests

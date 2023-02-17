@@ -3,7 +3,7 @@ import { format } from 'std/datetime/format.ts';
 
 import { handler } from './handler.ts';
 
-import type { Command, Executor, ICommandOptions, IExecutorOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, Command, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
 
 export class Task implements ITask, ITaskParams {
   private readonly _created: Date = new Date();
@@ -11,7 +11,7 @@ export class Task implements ITask, ITaskParams {
   private readonly _name: string;
   private readonly _needs: Array<string>;
   private readonly _command: Command;
-  private readonly _executor: Executor;
+  private readonly _code: Code;
   private readonly _options: Options;
   private _status: TaskStatus = 'ready';
   private _starting: null | PerformanceMark = null;
@@ -19,19 +19,19 @@ export class Task implements ITask, ITaskParams {
   private _measure: null | PerformanceMeasure = null;
   private _process: null | Deno.Process = null;
 
-  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], command?: Command, executor?: Executor, options?: Options) {
+  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], command?: Command, code?: Code, options?: Options) {
     const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
       name: nameOrTask as string,
       needs,
       command,
-      executor,
+      code,
       options,
     };
 
     this._name = task.name;
     this._needs = task.needs as Array<string>;
     this._command = task.command as Command;
-    this._executor = task.executor as Executor;
+    this._code = task.code as Code;
     this._options = task.options as Options;
     this._handler.add(this);
   }
@@ -89,8 +89,8 @@ export class Task implements ITask, ITaskParams {
     return this._command;
   }
 
-  public get executor(): Executor {
-    return this._executor;
+  public get code(): Code {
+    return this._code;
   }
 
   public get options(): Options {
@@ -109,8 +109,8 @@ export class Task implements ITask, ITaskParams {
 
     if (this._command !== undefined) {
       await this._runCommand(this._command, this._options);
-    } else if (this._executor !== undefined) {
-      await this._runExecutor(this._executor, this._options);
+    } else if (this._code !== undefined) {
+      await this._runCode(this._code, this._options);
     }
 
     this._finished = performance.mark('finished', {
@@ -155,30 +155,21 @@ export class Task implements ITask, ITaskParams {
     }
   }
 
-  // deno-lint-ignore no-unused-vars
-  private async _runExecutor(executor: Executor, options: IExecutorOptions): Promise<void> {
-    // TODO(thu): Instead of this, better you call _runCommand here and use 'deno run'-Command
-    // Note! You need options for permission like '-A' or '--allow-write'.
-    if (this._returnsPromise(executor)) {
-      if (this._isAsync(executor)) {
-        return await executor();
-      } else {
-        return await new Promise((resolve, reject) => {
-          (executor as () => Promise<void | any>)()
-            .then(() => resolve())
-            .catch((err: unknown) => reject(err));
-        });
+  private async _runCode(code: Code, options: ICodeOptions): Promise<void> {
+    if (typeof code === 'function') {
+      if (options?.repl) {
+        const funcAsString = code.toString();
+        const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
+
+        return await this._runCommand(command, options);
       }
-    } else {
-      return executor();
+
+      return await Promise.resolve((code as CodeFunction)());
     }
-  }
 
-  private _returnsPromise(fn: () => void | any): boolean {
-    return fn() instanceof Promise;
-  }
+    const file: string = code.file instanceof URL ? code.file.toString() : code.file;
+    const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
-  private _isAsync(fn: () => void | any): boolean {
-    return fn.constructor.name === 'AsyncFunction';
+    return await this._runCommand(command, options);
   }
 }

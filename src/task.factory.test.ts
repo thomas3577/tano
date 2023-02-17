@@ -6,7 +6,7 @@ import { handler } from './handler.ts';
 import { Task } from './task.ts';
 import { needs } from './needs.ts';
 
-import type { ITask, ITaskParams } from './definitions.ts';
+import type { CodeFile, ITask, ITaskParams } from './definitions.ts';
 
 describe(task.name, () => {
   describe('create tasks', () => {
@@ -20,7 +20,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-01');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -30,7 +30,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-02');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, undefined);
     });
 
@@ -40,7 +40,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-03');
       assertEquals(myTask.needs, ['my-pretask-031', 'my-pretask-032']);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -52,7 +52,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-04');
       assertEquals(myTask.needs, ['my-pretask-041', 'my-pretask-042']);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -63,7 +63,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-05');
       assertEquals(myTask.needs, ['my-pretask-051', 'my-pretask-052']);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -73,7 +73,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-06');
       assertEquals(myTask.needs, ['my-pretask-061', 'my-pretask-062']);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, undefined);
     });
 
@@ -85,7 +85,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-07');
       assertEquals(myTask.needs, ['my-pretask-071', 'my-pretask-072']);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, undefined);
     });
 
@@ -96,7 +96,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-08');
       assertEquals(myTask.needs, ['my-pretask-081', 'my-pretask-082']);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, undefined);
     });
 
@@ -106,7 +106,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-09');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -116,7 +116,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-10');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -126,7 +126,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-11');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -136,7 +136,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-12');
       assertEquals(myTask.needs, ['my-pretask-121', 'my-pretask-122']);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -148,7 +148,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-13');
       assertEquals(myTask.needs, ['my-pretask-131', 'my-pretask-132']);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -159,7 +159,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-14');
       assertEquals(myTask.needs, ['my-pretask-141', 'my-pretask-142']);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -169,7 +169,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-15');
       assertEquals(myTask.needs, ['my-pretask-151', 'my-pretask-152']);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -181,7 +181,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-16');
       assertEquals(myTask.needs, ['my-pretask-161', 'my-pretask-162']);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -192,7 +192,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-17');
       assertEquals(myTask.needs, ['my-pretask-171', 'my-pretask-172']);
       assertEquals(myTask.command, undefined);
-      assertEquals(typeof myTask.executor, 'function');
+      assertEquals(typeof myTask.code, 'function');
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -202,7 +202,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-18');
       assertEquals(myTask.needs, ['my-pretask-181', 'my-pretask-182']);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -214,7 +214,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-19');
       assertEquals(myTask.needs, ['my-pretask-191', 'my-pretask-192']);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -225,7 +225,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-20');
       assertEquals(myTask.needs, ['my-pretask-201', 'my-pretask-202']);
       assertEquals(myTask.command, 'My Command');
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, { cwd: './' });
     });
 
@@ -239,7 +239,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-21');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -249,7 +249,7 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-22');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
       assertEquals(myTask.options, undefined);
     });
 
@@ -259,7 +259,19 @@ describe(task.name, () => {
       assertEquals(myTask.name, 'my-task-23');
       assertEquals(myTask.needs, []);
       assertEquals(myTask.command, undefined);
-      assertEquals(myTask.executor, undefined);
+      assertEquals(myTask.code, undefined);
+      assertEquals(myTask.options, undefined);
+    });
+
+    it(`Task Var 24`, () => {
+      const file = new URL('file://test.ts');
+      const codeFile: CodeFile = { file };
+      const myTask: ITask = task('my-task-24', codeFile);
+
+      assertEquals(myTask.name, 'my-task-24');
+      assertEquals(myTask.needs, []);
+      assertEquals(myTask.command, undefined);
+      assertEquals(myTask.code, codeFile);
       assertEquals(myTask.options, undefined);
     });
   });

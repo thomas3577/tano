@@ -1,3 +1,10 @@
-import { task } from '../mod.ts';
+import { needs, task } from './mod.ts';
 
-task('default', 'ls', { cwd: 'C:\\' });
+task(
+  'default',
+  needs(
+    task('01', () => console.log('This was great!'), { repl: true }),
+    task('02', { file: 'tanofile.code.ts' }),
+  ),
+  `echo 'The END!'`,
+);

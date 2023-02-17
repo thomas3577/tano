@@ -16,7 +16,8 @@ export interface ITaskOptions extends RunOptions {
   condition?: Condition;
 }
 
-export interface IExecutorOptions extends ITaskOptions {
+export interface ICodeOptions extends ITaskOptions {
+  repl?: boolean;
   args?: Array<string>;
 }
 
@@ -24,11 +25,14 @@ export interface ICommandOptions extends ITaskOptions {
   [key: string]: any;
 }
 
-export interface ITaskParams {
+export interface IExecutors {
+  command?: Command;
+  code?: Code;
+}
+
+export interface ITaskParams extends IExecutors {
   name: string;
   needs?: Array<string>;
-  command?: Command;
-  executor?: Executor;
   options?: ITaskOptions;
 }
 
@@ -45,23 +49,29 @@ export interface INeeds {
   values: Array<string | ITaskParams>;
 }
 
+export interface ICodeFile {
+  file: string | URL;
+}
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Condition = (..._args: any[]) => (boolean | Promise<boolean>) | boolean;
 export type Command = string | Array<string>;
-export type Executor = <T>(..._args: any[]) => void | T | Promise<void | T>;
-export type Options = IExecutorOptions | ICommandOptions;
+export type CodeFunction = <T>(..._args: any[]) => void | T | Promise<void | T>;
+export type CodeFile = ICodeFile;
+export type Code = CodeFunction | CodeFile;
+export type Options = ICodeOptions | ICommandOptions;
 export type Needs = INeeds;
-export type CommandOrExecutorOrOptions = Command | Executor | Options;
-export type NeedsOrCommandOrExecutor = Needs | Command | Executor;
+export type CommandOrCodeOrOptions = Command | Code | Options;
+export type NeedsOrCommandOrCode = Needs | Command | Code;
 
 export type TaskDefinition = {
   (task: ITask): ITask;
   (task: ITaskParams): ITask;
   (name: string, needs?: INeeds): ITask;
   (name: string, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, code?: Code, options?: ICodeOptions): ITask;
   (name: string, needs?: INeeds, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, needs?: INeeds, executor?: Executor, options?: IExecutorOptions): ITask;
+  (name: string, needs?: INeeds, code?: Code, options?: ICodeOptions): ITask;
 };

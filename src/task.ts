@@ -4,7 +4,7 @@ import { format } from 'std/fmt/duration.ts';
 import { log } from './logger.ts';
 import { handler } from './handler.ts';
 
-import type { Code, CodeFunction, Command, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, Command, Condition, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
 
 export class Task implements ITask, ITaskParams {
   private readonly _created: Date = new Date();
@@ -99,6 +99,16 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async run(): Promise<void> {
+    const result: boolean = await this._executeCondition(this._options?.condition || ((): boolean => true));
+    if (!result) {
+      log.warning('');
+      log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
+        name: `'${gray(this._name)}'`,
+      });
+
+      return;
+    }
+
     if (this._command === undefined && this._code === undefined) {
       return;
     }
@@ -175,17 +185,28 @@ export class Task implements ITask, ITaskParams {
         return await this._runCommand(command, options);
       }
 
-      const func: CodeFunction = code as CodeFunction;
-      if (func.length > 0) {
-        return await new Promise((resolve) => func(() => resolve()));
-      } else {
-        return await Promise.resolve(func(() => {}));
-      }
+      return await this._executeCodeFunction(code);
     }
 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
     return await this._runCommand(command, options);
+  }
+
+  private async _executeCodeFunction(code: CodeFunction): Promise<void> {
+    if (code.length > 0) {
+      return await new Promise((resolve) => code(() => resolve()));
+    } else {
+      return await Promise.resolve(code(() => {}));
+    }
+  }
+
+  private async _executeCondition(condition: Condition): Promise<boolean> {
+    if (condition.length > 0) {
+      return await new Promise((resolve) => condition((result: boolean) => resolve(result)));
+    } else {
+      return await Promise.resolve(condition(() => true));
+    }
   }
 }

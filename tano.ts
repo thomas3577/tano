@@ -1,8 +1,8 @@
 import { parse } from 'std/flags/mod.ts';
 
-import { log } from './logger.ts';
-import { handler } from './handler.ts';
-import { getImportUrl } from './tano.factory.ts';
+import { log } from './src/logger.ts';
+import { handler } from './src/handler.ts';
+import { getImportUrl } from './src/tano.factory.ts';
 
 const cli = async () => {
   try {

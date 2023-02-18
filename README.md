@@ -5,7 +5,7 @@ Just another task runner.
 ## Install
 
 ```bash
-deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/mod.ts
+deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/tano.ts
 ```
 
 ## Preparation
@@ -45,3 +45,8 @@ tano my-task
 - Conditions
 - Modify Log output.
 - More tests
+
+## Documentation
+
+- [cli](./docs/cli.md)
+- [examples](./docs/examples.md)

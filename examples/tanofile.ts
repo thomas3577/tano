@@ -1,4 +1,5 @@
 import { needs, task } from '../mod.ts';
+import { task07 } from './tanofile.task.ts';
 
 task(
   'default',
@@ -19,6 +20,14 @@ task(
         console.log('Hello world delayed from callback function.');
         done();
       }, 200);
+    }),
+    task07,
+    task('08', async () => {
+      const deno = await Deno.readTextFile('./deno.json');
+
+      console.dir(deno);
+    }, {
+      args: ['--allow-write'],
     }),
   ),
   `echo 'The END!'`,

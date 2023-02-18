@@ -99,6 +99,10 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async run(): Promise<void> {
+    if (this._status !== 'ready') {
+      throw new Error(`The task '${this._name}' has already been run.`);
+    }
+
     const result: boolean = await this._executeCondition(this._options?.condition || ((): boolean => true));
     if (!result) {
       log.warning('');

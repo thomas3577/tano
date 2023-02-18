@@ -1,3 +1,6 @@
+import { bold, green } from 'std/fmt/colors.ts';
+import { format } from 'std/fmt/duration.ts';
+
 import { log } from './logger.ts';
 
 import type { IHandler, ITask } from './definitions.ts';
@@ -65,7 +68,7 @@ export class Handler implements IHandler {
    * @param taskName - Name of the task.
    */
   public async run(taskName: string = 'default'): Promise<void> {
-    log.info(`Starting...`);
+    log.info(bold(green(`Starting...`)));
 
     this._finished = null;
     this._starting = performance.mark('starting_run', {
@@ -84,7 +87,9 @@ export class Handler implements IHandler {
 
     this._measure = performance.measure('run', 'starting_run', 'finished_run');
 
-    log.info(`Finished after ${this._measure.duration} ms`);
+    log.info(bold(green(`Finished after {duration}`)), {
+      duration: `${format(this._measure.duration, { ignoreZero: true })}`,
+    });
   }
 
   /**

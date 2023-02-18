@@ -1,3 +1,6 @@
+import { bold, gray } from 'std/fmt/colors.ts';
+import { format } from 'std/fmt/duration.ts';
+
 import { log } from './logger.ts';
 import { handler } from './handler.ts';
 
@@ -100,7 +103,10 @@ export class Task implements ITask, ITaskParams {
       return;
     }
 
-    log.info(`[${this._name}] Starting '${this._name}'...`);
+    log.info('');
+    log.info(`Starting {name}...`, {
+      name: `'${gray(this._name)}'`,
+    });
 
     this._finished = null;
     this._starting = performance.mark(`starting_${this._name}`, {
@@ -121,7 +127,10 @@ export class Task implements ITask, ITaskParams {
 
     this._measure = performance.measure(this._name, `starting_${this._name}`, `finished_${this._name}`);
 
-    log.info(`[${this._name}] Finished '${this._name}' after ${this._measure.duration} ms`);
+    log.info(`Finished {name} after {duration}`, {
+      name: `'${gray(this._name)}'`,
+      duration: `${bold(format(this._measure.duration, { ignoreZero: true }))}`,
+    });
   }
 
   public reset(): void {

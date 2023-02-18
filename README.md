@@ -5,7 +5,7 @@ Just another task runner.
 ## Install
 
 ```bash
-deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/mod.ts
+deno install --allow-read --allow-run --allow-net https://deno.land/x/install@v0.0.1/mod.ts
 ```
 
 ## Preparation

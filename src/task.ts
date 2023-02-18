@@ -1,6 +1,4 @@
-import { error, info } from 'std/log/mod.ts';
-import { format } from 'std/datetime/format.ts';
-
+import { log } from './logger.ts';
 import { handler } from './handler.ts';
 
 import type { Code, CodeFunction, Command, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
@@ -98,14 +96,18 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async run(): Promise<void> {
+    if (this._command === undefined && this._code === undefined) {
+      return;
+    }
+
+    log.info(`[${this._name}] Starting '${this._name}'...`);
+
     this._finished = null;
-    this._starting = performance.mark('starting', {
+    this._starting = performance.mark(`starting_${this._name}`, {
       startTime: Date.now(),
     });
 
     this._status = 'running';
-
-    info(`[${format(new Date(this._starting.startTime), 'HH:mm:ss')}] Starting '${this._name}'...`);
 
     if (this._command !== undefined) {
       await this._runCommand(this._command, this._options);
@@ -113,13 +115,13 @@ export class Task implements ITask, ITaskParams {
       await this._runCode(this._code, this._options);
     }
 
-    this._finished = performance.mark('finished', {
+    this._finished = performance.mark(`finished_${this._name}`, {
       startTime: Date.now(),
     });
 
-    this._measure = performance.measure(this._name, 'starting', 'finished');
+    this._measure = performance.measure(this._name, `starting_${this._name}`, `finished_${this._name}`);
 
-    info(`[${format(new Date(this._finished.startTime), 'HH:mm:ss')}] Finished '${this._name}' after ${this._measure.duration} ms`);
+    log.info(`[${this._name}] Finished '${this._name}' after ${this._measure.duration} ms`);
   }
 
   public reset(): void {
@@ -131,7 +133,7 @@ export class Task implements ITask, ITaskParams {
 
   private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
     this._process = Deno.run({
-      cmd: Array.isArray(command) ? command : command.split(' '), // TODO(thu): It's a bad idea to split. But [command] won't work.
+      cmd: Array.isArray(command) ? command : command.split(' '),
       cwd: options?.cwd || Deno.cwd(),
       env: options?.env,
       stdout: options?.stdout || 'piped',
@@ -148,7 +150,7 @@ export class Task implements ITask, ITaskParams {
       this._process.close();
       this._status = 'success';
     } else {
-      error(`[${format(new Date(), 'HH:mm:ss')}] ${rawError}`);
+      log.error(`[${this._name}] ${rawError}`);
       await Promise.reject(new TextDecoder().decode(rawError));
       this._process.kill();
       this._status = 'failed';

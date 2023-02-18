@@ -11,7 +11,9 @@
         "--allow-read",
         "--allow-run",
         "--inspect-brk",
-        "./src/tano.ts"
+        "./src/tano.ts",
+        "--file",
+        "./examples/tanofile.ts"
       ],
       "attachSimplePort": 9229
     },

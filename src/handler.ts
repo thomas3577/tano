@@ -1,3 +1,5 @@
+import { log } from './logger.ts';
+
 import type { IHandler, ITask } from './definitions.ts';
 
 export class Handler implements IHandler {
@@ -53,6 +55,8 @@ export class Handler implements IHandler {
     }
 
     this._cache.set(task.name, task);
+
+    log.debug(`Added task ${task.name}`);
   }
 
   /**
@@ -61,8 +65,10 @@ export class Handler implements IHandler {
    * @param taskName - Name of the task.
    */
   public async run(taskName: string = 'default'): Promise<void> {
+    log.info(`Starting...`);
+
     this._finished = null;
-    this._starting = performance.mark('starting', {
+    this._starting = performance.mark('starting_run', {
       startTime: Date.now(),
     });
 
@@ -72,11 +78,13 @@ export class Handler implements IHandler {
       await this._cache.get(tn)?.run();
     }
 
-    this._finished = performance.mark('finished', {
+    this._finished = performance.mark('finished_run', {
       startTime: Date.now(),
     });
 
-    this._measure = performance.measure('run', 'starting', 'finished');
+    this._measure = performance.measure('run', 'starting_run', 'finished_run');
+
+    log.info(`Finished after ${this._measure.duration} ms`);
   }
 
   /**

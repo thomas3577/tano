@@ -1,8 +1,7 @@
 import { isAbsolute, join } from 'std/path/mod.ts';
-import { format } from 'std/datetime/format.ts';
 import { parse } from 'std/flags/mod.ts';
-import { error } from 'std/log/mod.ts';
 
+import { log } from './logger.ts';
 import { handler } from './handler.ts';
 
 const cli = async () => {
@@ -14,14 +13,27 @@ const cli = async () => {
       },
     });
 
-    const importFile: string = flags.file;
-    const importPath: string = isAbsolute(importFile) ? join('file:', importFile) : join('file:', Deno.cwd(), importFile);
+    let importUrl: null | string = null;
+
+    try {
+      importUrl = new URL(flags.file).toString();
+
+      log.info(`Using tanofile ${importUrl}`);
+    } catch (_: unknown) {
+      const importFile: string = flags.file;
+      const importPath: string = isAbsolute(importFile) ? importFile : join(Deno.cwd(), importFile);
+
+      importUrl = join('file:', importPath);
+
+      log.info(`Using tanofile ${importPath}`);
+    }
+
     const taskName: string = flags.task || flags._[0] as string;
 
-    await import(importPath);
+    await import(importUrl);
     await handler.run(taskName);
   } catch (err: unknown) {
-    error(`[${format(new Date(), 'HH:mm:ss')}] ${err}`);
+    log.error(`${err}`);
   }
 };
 

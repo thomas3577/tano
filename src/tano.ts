@@ -13,7 +13,7 @@ const cli = async () => {
       },
     });
 
-    const importUrl: null | string = getImportUrl(flags.file);
+    const importUrl: null | string = await getImportUrl(flags.file);
 
     log.info(`Using tanofile ${importUrl}`);
 

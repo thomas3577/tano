@@ -1,8 +1,8 @@
-import { isAbsolute, join } from 'std/path/mod.ts';
 import { parse } from 'std/flags/mod.ts';
 
 import { log } from './logger.ts';
 import { handler } from './handler.ts';
+import { getImportUrl } from './tano.factory.ts';
 
 const cli = async () => {
   try {
@@ -13,20 +13,9 @@ const cli = async () => {
       },
     });
 
-    let importUrl: null | string = null;
+    const importUrl: null | string = getImportUrl(flags.file);
 
-    try {
-      importUrl = new URL(flags.file).toString();
-
-      log.info(`Using tanofile ${importUrl}`);
-    } catch (_: unknown) {
-      const importFile: string = flags.file;
-      const importPath: string = isAbsolute(importFile) ? importFile : join(Deno.cwd(), importFile);
-
-      importUrl = join('file:', importPath);
-
-      log.info(`Using tanofile ${importPath}`);
-    }
+    log.info(`Using tanofile ${importUrl}`);
 
     const taskName: string = flags.task || flags._[0] as string;
 

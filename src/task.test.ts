@@ -13,4 +13,16 @@ describe(Task.name, () => {
     assertInstanceOf(actual, Task);
     assertEquals(actual.name, 'my-task-instance');
   });
+
+  it(`Should run the task.`, async () => {
+    const actual: ITask = new Task('my-task-01', [], `echo 'Runs my task'`);
+
+    assertNotEquals(actual, null);
+    assertInstanceOf(actual, Task);
+    assertEquals(actual.name, 'my-task-01');
+
+    await actual.runThis();
+
+    assertEquals(actual.status, 'success');
+  });
 });

@@ -3,6 +3,7 @@ export interface IHandler {
   starting: null | PerformanceMark;
   finished: null | PerformanceMark;
   count: number;
+  executed: number;
   add(task: ITaskParams): void;
   run(taskName?: string): Promise<void>;
   reset(): void;
@@ -42,6 +43,7 @@ export interface ITask extends ITaskParams {
   starting: null | PerformanceMark;
   finished: null | PerformanceMark;
   run(): Promise<void>;
+  runThis(): Promise<void>;
   reset(): void;
 }
 

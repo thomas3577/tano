@@ -1,5 +1,5 @@
 import { assertEquals } from 'std/testing/asserts.ts';
-import { afterAll, describe, it } from 'std/testing/bdd.ts';
+import { afterAll, afterEach, describe, it } from 'std/testing/bdd.ts';
 
 import { task } from './task.factory.ts';
 import { handler } from './handler.ts';
@@ -277,22 +277,50 @@ describe(task.name, () => {
   });
 
   describe('run tasks', () => {
-    afterAll(() => {
+    afterEach(() => {
       handler.clear();
     });
 
     it(`run one task with a command`, async () => {
-      const myTask: ITask = task('my-task-00', `echo 'First Task'`);
+      const actual: ITask = task('my-task-100', `echo 'First Task'`);
 
-      await myTask.run();
+      assertEquals(actual.status, 'ready');
+      assertEquals(handler.executed, 0);
+
+      await actual.run();
+
+      assertEquals(actual.status, 'success');
+      assertEquals(handler.executed, 1);
     });
 
     it(`run one task with a function`, async () => {
-      const myTask: ITask = task('my-task-01', () => {
+      const actual: ITask = task('my-task-101', () => {
         console.log('>>> TEST');
       });
 
-      await myTask.run();
+      assertEquals(actual.status, 'ready');
+      assertEquals(handler.executed, 0);
+
+      await actual.run();
+
+      assertEquals(actual.status, 'success');
+      assertEquals(handler.executed, 1);
+    });
+
+    it(`run two task with a command and a function`, async () => {
+      task('my-pretask-102-01', `echo 'My pre-task'`);
+
+      const actual: ITask = task('my-task-102', needs('my-pretask-102-01'), () => {
+        console.log('>>> TEST');
+      });
+
+      assertEquals(actual.status, 'ready');
+      assertEquals(handler.executed, 0);
+
+      await actual.run();
+
+      assertEquals(actual.status, 'success');
+      assertEquals(handler.executed, 2);
     });
   });
 });

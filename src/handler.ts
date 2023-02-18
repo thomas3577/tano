@@ -48,8 +48,11 @@ export class Handler implements IHandler {
     return this._cache.size;
   }
 
+  /**
+   * Gets the number of executed tasks.
+   */
   public get executed(): number {
-    return this._executed;
+    return Array.from(this._cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running').length;
   }
 
   /**
@@ -83,7 +86,7 @@ export class Handler implements IHandler {
     const taskNames: string[] = this._createPlan(taskName);
 
     for (const tn of taskNames) {
-      await this._cache.get(tn)?.run();
+      await this._cache.get(tn)?.runThis();
       this._executed++;
     }
 
@@ -103,7 +106,6 @@ export class Handler implements IHandler {
    */
   public reset(): void {
     this._cache.forEach((task: ITask) => task.reset());
-    this._executed = 0;
   }
 
   /**
@@ -111,7 +113,6 @@ export class Handler implements IHandler {
    */
   public clear(): void {
     this._cache.clear();
-    this._executed = 0;
   }
 
   private _createPlan(taskName: string, taskNames: string[] = []): string[] {

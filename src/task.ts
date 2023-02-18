@@ -99,6 +99,10 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async run(): Promise<void> {
+    await this._handler.run(this._name);
+  }
+
+  public async runThis(): Promise<void> {
     if (this._status !== 'ready') {
       throw new Error(`The task '${this._name}' has already been run.`);
     }
@@ -186,16 +190,40 @@ export class Task implements ITask, ITaskParams {
         const funcAsString = code.toString();
         const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
-        return await this._runCommand(command, options);
+        return await this._runCommand(command, options)
+          .then(() => {
+            this._status = 'success';
+          })
+          .catch((err) => {
+            this._status = 'failed';
+
+            throw err;
+          });
       }
 
-      return await this._executeCodeFunction(code);
+      return await this._executeCodeFunction(code)
+        .then(() => {
+          this._status = 'success';
+        })
+        .catch((err) => {
+          this._status = 'failed';
+
+          throw err;
+        });
     }
 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
-    return await this._runCommand(command, options);
+    return await this._runCommand(command, options)
+      .then(() => {
+        this._status = 'success';
+      })
+      .catch((err) => {
+        this._status = 'failed';
+
+        throw err;
+      });
   }
 
   private async _executeCodeFunction(code: CodeFunction): Promise<void> {

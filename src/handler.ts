@@ -11,6 +11,7 @@ export class Handler implements IHandler {
   private _starting: null | PerformanceMark = null;
   private _finished: null | PerformanceMark = null;
   private _measure: null | PerformanceMeasure = null;
+  private _executed: number = 0;
 
   /**
    * Timestamp when the handler was created.
@@ -47,6 +48,10 @@ export class Handler implements IHandler {
     return this._cache.size;
   }
 
+  public get executed(): number {
+    return this._executed;
+  }
+
   /**
    * Adds a task to the cache.
    *
@@ -79,6 +84,7 @@ export class Handler implements IHandler {
 
     for (const tn of taskNames) {
       await this._cache.get(tn)?.run();
+      this._executed++;
     }
 
     this._finished = performance.mark('finished_run', {
@@ -97,6 +103,7 @@ export class Handler implements IHandler {
    */
   public reset(): void {
     this._cache.forEach((task: ITask) => task.reset());
+    this._executed = 0;
   }
 
   /**
@@ -104,6 +111,7 @@ export class Handler implements IHandler {
    */
   public clear(): void {
     this._cache.clear();
+    this._executed = 0;
   }
 
   private _createPlan(taskName: string, taskNames: string[] = []): string[] {

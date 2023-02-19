@@ -16,7 +16,17 @@ import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 task('default', `ls`);
 ```
 
-## 02 Run a function
+## 02 Run command line from another working directory
+
+**tanofile.ts:**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('default', `ls`, { cwd: '/usr/bin' });
+```
+
+## 03 Run a function
 
 **tanofile.ts:**
 
@@ -31,7 +41,7 @@ const myTask = task('default', () => {
 // Hello world
 ```
 
-## 03 Run a function with promise
+## 04 Run a function with promise
 
 **tanofile.ts:**
 
@@ -47,7 +57,7 @@ task('default', (): Promise<void> => {
 // Hello world
 ```
 
-## 04 Run a function async
+## 05 Run a function async
 
 **tanofile.ts:**
 
@@ -63,7 +73,25 @@ task('default', async (): Promise<void> => {
 // Hello world
 ```
 
-## 05 Run a pre-task
+## 06 Run a function with callback function
+
+**tanofile.ts:**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('default', (done): void => {
+  setTimeout(() => {
+    console.log('Hello world');
+    done();
+  }, 250);
+});
+
+// Output:
+// Hello world
+```
+
+## 07 Run a pre-task
 
 **tanofile.ts:**
 
@@ -78,7 +106,7 @@ task('default', needs('my-pre-task'), () => console.log('Runs as second task'));
 // Runs as second task
 ```
 
-## 06 Run many tasks
+## 08 Run many tasks
 
 **tanofile.ts:**
 
@@ -96,7 +124,7 @@ task('default', needs('task01', 'task02', 'task03'));
 // 3
 ```
 
-## 07 Run many tasks with final task
+## 09 Run many tasks with final task
 
 **tanofile.ts:**
 
@@ -115,7 +143,7 @@ task('default', needs('task01', 'task02', 'task03'), `echo '4'`);
 // 4
 ```
 
-## 08 Or in another way
+## 10 Or in another way
 
 **tanofile.ts:**
 
@@ -137,4 +165,55 @@ task(
 // 2
 // 3
 // 4
+```
+
+## 11 Run a function with deno repl (--eval)
+
+**tanofile.ts:**
+
+```TypeScript
+import { needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('default', () => console.log('Hello world'), { eval: true });
+
+// Output:
+// Hello world
+```
+
+## 12 Run from a TypeScript file
+
+**func.ts:**
+
+```TypeScript
+console.log('Hello world');
+```
+
+**tanofile.ts:**
+
+```TypeScript
+import { needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('default', { file: 'func.ts' });
+
+// Output:
+// Hello world
+```
+
+## 13 Run from a TypeScript file from another working directory
+
+**func.ts:**
+
+```TypeScript
+console.log('Hello world');
+```
+
+**tanofile.ts:**
+
+```TypeScript
+import { needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('default', { file: 'func.ts' }, { cwd: '/usr/bin' });
+
+// Output:
+// Hello world
 ```

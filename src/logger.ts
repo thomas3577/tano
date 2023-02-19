@@ -1,36 +1,47 @@
 import { format } from 'std/datetime/format.ts';
-import { handlers, LogRecord, setup } from 'std/log/mod.ts';
+import { getLogger, handlers, Logger, LogRecord, setup } from 'std/log/mod.ts';
+import { ConsoleHandler } from 'std/log/handlers.ts';
 import { gray } from 'std/fmt/colors.ts';
-import * as logger from 'std/log/mod.ts';
 
-setup({
-  handlers: {
-    console: new handlers.ConsoleHandler('DEBUG', {
-      formatter: (logRecord: LogRecord) => {
-        const datetime: string = format(logRecord.datetime, 'HH:mm:ss');
-        let msg = !logRecord.msg ? '' : `[${datetime}] ${logRecord.msg}`;
+type LogLevel = 'INFO' | 'NOTSET' | 'DEBUG' | 'WARNING' | 'ERROR' | 'CRITICAL' | undefined;
 
-        const params = logRecord.args?.at(0);
-        if (params && typeof params === 'object') {
-          for (const [key, value] of Object.entries(params)) {
-            msg = msg.replace(`{${key}}`, `${value}`);
-          }
-        }
+const consoleHandler: ConsoleHandler = new handlers.ConsoleHandler('DEBUG', {
+  formatter: (logRecord: LogRecord) => {
+    const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
+    let msg: string = !logRecord.msg ? '' : `[${timestamp}] ${logRecord.msg}`;
 
-        if (logRecord.levelName === 'DEBUG') {
-          msg = gray(msg);
-        }
+    const params = logRecord.args?.at(0);
+    if (params && typeof params === 'object') {
+      for (const [key, value] of Object.entries(params)) {
+        msg = msg.replace(`{${key}}`, `${value}`);
+      }
+    }
 
-        return msg;
-      },
-    }),
-  },
-  loggers: {
-    default: {
-      level: 'INFO',
-      handlers: ['console'],
-    },
+    if (logRecord.levelName === 'DEBUG') {
+      msg = gray(msg);
+    }
+
+    return msg;
   },
 });
 
-export const log = logger;
+export { Logger };
+
+export const logger = (): Logger => {
+  const silent = Deno.env.get('SILENT') === 'true';
+  const logLevel: LogLevel = Deno.env.get('LOG_LEVEL') as LogLevel || 'INFO';
+
+  setup({
+    handlers: silent ? undefined : {
+      console: consoleHandler,
+    },
+    loggers: {
+      default: {
+        level: logLevel,
+        handlers: ['console'],
+      },
+    },
+  });
+
+  return getLogger();
+};

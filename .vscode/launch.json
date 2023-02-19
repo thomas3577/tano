@@ -10,6 +10,7 @@
         "run",
         "--allow-read",
         "--allow-run",
+        "--allow-env",
         "--inspect-brk",
         "./tano.ts",
         "--file",
@@ -26,6 +27,7 @@
         "test",
         "--allow-read",
         "--allow-run",
+        "--allow-env",
         "--inspect-brk"
       ],
       "attachSimplePort": 9229

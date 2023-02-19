@@ -1,17 +1,17 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
-import { log } from './logger.ts';
+import { Logger, logger } from './logger.ts';
 
 import type { IHandler, ITask } from './definitions.ts';
 
 export class Handler implements IHandler {
+  private readonly _log: Logger = logger();
   private readonly _created: Date = new Date();
   private readonly _cache: Map<string, ITask> = new Map();
   private _starting: null | PerformanceMark = null;
   private _finished: null | PerformanceMark = null;
   private _measure: null | PerformanceMeasure = null;
-  private _executed: number = 0;
 
   /**
    * Timestamp when the handler was created.
@@ -67,7 +67,7 @@ export class Handler implements IHandler {
 
     this._cache.set(task.name, task);
 
-    log.debug(`Added task ${task.name}`);
+    this._log.debug(`Added task ${task.name}`);
   }
 
   /**
@@ -76,7 +76,7 @@ export class Handler implements IHandler {
    * @param taskName - Name of the task.
    */
   public async run(taskName: string = 'default'): Promise<void> {
-    log.info(bold(green(`Starting...`)));
+    this._log.info(bold(green(`Starting...`)));
 
     this._finished = null;
     this._starting = performance.mark('starting_run', {
@@ -87,7 +87,6 @@ export class Handler implements IHandler {
 
     for (const tn of taskNames) {
       await this._cache.get(tn)?.runThis();
-      this._executed++;
     }
 
     this._finished = performance.mark('finished_run', {
@@ -96,7 +95,7 @@ export class Handler implements IHandler {
 
     this._measure = performance.measure('run', 'starting_run', 'finished_run');
 
-    log.info(bold(green(`Finished after {duration}`)), {
+    this._log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this._measure.duration, { ignoreZero: true })}`,
     });
   }

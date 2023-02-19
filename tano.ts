@@ -1,26 +1,20 @@
-import { parse } from 'std/flags/mod.ts';
-
-import { log } from './src/logger.ts';
+import { Logger, logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';
+import { setup } from './src/tano.config.ts';
+import { ITanoConfig } from './src/definitions.ts';
 import { getImportUrl } from './src/tano.factory.ts';
 
 const cli = async () => {
-  try {
-    const flags = parse(Deno.args, {
-      string: ['file', 'task'],
-      default: {
-        file: 'tanofile.ts',
-      },
-    });
+  const config: ITanoConfig = setup();
+  const log: Logger = logger();
 
-    const importUrl: null | string = await getImportUrl(flags.file);
+  try {
+    const importUrl: string = await getImportUrl(config.file);
 
     log.info(`Using tanofile ${importUrl}`);
 
-    const taskName: string = flags.task || flags._[0] as string;
-
     await import(importUrl);
-    await handler.run(taskName);
+    await handler.run(config.task);
   } catch (err: unknown) {
     log.error(`${err}`);
   }

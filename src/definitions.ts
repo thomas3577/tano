@@ -1,3 +1,8 @@
+export interface ITanoConfig {
+  file: string;
+  task: string;
+}
+
 export interface IHandler {
   created: Date;
   starting: null | PerformanceMark;

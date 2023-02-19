@@ -5,7 +5,7 @@ Just another task runner.
 ## Install
 
 ```bash
-deno install --allow-read --allow-run https://deno.land/x/install@v0.0.1/tano.ts
+deno install --allow-read --allow-run --allow-env https://deno.land/x/install@v0.0.1/tano.ts
 ```
 
 ## Preparation

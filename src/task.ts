@@ -1,12 +1,13 @@
 import { bold, gray } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
-import { log } from './logger.ts';
+import { Logger, logger } from './logger.ts';
 import { handler } from './handler.ts';
 
 import type { Code, CodeFunction, Command, Condition, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
 
 export class Task implements ITask, ITaskParams {
+  private readonly _log: Logger = logger();
   private readonly _created: Date = new Date();
   private readonly _handler: IHandler = handler;
   private readonly _name: string;
@@ -109,8 +110,8 @@ export class Task implements ITask, ITaskParams {
 
     const result: boolean = await this._executeCondition(this._options?.condition || ((): boolean => true));
     if (!result) {
-      log.warning('');
-      log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
+      this._log.warning('');
+      this._log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
         name: `'${gray(this._name)}'`,
       });
 
@@ -121,8 +122,8 @@ export class Task implements ITask, ITaskParams {
       return;
     }
 
-    log.info('');
-    log.info(`Starting {name}...`, {
+    this._log.info('');
+    this._log.info(`Starting {name}...`, {
       name: `'${gray(this._name)}'`,
     });
 
@@ -145,7 +146,7 @@ export class Task implements ITask, ITaskParams {
 
     this._measure = performance.measure(this._name, `starting_${this._name}`, `finished_${this._name}`);
 
-    log.info(`Finished {name} after {duration}`, {
+    this._log.info(`Finished {name} after {duration}`, {
       name: `'${gray(this._name)}'`,
       duration: `${bold(format(this._measure.duration, { ignoreZero: true }))}`,
     });
@@ -177,7 +178,7 @@ export class Task implements ITask, ITaskParams {
       this._process.close();
       this._status = 'success';
     } else {
-      log.error(`[${this._name}] ${rawError}`);
+      this._log.error(`[${this._name}] ${rawError}`);
       await Promise.reject(new TextDecoder().decode(rawError));
       this._process.kill();
       this._status = 'failed';

@@ -29,7 +29,7 @@ export { Logger };
 
 export const logger = (): Logger => {
   const silent = Deno.env.get('SILENT') === 'true';
-  const logLevel: LogLevel = Deno.env.get('LOG_LEVEL') as LogLevel || 'INFO';
+  const logLevel: LogLevel = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LogLevel || 'INFO';
 
   setup({
     handlers: silent ? undefined : {

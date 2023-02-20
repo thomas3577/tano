@@ -127,6 +127,10 @@ export class Task implements ITask, ITaskParams {
       name: `'${gray(this._name)}'`,
     });
 
+    if (this._options?.description) {
+      this._log.info(`Description: ${gray(this._options.description)}`);
+    }
+
     this._finished = null;
     this._starting = performance.mark(`starting_${this._name}`, {
       startTime: Date.now(),

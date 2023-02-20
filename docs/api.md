@@ -94,3 +94,39 @@ import { needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
 task('My Task', needs('My Pre Task'));
 ```
+
+## Overload 4
+
+```TypeScript
+task(taskName: string, command?: Command, options?: ICommandOptions) => ITask;
+```
+
+**Parameters:**
+
+- `taskName` (string): Sets the name of the task.
+- `command` (string | string[]): A Command to run in the shell.
+- _(optional)_ `options` (ICommandOptions): The following properties are included:
+
+  - _(optional)_ `cwd` (string): The current working directory that should be used.
+  - _(optional)_ `cwd` (Record<string, string>): Any environment variables to be set when running.
+  - _(optional)_ `description` (string): Additional description of this task.
+  - _(optional)_ `condition` (Condition): A function to define a condition. The return value should always be a `boolean`.
+
+**Return Value:**
+
+- (ITask): An instance of an Task.
+
+**Example:**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+// Var 1
+task('My Task 1', 'ls -la', { cwd: 'C:\\temp' });
+
+// Var 2
+task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
+
+// Var 3
+task('My Task 3', ['bash', '-c', 'ls -la'], { cwd: 'C:\\temp' });
+```

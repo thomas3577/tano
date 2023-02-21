@@ -113,6 +113,10 @@ export class Task implements ITask, ITaskParams {
   }
 
   public async runThis(): Promise<void> {
+    if (this._type === undefined) {
+      return;
+    }
+
     if (this._status !== 'ready') {
       throw new Error(`The task '${this._name}' has already been run.`);
     }
@@ -127,10 +131,30 @@ export class Task implements ITask, ITaskParams {
       return;
     }
 
-    if (this._command === undefined && this._code === undefined) {
-      return;
-    }
+    this._preRun();
 
+    await this._run(this._type, this._command, this._code, this._options)
+      .catch((err) => {
+        this._status = 'failed';
+
+        this._log.error(`${bold(red('Error'))} {name}: ${err}`, {
+          name: `'${gray(this._name)}'`,
+        });
+
+        throw err;
+      });
+
+    this._postRun();
+  }
+
+  public reset(): void {
+    this._starting = null;
+    this._finished = null;
+    this._process = null;
+    this._status = 'ready';
+  }
+
+  private _preRun(): void {
     this._log.info('');
     this._log.info(`Starting {name}...`, {
       name: `'${gray(this._name)}'`,
@@ -146,18 +170,9 @@ export class Task implements ITask, ITaskParams {
     });
 
     this._status = 'running';
+  }
 
-    await this._run(this._type, this._command, this._code, this._options)
-      .catch((err) => {
-        this._status = 'failed';
-
-        this._log.error(`${bold(red('Error'))} {name}: ${err}`, {
-          name: `'${gray(this._name)}'`,
-        });
-
-        throw err;
-      });
-
+  private _postRun(): void {
     this._status = 'success';
 
     this._finished = performance.mark(`finished_${this._name}`, {
@@ -170,13 +185,6 @@ export class Task implements ITask, ITaskParams {
       name: `'${gray(this._name)}'`,
       duration: `${bold(format(this._measure.duration, { ignoreZero: true }))}`,
     });
-  }
-
-  public reset(): void {
-    this._starting = null;
-    this._finished = null;
-    this._process = null;
-    this._status = 'ready';
   }
 
   private async _run(type: TaskType, command: Command, code: Code, options: Options): Promise<void> {

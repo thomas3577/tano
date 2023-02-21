@@ -1,9 +1,8 @@
 {
   "tasks": {
+    "install": "deno install -A -f -n  tano --config ./deno.json  ./tano.ts",
     "run": "deno run --allow-read --allow-run --allow-env ./tano.ts --file ./examples/tanofile.ts",
-    "cmd": "tano.cmd --allow-write --file ./examples/tanofile.ts",
     "check": "deno fmt --check && deno lint",
-    "lock": "deno cache --lock-write ./example/tanofile.ts",
     "test": "deno test --allow-read --allow-run --allow-env"
   },
   "compilerOptions": {

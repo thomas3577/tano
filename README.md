@@ -1,6 +1,6 @@
 # tano
 
-Just another task runner.
+Just another task runner cli with no dependencies and inspired by Gulp.
 
 ## Install
 
@@ -48,5 +48,6 @@ tano my-task
 
 ## Documentation
 
+- [api](./docs/api.md)
 - [cli](./docs/cli.md)
 - [examples](./docs/examples.md)

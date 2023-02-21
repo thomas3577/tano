@@ -76,6 +76,11 @@ export class Handler implements IHandler {
    * @param taskName - Name of the task.
    */
   public async run(taskName: string = 'default'): Promise<void> {
+    this._log.info(`Deno       v${Deno.version.deno}`);
+    this._log.info(`TypeScript v${Deno.version.typescript}`);
+    this._log.info(`V8         v${Deno.version.v8}`);
+    this._log.info(`CWD: ${Deno.cwd()}`);
+    this._log.info('');
     this._log.info(bold(green(`Starting...`)));
 
     this._finished = null;

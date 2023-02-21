@@ -5,7 +5,7 @@ Just another task runner cli with no dependencies and inspired by Gulp.
 ## Install
 
 ```bash
-deno install --allow-read --allow-run --allow-env https://deno.land/x/install@v0.0.1/tano.ts
+deno install -A -f -n  tano --config ./deno.json  https://deno.land/x/install@v0.0.1/tano.ts
 ```
 
 ## Preparation

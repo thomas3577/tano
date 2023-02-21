@@ -6,7 +6,7 @@ task(
   needs(
     task('01', `echo 'Hello World from cmd.'`, { repl: true }),
     task('02', () => console.log('Hello World from code at repl.'), { repl: true }),
-    task('03', { file: 'tanofile.code.ts' }, { cwd: './examples' }),
+    task('03', { file: 'tanofile.code.ts' }, { cwd: './' }),
     task('04', async (): Promise<void> => {
       return await new Promise((r) => {
         setTimeout(() => {
@@ -23,7 +23,7 @@ task(
     }),
     task07,
     task('08', async () => {
-      const deno = await Deno.readTextFile('./deno.json');
+      const deno = await Deno.readTextFile('../deno.json');
 
       console.dir(deno);
     }, {

@@ -1,4 +1,4 @@
-import { bold, gray } from 'std/fmt/colors.ts';
+import { bold, gray, red } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
@@ -182,7 +182,10 @@ export class Task implements ITask, ITaskParams {
       this._process.close();
       this._status = 'success';
     } else {
-      this._log.error(`[${this._name}] ${rawError}`);
+      this._log.error(`${bold(red('Error'))} {name}: ${rawError}`, {
+        name: `'${gray(this._name)}'`,
+      });
+
       await Promise.reject(new TextDecoder().decode(rawError));
       this._process.kill();
       this._status = 'failed';

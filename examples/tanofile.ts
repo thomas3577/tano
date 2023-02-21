@@ -32,3 +32,17 @@ task(
   ),
   `echo 'The END!'`,
 );
+
+task(
+  'few',
+  needs(
+    ...Array.from(Array(100).keys()).map((key) =>
+      task(`${key}`, (done) => {
+        setTimeout(() => {
+          console.log(`Task ${key}`);
+          done();
+        }, 5);
+      }, { repl: true })
+    ),
+  ),
+);

@@ -78,7 +78,7 @@ export type TaskDefinition = {
   (task: ITaskParams): ITask;
   (name: string, needs?: INeeds): ITask;
   (name: string, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, code?: Code, options?: ICodeOptions): ITask;
   (name: string, needs?: INeeds, command?: Command, options?: ICommandOptions): ITask;
+  (name: string, code?: Code, options?: ICodeOptions): ITask;
   (name: string, needs?: INeeds, code?: Code, options?: ICodeOptions): ITask;
 };

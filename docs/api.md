@@ -179,7 +179,7 @@ task('My Task 4', async (): Promise<void> => {
 
 **Note!**
 
-Functions like in the examples above are executed in the main process. If you want to run JavaScript/TypeScript in a separate process you can either do this with the `eval` option or outsource the code to a separate file.
+Functions like in the examples above are executed in the main process. If you want to run JavaScript/TypeScript in a separate process you can either do this with the `repl` option or outsource the code to a separate file.
 
 **Example:**
 
@@ -189,7 +189,7 @@ import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 // Var 5
 task('My Task 5', () => {
   // Do something.
-}, { eval: true });
+}, { repl: true });
 
 // Var 6
 task('My Task 6', 'my-task-6.ts');

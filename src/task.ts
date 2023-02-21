@@ -6,6 +6,8 @@ import { handler } from './handler.ts';
 
 import type { Code, CodeFunction, Command, Condition, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
 
+type TaskType = 'command' | 'code' | undefined;
+
 export class Task implements ITask, ITaskParams {
   private readonly _log: Logger = logger();
   private readonly _created: Date = new Date();
@@ -15,6 +17,7 @@ export class Task implements ITask, ITaskParams {
   private readonly _command: Command;
   private readonly _code: Code;
   private readonly _options: Options;
+  private _type: TaskType = undefined;
   private _status: TaskStatus = 'ready';
   private _starting: null | PerformanceMark = null;
   private _finished: null | PerformanceMark = null;
@@ -36,6 +39,12 @@ export class Task implements ITask, ITaskParams {
     this._code = task.code as Code;
     this._options = task.options as Options;
     this._handler.add(this);
+
+    if (this._command !== undefined) {
+      this._type = 'command';
+    } else if (this._code !== undefined) {
+      this._type = 'code';
+    }
   }
 
   /**
@@ -138,11 +147,18 @@ export class Task implements ITask, ITaskParams {
 
     this._status = 'running';
 
-    if (this._command !== undefined) {
-      await this._runCommand(this._command, this._options);
-    } else if (this._code !== undefined) {
-      await this._runCode(this._code, this._options);
-    }
+    await this._run(this._type, this._command, this._code, this._options)
+      .catch((err) => {
+        this._status = 'failed';
+
+        this._log.error(`${bold(red('Error'))} {name}: ${err}`, {
+          name: `'${gray(this._name)}'`,
+        });
+
+        throw err;
+      });
+
+    this._status = 'success';
 
     this._finished = performance.mark(`finished_${this._name}`, {
       startTime: Date.now(),
@@ -163,6 +179,14 @@ export class Task implements ITask, ITaskParams {
     this._status = 'ready';
   }
 
+  private async _run(type: TaskType, command: Command, code: Code, options: Options): Promise<void> {
+    if (type === 'command') {
+      await this._runCommand(command, options);
+    } else if (this._type === 'code') {
+      await this._runCode(code, options);
+    }
+  }
+
   private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
     this._process = Deno.run({
       cmd: Array.isArray(command) ? command : command.split(' '),
@@ -179,16 +203,12 @@ export class Task implements ITask, ITaskParams {
 
     if (status.code === 0) {
       await Deno.stdout.write(rawOutput);
-      this._process.close();
-      this._status = 'success';
-    } else {
-      this._log.error(`${bold(red('Error'))} {name}: ${rawError}`, {
-        name: `'${gray(this._name)}'`,
-      });
 
+      this._process.close();
+    } else {
       await Promise.reject(new TextDecoder().decode(rawError));
+
       this._process.kill();
-      this._status = 'failed';
     }
   }
 
@@ -198,55 +218,23 @@ export class Task implements ITask, ITaskParams {
         const funcAsString = code.toString();
         const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
-        return await this._runCommand(command, options)
-          .then(() => {
-            this._status = 'success';
-          })
-          .catch((err) => {
-            this._status = 'failed';
-
-            throw err;
-          });
+        return await this._runCommand(command, options);
       }
 
-      return await this._executeCodeFunction(code)
-        .then(() => {
-          this._status = 'success';
-        })
-        .catch((err) => {
-          this._status = 'failed';
-
-          throw err;
-        });
+      return await this._executeCodeFunction(code);
     }
 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
-    return await this._runCommand(command, options)
-      .then(() => {
-        this._status = 'success';
-      })
-      .catch((err) => {
-        this._status = 'failed';
-
-        throw err;
-      });
+    return await this._runCommand(command, options);
   }
 
   private async _executeCodeFunction(code: CodeFunction): Promise<void> {
-    if (code.length > 0) {
-      return await new Promise((resolve) => code(() => resolve()));
-    } else {
-      return await Promise.resolve(code(() => {}));
-    }
+    return code.length > 0 ? await new Promise((resolve) => code(() => resolve())) : await Promise.resolve(code(() => {}));
   }
 
   private async _executeCondition(condition: Condition): Promise<boolean> {
-    if (condition.length > 0) {
-      return await new Promise((resolve) => condition((result: boolean) => resolve(result)));
-    } else {
-      return await Promise.resolve(condition(() => true));
-    }
+    return condition.length > 0 ? await new Promise((resolve) => condition((result: boolean) => resolve(result))) : await Promise.resolve(condition(() => true));
   }
 }

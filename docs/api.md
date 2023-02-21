@@ -1,6 +1,6 @@
 # Task API
 
-There are some overloads.
+There are some overloads. The return value is in any case `ITask`.
 
 ## Overload 1
 
@@ -11,10 +11,6 @@ task(task: ITask) => ITask;
 **Parameters:**
 
 - `task` (ITask): An instance of an exist Task.
-
-**Return Value:**
-
-- (ITask): An instance of an Task.
 
 **Example:**
 
@@ -35,14 +31,6 @@ task(taskParams: ITaskParams) => ITask;
 **Parameters:**
 
 - `taskParams` (ITaskParams): Is an object that can contain all necessary parameters for a task. The following properties are included:
-
-  - `name` (string): The name of the Task. The name of a task must always be unique.
-  - _(optional)_ `needs`: (string[]): Names of tasks to be executed before this task.
-  - _(optional)_ `options` (ITaskOptions): Options for this task.
-
-**Return Value:**
-
-- (ITask): An instance of an Task.
 
 **Example:**
 
@@ -66,12 +54,7 @@ task(taskName: string, needs: INeeds) => ITask;
 
 - `taskName` (string): Sets the name of the task.
 - `needs` (INeeds): Names of tasks to be executed before this task. The following properties are included:
-
-  - `values` ((string | ITaskParams)[]): List of task names or task params. You can mix them.
-
-**Return Value:**
-
-- (ITask): An instance of an Task.
+- `values` ((string | ITaskParams)[]): List of task names or task params. You can mix them.
 
 **Example:**
 
@@ -79,7 +62,7 @@ task(taskName: string, needs: INeeds) => ITask;
 import { INeeds, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
 const needs: INeeds = {
-  values: 'My Pre Task',
+  values: ['My Pre Task'],
 };
 
 task('My Task', needs);
@@ -107,15 +90,6 @@ task(taskName: string, command?: Command, options?: ICommandOptions) => ITask;
 - `command` (string | string[]): A Command to run in the shell.
 - _(optional)_ `options` (ICommandOptions): The following properties are included:
 
-  - _(optional)_ `cwd` (string): The current working directory that should be used.
-  - _(optional)_ `cwd` (Record<string, string>): Any environment variables to be set when running.
-  - _(optional)_ `description` (string): Additional description of this task.
-  - _(optional)_ `condition` (Condition): A function to define a condition. The return value should always be a `boolean`.
-
-**Return Value:**
-
-- (ITask): An instance of an Task.
-
 **Example:**
 
 ```TypeScript
@@ -129,4 +103,94 @@ task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
 
 // Var 3
 task('My Task 3', ['bash', '-c', 'ls -la'], { cwd: 'C:\\temp' });
+```
+
+## Overload 5
+
+```TypeScript
+task(taskName: string, needs?: INeeds, command?: Command, options?: ICommandOptions) => ITask;
+```
+
+**Parameters:**
+
+- `taskName` (string): Sets the name of the task.
+- `needs` (INeeds): Names of tasks to be executed before this task. The following properties are included:
+- `command` (string | string[]): A Command to run in the shell.
+- _(optional)_ `options` (ICommandOptions): The following properties are included:
+
+**Example:**
+
+```TypeScript
+import { INeeds, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+const needs: INeeds = {
+  values: ['My Task 2', 'My Task 3'],
+};
+
+task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
+task('My Task 3', ['bash', '-c', 'ls -la'], { cwd: 'C:\\temp' });
+task('default', needs 'ls -la', { cwd: 'C:\\temp' });
+```
+
+## Overload 6
+
+```TypeScript
+task(taskName: string, code?: Code, options?: ICommandOptions) => ITask;
+```
+
+**Parameters:**
+
+- `taskName` (string): Sets the name of the task.
+- `code` (Code]): A JavaScript/TypeScript Function or File.
+- _(optional)_ `options` (ICodeOptions): The following properties are included:
+
+**Example:**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+// Var 1
+task('default', () => {
+  // Do something.
+});
+
+// Var 2
+task('My Task 2', (done) => {
+  setTimeout(() => {
+    // Do something.
+    done();
+  }, 10000);
+});
+
+// Var 3
+task('My Task 3', (): Promise<void> => {
+  // Do something.
+
+  Promise.resolve();
+});
+
+// Var 4
+task('My Task 4', async (): Promise<void> => {
+  // Do something.
+
+  await Promise.resolve();
+});
+```
+
+**Note!**
+
+Functions like in the examples above are executed in the main process. If you want to run JavaScript/TypeScript in a separate process you can either do this with the `eval` option or outsource the code to a separate file.
+
+**Example:**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+// Var 5
+task('My Task 5', () => {
+  // Do something.
+}, { eval: true });
+
+// Var 6
+task('My Task 6', 'my-task-6.ts');
 ```

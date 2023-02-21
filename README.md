@@ -42,8 +42,6 @@ tano my-task
 ## Todo
 
 - Documentation & Examples
-- Conditions
-- Modify Log output.
 - More tests
 
 ## Documentation

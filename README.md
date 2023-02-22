@@ -41,9 +41,10 @@ tano my-task
 
 ## Todo
 
-- Documentation & Examples
-- More tests
+- Documentation & Examples.
+- More tests.
 - Non-volatile cache to remember last run.
+- Output-Callback-Function.
 
 ## Documentation
 

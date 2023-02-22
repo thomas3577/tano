@@ -43,6 +43,7 @@ tano my-task
 
 - Documentation & Examples
 - More tests
+- Non-volatile cache to remember last run.
 
 ## Documentation
 

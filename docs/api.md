@@ -30,7 +30,7 @@ task(taskParams: ITaskParams) => ITask;
 
 **Parameters:**
 
-- `taskParams` (ITaskParams): Is an object that can contain all necessary parameters for a task. The following properties are included:
+- `taskParams` (ITaskParams): Is an object that can contain all necessary parameters for a task.
 
 **Example:**
 
@@ -53,7 +53,7 @@ task(taskName: string, needs: INeeds) => ITask;
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
-- `needs` (INeeds): Names of tasks to be executed before this task. The following properties are included:
+- `needs` (INeeds): Names of tasks to be executed before this task.
 - `values` ((string | ITaskParams)[]): List of task names or task params. You can mix them.
 
 **Example:**
@@ -65,6 +65,7 @@ const needs: INeeds = {
   values: ['My Pre Task'],
 };
 
+task('My Pre Task');
 task('My Task', needs);
 ```
 
@@ -78,6 +79,26 @@ import { needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 task('My Task', needs('My Pre Task'));
 ```
 
+**Example with embedded, needed tasks (Var 1):**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('My Task', {
+  values: [
+    task('My Pre Task'),
+  ],
+});
+```
+
+**Example with embedded, needed tasks (Var 2):**
+
+```TypeScript
+import { , task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('My Task', needs(task('My Pre Task')));
+```
+
 ## Overload 4
 
 ```TypeScript
@@ -88,7 +109,7 @@ task(taskName: string, command?: Command, options?: ICommandOptions) => ITask;
 
 - `taskName` (string): Sets the name of the task.
 - `command` (string | string[]): A Command to run in the shell.
-- _(optional)_ `options` (ICommandOptions): The following properties are included:
+- _(optional)_ `options` (ICommandOptions): Options for command executor.
 
 **Example:**
 
@@ -114,9 +135,9 @@ task(taskName: string, needs?: INeeds, command?: Command, options?: ICommandOpti
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
-- `needs` (INeeds): Names of tasks to be executed before this task. The following properties are included:
+- `needs` (INeeds): Names of tasks to be executed before this task.
 - `command` (string | string[]): A Command to run in the shell.
-- _(optional)_ `options` (ICommandOptions): The following properties are included:
+- _(optional)_ `options` (ICommandOptions): Options for command executor.
 
 **Example:**
 
@@ -142,7 +163,7 @@ task(taskName: string, code?: Code, options?: ICommandOptions) => ITask;
 
 - `taskName` (string): Sets the name of the task.
 - `code` (Code]): A JavaScript/TypeScript Function or File.
-- _(optional)_ `options` (ICodeOptions): The following properties are included:
+- _(optional)_ `options` (ICodeOptions): Options for code executor.
 
 **Example:**
 
@@ -193,4 +214,28 @@ task('My Task 5', () => {
 
 // Var 6
 task('My Task 6', 'my-task-6.ts');
+```
+
+## Overload 7
+
+```TypeScript
+task(taskName: string, needs?: INeeds, code?: Code, options?: ICommandOptions) => ITask;
+```
+
+**Parameters:**
+
+- `taskName` (string): Sets the name of the task.
+- `needs` (INeeds): Names of tasks to be executed before this task.
+- `code` (Code]): A JavaScript/TypeScript Function or File.
+- _(optional)_ `options` (ICodeOptions): Options for code executor.
+
+**Example:**
+
+```TypeScript
+import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+
+task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
+task('default', needs(), ('My Task 2') => {
+  // Do something.
+});
 ```

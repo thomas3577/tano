@@ -1,14 +1,26 @@
 import { Task } from './task.ts';
 
-import type { Code, Command, CommandOrCodeOrOptions, ICodeFile, INeeds, ITask, ITaskParams, NeedsOrCommandOrCode, Options, TaskDefinition } from './definitions.ts';
+import type { Code, Command, CommandOrCodeOrOptions, Executor, ICodeFile, INeeds, ITask, ITaskParams, NeedsOrCommandOrCode, Options, TaskDefinition } from './definitions.ts';
 
+/**
+ * Creates a new task.
+ *
+ * @param param1 {string | ITask | ITaskParams}
+ * @param param2 {Command | Code | INeeds}
+ * @param param3 {Command | Code | Options}
+ * @param param4 {Options}
+ *
+ * @returns {ITask} The reference to the created task.
+ */
 export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param2?: NeedsOrCommandOrCode, param3?: CommandOrCodeOrOptions, param4?: Options): ITask => {
   if (param1 instanceof Task) {
     return param1;
   }
 
   if (typeof param1 === 'object') {
-    return new Task(param1.name, param1.needs, param1.command, param1.code, param1.options);
+    const executor: Executor = (!param1.command ? param1.code : param1.command) as Executor;
+
+    return new Task(param1.name, param1.needs, executor, param1.options);
   }
 
   let needs: Array<string> = [];
@@ -37,7 +49,8 @@ export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param
     options = param4;
   }
 
-  const instance: ITask = new Task(param1, needs, command, code, options);
+  const executor: Executor = !command ? code : command;
+  const instance: ITask = new Task(param1, needs, executor, options);
 
   return instance;
 };

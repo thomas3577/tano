@@ -14,28 +14,28 @@ export class Handler implements IHandler {
   private _measure: null | PerformanceMeasure = null;
 
   /**
-   * Timestamp when the handler was created.
+   * Gets the timestamp when the handler was created.
    */
   public get created(): Date {
     return this._created;
   }
 
   /**
-   * Performance mark when the last run starts.
+   * Gets the performance mark when the last run starts.
    */
   public get starting(): null | PerformanceMark {
     return this._starting;
   }
 
   /**
-   * Performance mark when the last run ends.
+   * Gets the performance mark when the last run ends.
    */
   public get finished(): null | PerformanceMark {
     return this._finished;
   }
 
   /**
-   * Performance measure of the last run.
+   * Gets the performance measure of the last run.
    */
   public get measure(): null | PerformanceMeasure {
     return this._measure;
@@ -72,8 +72,11 @@ export class Handler implements IHandler {
 
   /**
    * Runs the Task.
+   * In the process, all dependent tasks `needs` are executed beforehand.
    *
-   * @param taskName - Name of the task.
+   * @param taskName {string} [optionalParam='default'] Name of the task.
+   *
+   * @returns {Promise<void>} A promise that resolves to void.
    */
   public async run(taskName: string = 'default'): Promise<void> {
     this._log.info(`Deno       v${Deno.version.deno}`);
@@ -106,14 +109,14 @@ export class Handler implements IHandler {
   }
 
   /**
-   * Resets all tasks.
+   * Resets all tasks so that you can run them again.
    */
   public reset(): void {
     this._cache.forEach((task: ITask) => task.reset());
   }
 
   /**
-   * Clears the cache.
+   * Clears the cache. The handler will then have no more tasks to execute.
    */
   public clear(): void {
     this._cache.clear();

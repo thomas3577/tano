@@ -69,6 +69,7 @@ export type CodeFunction = <T>(done: () => void) => void | T | Promise<void | T>
 export type CodeFile = ICodeFile;
 export type Code = CodeFunction | CodeFile;
 export type Options = ICodeOptions | ICommandOptions;
+export type Executor = Command | Code;
 export type Needs = INeeds;
 export type CommandOrCodeOrOptions = Command | Code | Options;
 export type NeedsOrCommandOrCode = Needs | Command | Code;

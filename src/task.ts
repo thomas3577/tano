@@ -4,10 +4,29 @@ import { format } from 'std/fmt/duration.ts';
 import { Logger, logger } from './logger.ts';
 import { handler } from './handler.ts';
 
-import type { Code, CodeFunction, Command, Condition, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, Command, Condition, Executor, ICodeFile, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
 
 type TaskType = 'command' | 'code' | undefined;
 
+const toCommand = (commandOrCode?: Executor): Command => {
+  if (typeof commandOrCode === 'string' || (typeof commandOrCode === 'object' && Array.isArray(commandOrCode))) {
+    return commandOrCode as Command;
+  } else {
+    return undefined as unknown as Command;
+  }
+};
+
+const toCode = (commandOrCode?: Executor): Code => {
+  if ((typeof commandOrCode === 'object' && (commandOrCode as ICodeFile).file !== undefined) || typeof commandOrCode === 'function') {
+    return commandOrCode as Code;
+  } else {
+    return undefined as unknown as Code;
+  }
+};
+
+/**
+ * Creates a new Task.
+ */
 export class Task implements ITask, ITaskParams {
   private readonly _log: Logger = logger();
   private readonly _created: Date = new Date();
@@ -24,7 +43,17 @@ export class Task implements ITask, ITaskParams {
   private _measure: null | PerformanceMeasure = null;
   private _process: null | Deno.Process = null;
 
-  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], command?: Command, code?: Code, options?: Options) {
+  /**
+   * Creates a new instance ot Task.
+   *
+   * @param {string | ITaskParams} nameOrTask - The name or an object which provides all task parameters.
+   * @param {string[]=[]} needs - Defines the dependencies which should be executed before this task.
+   * @param {Command | Code} executor - A command, function or JS/TS-file to execute.
+   * @param {Options} options - Options, depending on whether the executor is of type Command or Code.
+   */
+  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], executor?: Executor, options?: Options) {
+    const code: Code = toCode(executor);
+    const command: Command = toCommand(executor);
     const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
       name: nameOrTask as string,
       needs,
@@ -96,22 +125,41 @@ export class Task implements ITask, ITaskParams {
     return this._needs;
   }
 
+  /**
+   * The command that will be executed by this task if it is set.
+   */
   public get command(): Command {
     return this._command;
   }
 
+  /**
+   * The code that will be executed by this task if it is set.
+   */
   public get code(): Code {
     return this._code;
   }
 
+  /**
+   * Options, depending on whether the executor is of type Command or Code.
+   */
   public get options(): Options {
     return this._options;
   }
 
+  /**
+   * Executes all dependent tasks and its own.
+   *
+   * @returns {Promise<void>} A promise that resolves to void.
+   */
   public async run(): Promise<void> {
     await this._handler.run(this._name);
   }
 
+  /**
+   * Executes only this task (without the dependencies).
+   *
+   * @returns {Promise<void>} A promise that resolves to void.
+   */
   public async runThis(): Promise<void> {
     if (this._type === undefined) {
       return;
@@ -147,6 +195,9 @@ export class Task implements ITask, ITaskParams {
     this._postRun();
   }
 
+  /**
+   * Resets the task so that it can be executed again.
+   */
   public reset(): void {
     this._starting = null;
     this._finished = null;

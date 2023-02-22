@@ -31,15 +31,11 @@ export interface ICommandOptions extends ITaskOptions {
   [key: string]: any;
 }
 
-export interface IExecutors {
-  command?: Command;
-  code?: Code;
-}
-
-export interface ITaskParams extends IExecutors {
+export interface ITaskParams {
   name: string;
   needs?: Array<string>;
   options?: ITaskOptions;
+  executor?: Executor;
 }
 
 export interface ITask extends ITaskParams {
@@ -71,8 +67,8 @@ export type Code = CodeFunction | CodeFile;
 export type Options = ICodeOptions | ICommandOptions;
 export type Executor = Command | Code;
 export type Needs = INeeds;
-export type CommandOrCodeOrOptions = Command | Code | Options;
-export type NeedsOrCommandOrCode = Needs | Command | Code;
+export type ExecutorOrOptions = Executor | Options;
+export type NeedsOrExecutor = Needs | Executor;
 
 export type TaskDefinition = {
   (task: ITask): ITask;

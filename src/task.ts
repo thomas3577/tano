@@ -3,25 +3,18 @@ import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
 import { handler } from './handler.ts';
+import { isCode, isCommand } from './helper.ts';
 
-import type { Code, CodeFunction, Command, Condition, Executor, ICodeFile, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, Command, Condition, Executor, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
 
 type TaskType = 'command' | 'code' | undefined;
 
 const toCommand = (commandOrCode?: Executor): Command => {
-  if (typeof commandOrCode === 'string' || (typeof commandOrCode === 'object' && Array.isArray(commandOrCode))) {
-    return commandOrCode as Command;
-  } else {
-    return undefined as unknown as Command;
-  }
+  return (isCommand(commandOrCode) ? commandOrCode : undefined as unknown) as Command;
 };
 
 const toCode = (commandOrCode?: Executor): Code => {
-  if ((typeof commandOrCode === 'object' && (commandOrCode as ICodeFile).file !== undefined) || typeof commandOrCode === 'function') {
-    return commandOrCode as Code;
-  } else {
-    return undefined as unknown as Code;
-  }
+  return (isCode(commandOrCode) ? commandOrCode : undefined as unknown) as Code;
 };
 
 /**
@@ -33,8 +26,7 @@ export class Task implements ITask, ITaskParams {
   private readonly _handler: IHandler = handler;
   private readonly _name: string;
   private readonly _needs: Array<string>;
-  private readonly _command: Command;
-  private readonly _code: Code;
+  private readonly _executor: Executor;
   private readonly _options: Options;
   private _type: TaskType = undefined;
   private _status: TaskStatus = 'ready';
@@ -52,26 +44,22 @@ export class Task implements ITask, ITaskParams {
    * @param {Options} options - Options, depending on whether the executor is of type Command or Code.
    */
   constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], executor?: Executor, options?: Options) {
-    const code: Code = toCode(executor);
-    const command: Command = toCommand(executor);
     const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
       name: nameOrTask as string,
       needs,
-      command,
-      code,
+      executor,
       options,
     };
 
     this._name = task.name;
     this._needs = task.needs as Array<string>;
-    this._command = task.command as Command;
-    this._code = task.code as Code;
+    this._executor = task.executor as Command;
     this._options = task.options as Options;
     this._handler.add(this);
 
-    if (this._command !== undefined) {
+    if (isCommand(executor)) {
       this._type = 'command';
-    } else if (this._code !== undefined) {
+    } else if (isCode(executor)) {
       this._type = 'code';
     }
   }
@@ -126,17 +114,10 @@ export class Task implements ITask, ITaskParams {
   }
 
   /**
-   * The command that will be executed by this task if it is set.
+   * The command or code that will be executed by this task if it is set.
    */
-  public get command(): Command {
-    return this._command;
-  }
-
-  /**
-   * The code that will be executed by this task if it is set.
-   */
-  public get code(): Code {
-    return this._code;
+  public get executor(): Executor {
+    return this._executor;
   }
 
   /**
@@ -181,7 +162,7 @@ export class Task implements ITask, ITaskParams {
 
     this._preRun();
 
-    await this._run(this._type, this._command, this._code, this._options)
+    await this._run(this._type, this._executor, this._options)
       .catch((err) => {
         this._status = 'failed';
 
@@ -238,11 +219,11 @@ export class Task implements ITask, ITaskParams {
     });
   }
 
-  private async _run(type: TaskType, command: Command, code: Code, options: Options): Promise<void> {
+  private async _run(type: TaskType, executor: Executor, options: Options): Promise<void> {
     if (type === 'command') {
-      await this._runCommand(command, options);
+      await this._runCommand(toCommand(executor), options);
     } else if (this._type === 'code') {
-      await this._runCode(code, options);
+      await this._runCode(toCode(executor), options);
     }
   }
 

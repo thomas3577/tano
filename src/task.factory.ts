@@ -1,6 +1,11 @@
 import { Task } from './task.ts';
+import { isExecutor, isNeeds } from './helper.ts';
 
-import type { Code, Command, CommandOrCodeOrOptions, Executor, ICodeFile, INeeds, ITask, ITaskParams, NeedsOrCommandOrCode, Options, TaskDefinition } from './definitions.ts';
+import type { Executor, ExecutorOrOptions, INeeds, ITask, ITaskParams, NeedsOrExecutor, Options, TaskDefinition } from './definitions.ts';
+
+const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
+  return (isExecutor(param) ? param : undefined as unknown) as Executor;
+};
 
 /**
  * Creates a new task.
@@ -12,34 +17,25 @@ import type { Code, Command, CommandOrCodeOrOptions, Executor, ICodeFile, INeeds
  *
  * @returns {ITask} The reference to the created task.
  */
-export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param2?: NeedsOrCommandOrCode, param3?: CommandOrCodeOrOptions, param4?: Options): ITask => {
+export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param2?: NeedsOrExecutor, param3?: ExecutorOrOptions, param4?: Options): ITask => {
   if (param1 instanceof Task) {
     return param1;
   }
 
   if (typeof param1 === 'object') {
-    const executor: Executor = (!param1.command ? param1.code : param1.command) as Executor;
-
-    return new Task(param1.name, param1.needs, executor, param1.options);
+    return new Task(param1.name, param1.needs, param1.executor, param1.options);
   }
 
   let needs: Array<string> = [];
-  if (typeof param2 === 'object' && !(param2 as ICodeFile)?.file && Array.isArray((param2 as INeeds)?.values)) {
+  if (isNeeds(param2)) {
     needs = (param2 as INeeds).values.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
   }
 
-  let command: Command = undefined as unknown as Command;
-  if (typeof param3 === 'string') {
-    command = param3;
-  } else if (typeof param2 === 'string') {
-    command = param2;
-  }
-
-  let code: Code = undefined as unknown as Code;
-  if (typeof param2 === 'function' || (param2 as unknown as ICodeFile)?.file) {
-    code = param2 as Code;
-  } else if (typeof param3 === 'function' || (param3 as unknown as ICodeFile)?.file) {
-    code = param3 as Code;
+  let executor: Executor = undefined as unknown as Executor;
+  if (isExecutor(param3)) {
+    executor = toExecutor(param3);
+  } else if (isExecutor(param2)) {
+    executor = toExecutor(param2);
   }
 
   let options: Options = undefined as unknown as Options;
@@ -49,7 +45,6 @@ export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param
     options = param4;
   }
 
-  const executor: Executor = !command ? code : command;
   const instance: ITask = new Task(param1, needs, executor, options);
 
   return instance;

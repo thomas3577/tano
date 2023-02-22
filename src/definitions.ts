@@ -43,6 +43,8 @@ export interface ITask extends ITaskParams {
   created: Date;
   starting: null | PerformanceMark;
   finished: null | PerformanceMark;
+  measure: null | PerformanceMeasure;
+  process: null | Deno.Process;
   run(): Promise<void>;
   runThis(): Promise<void>;
   reset(): void;
@@ -61,7 +63,7 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Condition = (done: (result: boolean) => void) => (boolean | Promise<boolean>) | boolean;
 export type Command = string | Array<string>;
-export type CodeFunction = <T>(done: () => void) => void | T | Promise<void | T>;
+export type CodeFunction = <T>(done?: (result: T) => T | void) => void | T | PromiseLike<T | void>;
 export type CodeFile = ICodeFile;
 export type Code = CodeFunction | CodeFile;
 export type Options = ICodeOptions | ICommandOptions;

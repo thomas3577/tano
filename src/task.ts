@@ -28,7 +28,7 @@ export class Task implements ITask, ITaskParams {
   private readonly _needs: Array<string>;
   private readonly _executor: Executor;
   private readonly _options: Options;
-  private _type: TaskType = undefined;
+  private readonly _type: TaskType = undefined;
   private _status: TaskStatus = 'ready';
   private _starting: null | PerformanceMark = null;
   private _finished: null | PerformanceMark = null;
@@ -125,6 +125,13 @@ export class Task implements ITask, ITaskParams {
    */
   public get options(): Options {
     return this._options;
+  }
+
+  /**
+   * Gets the current process.
+   */
+  public get process(): null | Deno.Process {
+    return this._process;
   }
 
   /**

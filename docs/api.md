@@ -1,23 +1,23 @@
 # Task API
 
-There are some overloads. The return value is in any case `ITask`.
+There are some overloads. The return value is in any case `Task`.
 
 ## Overload 1
 
 ```TypeScript
-task(task: ITask) => ITask;
+task(task: Task) => Task;
 ```
 
 **Parameters:**
 
-- `task` (ITask): An instance of an exist Task.
+- `task` (Task): An instance of an exist Task.
 
 **Example:**
 
 ```TypeScript
-import { ITask, Task, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { Task, Task, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
-const myTask: ITask = new Task('My Task');
+const myTask: Task = new Task('My Task');
 
 task(myTask);
 ```
@@ -25,19 +25,19 @@ task(myTask);
 ## Overload 2
 
 ```TypeScript
-task(taskParams: ITaskParams) => ITask;
+task(taskParams: TaskParams) => Task;
 ```
 
 **Parameters:**
 
-- `taskParams` (ITaskParams): Is an object that can contain all necessary parameters for a task.
+- `taskParams` (TaskParams): Is an object that can contain all necessary parameters for a task.
 
 **Example:**
 
 ```TypeScript
-import { ITaskParams, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task, TaskParams } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
-const taskParams: ITaskParams = {
+const taskParams: TaskParams = {
   name: 'My Task',
 };
 
@@ -47,21 +47,21 @@ task(taskParams);
 ## Overload 3
 
 ```TypeScript
-task(taskName: string, needs: INeeds) => ITask;
+task(taskName: string, needs: Needs) => Task;
 ```
 
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
-- `needs` (INeeds): Names of tasks to be executed before this task.
-- `values` ((string | ITaskParams)[]): List of task names or task params. You can mix them.
+- `needs` (Needs): Names of tasks to be executed before this task.
+- `values` ((string | TaskParams)[]): List of task names or task params. You can mix them.
 
 **Example:**
 
 ```TypeScript
-import { INeeds, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { Needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
-const needs: INeeds = {
+const needs: Needs = {
   values: ['My Pre Task'],
 };
 
@@ -102,14 +102,14 @@ task('My Task', needs(task('My Pre Task')));
 ## Overload 4
 
 ```TypeScript
-task(taskName: string, command?: Command, options?: ICommandOptions) => ITask;
+task(taskName: string, command?: Command, options?: CommandOptions) => Task;
 ```
 
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
 - `command` (string | string[]): A Command to run in the shell.
-- _(optional)_ `options` (ICommandOptions): Options for command executor.
+- _(optional)_ `options` (CommandOptions): Options for command executor.
 
 **Example:**
 
@@ -129,22 +129,22 @@ task('My Task 3', ['bash', '-c', 'ls -la'], { cwd: 'C:\\temp' });
 ## Overload 5
 
 ```TypeScript
-task(taskName: string, needs?: INeeds, command?: Command, options?: ICommandOptions) => ITask;
+task(taskName: string, needs?: Needs, command?: Command, options?: CommandOptions) => Task;
 ```
 
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
-- `needs` (INeeds): Names of tasks to be executed before this task.
+- `needs` (Needs): Names of tasks to be executed before this task.
 - `command` (string | string[]): A Command to run in the shell.
-- _(optional)_ `options` (ICommandOptions): Options for command executor.
+- _(optional)_ `options` (CommandOptions): Options for command executor.
 
 **Example:**
 
 ```TypeScript
-import { INeeds, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { Needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 
-const needs: INeeds = {
+const needs: Needs = {
   values: ['My Task 2', 'My Task 3'],
 };
 
@@ -156,14 +156,14 @@ task('default', needs 'ls -la', { cwd: 'C:\\temp' });
 ## Overload 6
 
 ```TypeScript
-task(taskName: string, code?: Code, options?: ICommandOptions) => ITask;
+task(taskName: string, code?: Code, options?: CommandOptions) => Task;
 ```
 
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
 - `code` (Code]): A JavaScript/TypeScript Function or File.
-- _(optional)_ `options` (ICodeOptions): Options for code executor.
+- _(optional)_ `options` (CodeOptions): Options for code executor.
 
 **Example:**
 
@@ -219,15 +219,15 @@ task('My Task 6', 'my-task-6.ts');
 ## Overload 7
 
 ```TypeScript
-task(taskName: string, needs?: INeeds, code?: Code, options?: ICommandOptions) => ITask;
+task(taskName: string, needs?: Needs, code?: Code, options?: CommandOptions) => Task;
 ```
 
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
-- `needs` (INeeds): Names of tasks to be executed before this task.
+- `needs` (Needs): Names of tasks to be executed before this task.
 - `code` (Code]): A JavaScript/TypeScript Function or File.
-- _(optional)_ `options` (ICodeOptions): Options for code executor.
+- _(optional)_ `options` (CodeOptions): Options for code executor.
 
 **Example:**
 

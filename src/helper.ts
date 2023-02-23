@@ -1,7 +1,7 @@
-import { Executor, ExecutorOrOptions, ICodeFile, INeeds, NeedsOrExecutor } from './definitions.ts';
+import { CodeFile, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './definitions.ts';
 
 export const isNeeds = (param?: NeedsOrExecutor): boolean => {
-  return typeof param === 'object' && !(param as ICodeFile)?.file && Array.isArray((param as INeeds)?.values);
+  return typeof param === 'object' && !(param as CodeFile)?.file && Array.isArray((param as Needs)?.values);
 };
 
 export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean => {
@@ -13,5 +13,5 @@ export const isCommand = (commandOrCode?: Executor): boolean => {
 };
 
 export const isCode = (commandOrCode?: Executor) => {
-  return (typeof commandOrCode === 'object' && (commandOrCode as ICodeFile).file !== undefined) || typeof commandOrCode === 'function';
+  return (typeof commandOrCode === 'object' && (commandOrCode as CodeFile).file !== undefined) || typeof commandOrCode === 'function';
 };

@@ -1,8 +1,8 @@
 import { parse } from 'std/flags/mod.ts';
 
-import { ITanoConfig } from './definitions.ts';
+import { TanoConfig } from './definitions.ts';
 
-export const setup = (): ITanoConfig => {
+export const setup = (): TanoConfig => {
   const flags = parse(Deno.args, {
     string: ['file', 'task', 'log-level'],
     boolean: ['silent', 'abort-on-error'],
@@ -20,7 +20,7 @@ export const setup = (): ITanoConfig => {
   Deno.env.set('SILENT', `${flags.silent}`);
   Deno.env.set('LOG_LEVEL', logLevel);
 
-  const config: ITanoConfig = {
+  const config: TanoConfig = {
     file: flags.file,
     task: flags.task || flags._[0] as string,
   };

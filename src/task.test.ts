@@ -3,11 +3,9 @@ import { describe, it } from 'std/testing/bdd.ts';
 
 import { Task } from './task.ts';
 
-import type { ITask } from './definitions.ts';
-
 describe(Task.name, () => {
   it(`Should create a instance of Task`, () => {
-    const actual: ITask = new Task('my-task-instance');
+    const actual: Task = new Task('my-task-instance');
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
@@ -15,7 +13,7 @@ describe(Task.name, () => {
   });
 
   it(`Should run the task.`, async () => {
-    const actual: ITask = new Task('my-task-01', [], `echo 'Runs my task'`);
+    const actual: Task = new Task('my-task-01', [], `echo 'Runs my task'`);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);

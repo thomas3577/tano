@@ -2,13 +2,12 @@ import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
+import { Task } from './task.ts';
 
-import type { IHandler, ITask } from './definitions.ts';
-
-export class Handler implements IHandler {
+export class Handler {
   private readonly _log: Logger = logger();
   private readonly _created: Date = new Date();
-  private readonly _cache: Map<string, ITask> = new Map();
+  private readonly _cache: Map<string, Task> = new Map();
   private _starting: null | PerformanceMark = null;
   private _finished: null | PerformanceMark = null;
   private _measure: null | PerformanceMeasure = null;
@@ -60,7 +59,7 @@ export class Handler implements IHandler {
    *
    * @param task - A task to add.
    */
-  public add(task: ITask): void {
+  public add(task: Task): void {
     if (this._cache.has(task.name)) {
       throw new Error(`Task with the name '${task.name}' already exists.`);
     }
@@ -91,7 +90,7 @@ export class Handler implements IHandler {
       startTime: Date.now(),
     });
 
-    const taskNames: string[] = this._createPlan(taskName);
+    const taskNames: Array<string> = this._createPlan(taskName);
 
     for (const tn of taskNames) {
       await this._cache.get(tn)?.runThis();
@@ -112,7 +111,7 @@ export class Handler implements IHandler {
    * Resets all tasks so that you can run them again.
    */
   public reset(): void {
-    this._cache.forEach((task: ITask) => task.reset());
+    this._cache.forEach((task: Task) => task.reset());
   }
 
   /**
@@ -122,9 +121,9 @@ export class Handler implements IHandler {
     this._cache.clear();
   }
 
-  private _createPlan(taskName: string, taskNames: string[] = []): string[] {
+  private _createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
     if (this._cache.has(taskName)) {
-      const task: ITask = this._cache.get(taskName) as ITask;
+      const task: Task = this._cache.get(taskName) as Task;
 
       if (task && task.needs && task.needs?.length > 0) {
         task.needs.forEach((tn) => this._createPlan(tn, taskNames));
@@ -137,4 +136,4 @@ export class Handler implements IHandler {
   }
 }
 
-export const handler: IHandler = new Handler();
+export const handler = new Handler();

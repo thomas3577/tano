@@ -1,60 +1,38 @@
-export interface ITanoConfig {
+import { Task } from './task.ts';
+
+export interface TanoConfig {
   file: string;
   task: string;
 }
 
-export interface IHandler {
-  created: Date;
-  starting: null | PerformanceMark;
-  finished: null | PerformanceMark;
-  count: number;
-  executed: number;
-  add(task: ITaskParams): void;
-  run(taskName?: string): Promise<void>;
-  reset(): void;
-  clear(): void;
-}
-
 export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
-export interface ITaskOptions extends RunOptions {
+export interface TaskOptions extends RunOptions {
   description?: string;
   condition?: Condition;
 }
 
-export interface ICodeOptions extends ITaskOptions {
+export interface CodeOptions extends TaskOptions {
   repl?: boolean;
   args?: Array<string>;
 }
 
-export interface ICommandOptions extends ITaskOptions {
+export interface CommandOptions extends TaskOptions {
   [key: string]: any;
 }
 
-export interface ITaskParams {
+export interface TaskParams {
   name: string;
   needs?: Array<string>;
-  options?: ITaskOptions;
+  options?: TaskOptions;
   executor?: Executor;
 }
 
-export interface ITask extends ITaskParams {
-  status: TaskStatus;
-  created: Date;
-  starting: null | PerformanceMark;
-  finished: null | PerformanceMark;
-  measure: null | PerformanceMeasure;
-  process: null | Deno.Process;
-  run(): Promise<void>;
-  runThis(): Promise<void>;
-  reset(): void;
+export interface Needs {
+  values: Array<string | TaskParams>;
 }
 
-export interface INeeds {
-  values: Array<string | ITaskParams>;
-}
-
-export interface ICodeFile {
+export interface CodeFile {
   file: string | URL;
 }
 
@@ -64,20 +42,18 @@ export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Condition = (done: (result: boolean) => void) => (boolean | Promise<boolean>) | boolean;
 export type Command = string | Array<string>;
 export type CodeFunction = <T>(done?: (result: T) => T | void) => void | T | PromiseLike<T | void>;
-export type CodeFile = ICodeFile;
 export type Code = CodeFunction | CodeFile;
-export type Options = ICodeOptions | ICommandOptions;
+export type Options = CodeOptions | CommandOptions;
 export type Executor = Command | Code;
-export type Needs = INeeds;
 export type ExecutorOrOptions = Executor | Options;
 export type NeedsOrExecutor = Needs | Executor;
 
 export type TaskDefinition = {
-  (task: ITask): ITask;
-  (task: ITaskParams): ITask;
-  (name: string, needs?: INeeds): ITask;
-  (name: string, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, needs?: INeeds, command?: Command, options?: ICommandOptions): ITask;
-  (name: string, code?: Code, options?: ICodeOptions): ITask;
-  (name: string, needs?: INeeds, code?: Code, options?: ICodeOptions): ITask;
+  (task: Task): Task;
+  (task: TaskParams): Task;
+  (name: string, needs?: Needs): Task;
+  (name: string, command?: Command, options?: CommandOptions): Task;
+  (name: string, needs?: Needs, command?: Command, options?: CommandOptions): Task;
+  (name: string, code?: Code, options?: CodeOptions): Task;
+  (name: string, needs?: Needs, code?: Code, options?: CodeOptions): Task;
 };

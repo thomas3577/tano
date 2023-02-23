@@ -2,10 +2,10 @@ import { bold, gray, red } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
-import { handler } from './handler.ts';
+import { Handler, handler } from './handler.ts';
 import { isCode, isCommand } from './helper.ts';
 
-import type { Code, CodeFunction, Command, Condition, Executor, ICodeOptions, ICommandOptions, IHandler, ITask, ITaskParams, Options, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
 
 type TaskType = 'command' | 'code' | undefined;
 
@@ -20,10 +20,10 @@ const toCode = (commandOrCode?: Executor): Code => {
 /**
  * Creates a new Task.
  */
-export class Task implements ITask, ITaskParams {
+export class Task implements TaskParams {
   private readonly _log: Logger = logger();
   private readonly _created: Date = new Date();
-  private readonly _handler: IHandler = handler;
+  private readonly _handler: Handler = handler;
   private readonly _name: string;
   private readonly _needs: Array<string>;
   private readonly _executor: Executor;
@@ -38,13 +38,13 @@ export class Task implements ITask, ITaskParams {
   /**
    * Creates a new instance ot Task.
    *
-   * @param {string | ITaskParams} nameOrTask - The name or an object which provides all task parameters.
+   * @param {string | TaskParams} nameOrTask - The name or an object which provides all task parameters.
    * @param {string[]=[]} needs - Defines the dependencies which should be executed before this task.
    * @param {Command | Code} executor - A command, function or JS/TS-file to execute.
    * @param {Options} options - Options, depending on whether the executor is of type Command or Code.
    */
-  constructor(nameOrTask: string | ITaskParams, needs: Array<string> = [], executor?: Executor, options?: Options) {
-    const task: ITaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as ITaskParams : {
+  constructor(nameOrTask: string | TaskParams, needs: Array<string> = [], executor?: Executor, options?: Options) {
+    const task: TaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as TaskParams : {
       name: nameOrTask as string,
       needs,
       executor,
@@ -234,7 +234,7 @@ export class Task implements ITask, ITaskParams {
     }
   }
 
-  private async _runCommand(command: Command, options: ICommandOptions): Promise<void> {
+  private async _runCommand(command: Command, options: CommandOptions): Promise<void> {
     this._process = Deno.run({
       cmd: Array.isArray(command) ? command : command.split(' '),
       cwd: options?.cwd || Deno.cwd(),
@@ -259,7 +259,7 @@ export class Task implements ITask, ITaskParams {
     }
   }
 
-  private async _runCode(code: Code, options: ICodeOptions): Promise<void> {
+  private async _runCode(code: Code, options: CodeOptions): Promise<void> {
     if (typeof code === 'function') {
       if (options?.repl) {
         const funcAsString = code.toString();

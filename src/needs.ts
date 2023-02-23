@@ -1,5 +1,5 @@
-import type { INeeds, ITaskParams } from './definitions.ts';
+import type { Needs, TaskParams } from './definitions.ts';
 
-export const needs = (...values: Array<string | ITaskParams>): INeeds => ({
+export const needs = (...values: Array<string | TaskParams>): Needs => ({
   values,
 });

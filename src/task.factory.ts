@@ -1,7 +1,7 @@
 import { Task } from './task.ts';
 import { isExecutor, isNeeds } from './helper.ts';
 
-import type { Executor, ExecutorOrOptions, INeeds, ITask, ITaskParams, NeedsOrExecutor, Options, TaskDefinition } from './definitions.ts';
+import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, TaskDefinition, TaskParams } from './definitions.ts';
 
 const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
   return (isExecutor(param) ? param : undefined as unknown) as Executor;
@@ -10,16 +10,16 @@ const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
 /**
  * Creates a new task.
  *
- * @param param1 {string | ITask | ITaskParams}
- * @param param2 {Command | Code | INeeds}
+ * @param param1 {string | Task | TaskParams}
+ * @param param2 {Needs | Command | Code}
  * @param param3 {Command | Code | Options}
  * @param param4 {Options}
  *
- * @returns {ITask} The reference to the created task.
+ * @returns {Task} The reference to the created task.
  */
-export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param2?: NeedsOrExecutor, param3?: ExecutorOrOptions, param4?: Options): ITask => {
+export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?: NeedsOrExecutor, param3?: ExecutorOrOptions, param4?: Options): Task => {
   if (param1 instanceof Task) {
-    return param1;
+    return param1 as Task;
   }
 
   if (typeof param1 === 'object') {
@@ -28,7 +28,7 @@ export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param
 
   let needs: Array<string> = [];
   if (isNeeds(param2)) {
-    needs = (param2 as INeeds).values.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
+    needs = (param2 as Needs).values.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
   }
 
   let executor: Executor = undefined as unknown as Executor;
@@ -45,7 +45,7 @@ export const task: TaskDefinition = (param1: string | ITask | ITaskParams, param
     options = param4;
   }
 
-  const instance: ITask = new Task(param1, needs, executor, options);
+  const instance: Task = new Task(param1, needs, executor, options);
 
-  return instance;
+  return instance as Task;
 };

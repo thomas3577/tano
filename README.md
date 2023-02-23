@@ -46,8 +46,10 @@ tano my-task
 - Option to skip task, if no changes (Defines in the options). Non-volatile cache to remember last run.
 - cli: --force > To ignore "no changes"
 - cli: --abort-on-error
+- cli: --help
 - Output-Callback-Functions "starts", "output", "error" (Defines in the options).
 - shorthand args?
+- Use of [private class features](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields)
 
 ## Documentation
 

@@ -21,19 +21,19 @@ const toCode = (commandOrCode?: Executor): Code => {
  * Creates a new Task.
  */
 export class Task implements TaskParams {
-  private readonly _log: Logger = logger();
-  private readonly _created: Date = new Date();
-  private readonly _handler: Handler = handler;
-  private readonly _name: string;
-  private readonly _needs: Array<string>;
-  private readonly _executor: Executor;
-  private readonly _options: Options;
-  private readonly _type: TaskType = undefined;
-  private _status: TaskStatus = 'ready';
-  private _starting: null | PerformanceMark = null;
-  private _finished: null | PerformanceMark = null;
-  private _measure: null | PerformanceMeasure = null;
-  private _process: null | Deno.Process = null;
+  readonly #log: Logger = logger();
+  readonly #created: Date = new Date();
+  readonly #handler: Handler = handler;
+  readonly #name: string;
+  readonly #needs: Array<string>;
+  readonly #executor: Executor;
+  readonly #options: Options;
+  readonly #type: TaskType = undefined;
+  #status: TaskStatus = 'ready';
+  #starting: null | PerformanceMark = null;
+  #finished: null | PerformanceMark = null;
+  #measure: null | PerformanceMeasure = null;
+  #process: null | Deno.Process = null;
 
   /**
    * Creates a new instance ot Task.
@@ -51,87 +51,87 @@ export class Task implements TaskParams {
       options,
     };
 
-    this._name = task.name;
-    this._needs = task.needs as Array<string>;
-    this._executor = task.executor as Command;
-    this._options = task.options as Options;
-    this._handler.add(this);
+    this.#name = task.name;
+    this.#needs = task.needs as Array<string>;
+    this.#executor = task.executor as Command;
+    this.#options = task.options as Options;
+    this.#handler.add(this);
 
     if (isCommand(executor)) {
-      this._type = 'command';
+      this.#type = 'command';
     } else if (isCode(executor)) {
-      this._type = 'code';
+      this.#type = 'code';
     }
   }
 
   /**
    * Unique name of the task.
    */
-  public get name(): string {
-    return this._name;
+  get name(): string {
+    return this.#name;
   }
 
   /**
    * Status of the task.
    */
-  public get status(): TaskStatus {
-    return this._status;
+  get status(): TaskStatus {
+    return this.#status;
   }
 
   /**
    * Timestamp when the handler was created.
    */
-  public get created(): Date {
-    return this._created;
+  get created(): Date {
+    return this.#created;
   }
 
   /**
    * Performance mark when the last run starts.
    */
-  public get starting(): null | PerformanceMark {
-    return this._starting;
+  get starting(): null | PerformanceMark {
+    return this.#starting;
   }
 
   /**
    * Performance mark when the last run ends.
    */
-  public get finished(): null | PerformanceMark {
-    return this._finished;
+  get finished(): null | PerformanceMark {
+    return this.#finished;
   }
 
   /**
    * Performance measure of the last run.
    */
-  public get measure(): null | PerformanceMeasure {
-    return this._measure;
+  get measure(): null | PerformanceMeasure {
+    return this.#measure;
   }
 
   /**
    * Task that must be executed before this task is executed.
    */
-  public get needs(): Array<string> {
-    return this._needs;
+  get needs(): Array<string> {
+    return this.#needs;
   }
 
   /**
    * The command or code that will be executed by this task if it is set.
    */
-  public get executor(): Executor {
-    return this._executor;
+  get executor(): Executor {
+    return this.#executor;
   }
 
   /**
    * Options, depending on whether the executor is of type Command or Code.
    */
-  public get options(): Options {
-    return this._options;
+  get options(): Options {
+    return this.#options;
   }
 
   /**
    * Gets the current process.
    */
-  public get process(): null | Deno.Process {
-    return this._process;
+  get process(): null | Deno.Process {
+    return this.#process;
   }
 
   /**
@@ -139,8 +139,8 @@ export class Task implements TaskParams {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  public async run(): Promise<void> {
-    await this._handler.run(this._name);
+  async run(): Promise<void> {
+    await this.#handler.run(this.#name);
   }
 
   /**
@@ -148,94 +148,94 @@ export class Task implements TaskParams {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  public async runThis(): Promise<void> {
-    if (this._type === undefined) {
+  async runThis(): Promise<void> {
+    if (this.#type === undefined) {
       return;
     }
 
-    if (this._status !== 'ready') {
-      throw new Error(`The task '${this._name}' has already been run.`);
+    if (this.#status !== 'ready') {
+      throw new Error(`The task '${this.#name}' has already been run.`);
     }
 
-    const result: boolean = await this._executeCondition(this._options?.condition || ((): boolean => true));
+    const result: boolean = await this.#executeCondition(this.#options?.condition || ((): boolean => true));
     if (!result) {
-      this._log.warning('');
-      this._log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
-        name: `'${gray(this._name)}'`,
+      this.#log.warning('');
+      this.#log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
+        name: `'${gray(this.#name)}'`,
       });
 
       return;
     }
 
-    this._preRun();
+    this.#preRun();
 
-    await this._run(this._type, this._executor, this._options)
+    await this.#run(this.#type, this.#executor, this.#options)
       .catch((err) => {
-        this._status = 'failed';
+        this.#status = 'failed';
 
-        this._log.error(`${bold(red('Error'))} {name}: ${err}`, {
-          name: `'${gray(this._name)}'`,
+        this.#log.error(`${bold(red('Error'))} {name}: ${err}`, {
+          name: `'${gray(this.#name)}'`,
         });
 
         throw err;
       });
 
-    this._postRun();
+    this.#postRun();
   }
 
   /**
    * Resets the task so that it can be executed again.
    */
-  public reset(): void {
-    this._starting = null;
-    this._finished = null;
-    this._process = null;
-    this._status = 'ready';
+  reset(): void {
+    this.#starting = null;
+    this.#finished = null;
+    this.#process = null;
+    this.#status = 'ready';
   }
 
-  private _preRun(): void {
-    this._log.info('');
-    this._log.info(`Starting {name}...`, {
-      name: `'${gray(this._name)}'`,
+  #preRun(): void {
+    this.#log.info('');
+    this.#log.info(`Starting {name}...`, {
+      name: `'${gray(this.#name)}'`,
     });
 
-    if (this._options?.description) {
-      this._log.info(`Description: ${gray(this._options.description)}`);
+    if (this.#options?.description) {
+      this.#log.info(`Description: ${gray(this.#options.description)}`);
     }
 
-    this._finished = null;
-    this._starting = performance.mark(`starting_${this._name}`, {
+    this.#finished = null;
+    this.#starting = performance.mark(`starting_${this.#name}`, {
       startTime: Date.now(),
     });
 
-    this._status = 'running';
+    this.#status = 'running';
   }
 
-  private _postRun(): void {
-    this._status = 'success';
+  #postRun(): void {
+    this.#status = 'success';
 
-    this._finished = performance.mark(`finished_${this._name}`, {
+    this.#finished = performance.mark(`finished_${this.#name}`, {
       startTime: Date.now(),
     });
 
-    this._measure = performance.measure(this._name, `starting_${this._name}`, `finished_${this._name}`);
+    this.#measure = performance.measure(this.#name, `starting_${this.#name}`, `finished_${this.#name}`);
 
-    this._log.info(`Finished {name} after {duration}`, {
-      name: `'${gray(this._name)}'`,
-      duration: `${bold(format(this._measure.duration, { ignoreZero: true }))}`,
+    this.#log.info(`Finished {name} after {duration}`, {
+      name: `'${gray(this.#name)}'`,
+      duration: `${bold(format(this.#measure.duration, { ignoreZero: true }))}`,
     });
   }
 
-  private async _run(type: TaskType, executor: Executor, options: Options): Promise<void> {
+  async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {
     if (type === 'command') {
-      await this._runCommand(toCommand(executor), options);
-    } else if (this._type === 'code') {
-      await this._runCode(toCode(executor), options);
+      await this.#runCommand(toCommand(executor), options);
+    } else if (this.#type === 'code') {
+      await this.#runCode(toCode(executor), options);
     }
   }
 
-  private async _runCommand(command: Command, options: CommandOptions): Promise<void> {
-    this._process = Deno.run({
+  async #runCommand(command: Command, options: CommandOptions): Promise<void> {
+    this.#process = Deno.run({
       cmd: Array.isArray(command) ? command : command.split(' '),
       cwd: options?.cwd || Deno.cwd(),
       env: options?.env,
@@ -244,44 +244,44 @@ export class Task implements TaskParams {
       stdin: options?.stdin || 'null',
     });
 
-    const status: Deno.ProcessStatus = await this._process.status();
-    const rawOutput: Uint8Array = await this._process.output();
-    const rawError: Uint8Array = await this._process.stderrOutput();
+    const status: Deno.ProcessStatus = await this.#process.status();
+    const rawOutput: Uint8Array = await this.#process.output();
+    const rawError: Uint8Array = await this.#process.stderrOutput();
 
     if (status.code === 0) {
       await Deno.stdout.write(rawOutput);
 
-      this._process.close();
+      this.#process.close();
     } else {
       await Promise.reject(new TextDecoder().decode(rawError));
 
-      this._process.kill();
+      this.#process.kill();
     }
   }
 
-  private async _runCode(code: Code, options: CodeOptions): Promise<void> {
+  async #runCode(code: Code, options: CodeOptions): Promise<void> {
     if (typeof code === 'function') {
       if (options?.repl) {
         const funcAsString = code.toString();
         const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
-        return await this._runCommand(command, options);
+        return await this.#runCommand(command, options);
       }
 
-      return await this._executeCodeFunction(code);
+      return await this.#executeCodeFunction(code);
     }
 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
-    return await this._runCommand(command, options);
+    return await this.#runCommand(command, options);
   }
 
-  private async _executeCodeFunction(code: CodeFunction): Promise<void> {
+  async #executeCodeFunction(code: CodeFunction): Promise<void> {
     return code.length > 0 ? await new Promise((resolve) => code(() => resolve())) : await Promise.resolve(code(() => {}));
   }
 
-  private async _executeCondition(condition: Condition): Promise<boolean> {
+  async #executeCondition(condition: Condition): Promise<boolean> {
     return condition.length > 0 ? await new Promise((resolve) => condition((result: boolean) => resolve(result))) : await Promise.resolve(condition(() => true));
   }
 }

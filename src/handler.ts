@@ -5,53 +5,53 @@ import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
 
 export class Handler {
-  private readonly _log: Logger = logger();
-  private readonly _created: Date = new Date();
-  private readonly _cache: Map<string, Task> = new Map();
-  private _starting: null | PerformanceMark = null;
-  private _finished: null | PerformanceMark = null;
-  private _measure: null | PerformanceMeasure = null;
+  readonly #log: Logger = logger();
+  readonly #created: Date = new Date();
+  readonly #cache: Map<string, Task> = new Map();
+  #starting: null | PerformanceMark = null;
+  #finished: null | PerformanceMark = null;
+  #measure: null | PerformanceMeasure = null;
 
   /**
    * Gets the timestamp when the handler was created.
    */
-  public get created(): Date {
-    return this._created;
+  get created(): Date {
+    return this.#created;
   }
 
   /**
    * Gets the performance mark when the last run starts.
    */
-  public get starting(): null | PerformanceMark {
-    return this._starting;
+  get starting(): null | PerformanceMark {
+    return this.#starting;
   }
 
   /**
    * Gets the performance mark when the last run ends.
    */
-  public get finished(): null | PerformanceMark {
-    return this._finished;
+  get finished(): null | PerformanceMark {
+    return this.#finished;
   }
 
   /**
    * Gets the performance measure of the last run.
    */
-  public get measure(): null | PerformanceMeasure {
-    return this._measure;
+  get measure(): null | PerformanceMeasure {
+    return this.#measure;
   }
 
   /**
    * Gets the number of tasks that are in the cache.
    */
-  public get count(): number {
-    return this._cache.size;
+  get count(): number {
+    return this.#cache.size;
   }
 
   /**
    * Gets the number of executed tasks.
    */
-  public get executed(): number {
-    return Array.from(this._cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running').length;
+  get executed(): number {
+    return Array.from(this.#cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running').length;
   }
 
   /**
@@ -59,14 +59,14 @@ export class Handler {
    *
    * @param task - A task to add.
    */
-  public add(task: Task): void {
-    if (this._cache.has(task.name)) {
+  add(task: Task): void {
+    if (this.#cache.has(task.name)) {
       throw new Error(`Task with the name '${task.name}' already exists.`);
     }
 
-    this._cache.set(task.name, task);
+    this.#cache.set(task.name, task);
 
-    this._log.debug(`Added task ${task.name}`);
+    this.#log.debug(`Added task ${task.name}`);
   }
 
   /**
@@ -77,55 +77,55 @@ export class Handler {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  public async run(taskName: string = 'default'): Promise<void> {
-    this._log.info(`Deno       v${Deno.version.deno}`);
-    this._log.info(`TypeScript v${Deno.version.typescript}`);
-    this._log.info(`V8         v${Deno.version.v8}`);
-    this._log.info('');
-    this._log.info(bold(green(`Starting...`)));
+  async run(taskName: string = 'default'): Promise<void> {
+    this.#log.info(`Deno       v${Deno.version.deno}`);
+    this.#log.info(`TypeScript v${Deno.version.typescript}`);
+    this.#log.info(`V8         v${Deno.version.v8}`);
+    this.#log.info('');
+    this.#log.info(bold(green(`Starting...`)));
 
-    this._finished = null;
-    this._starting = performance.mark('starting_run', {
+    this.#finished = null;
+    this.#starting = performance.mark('starting_run', {
       startTime: Date.now(),
     });
 
-    const taskNames: Array<string> = this._createPlan(taskName);
+    const taskNames: Array<string> = this.#createPlan(taskName);
 
     for (const tn of taskNames) {
-      await this._cache.get(tn)?.runThis();
+      await this.#cache.get(tn)?.runThis();
     }
 
-    this._finished = performance.mark('finished_run', {
+    this.#finished = performance.mark('finished_run', {
       startTime: Date.now(),
     });
 
-    this._measure = performance.measure('run', 'starting_run', 'finished_run');
+    this.#measure = performance.measure('run', 'starting_run', 'finished_run');
 
-    this._log.info(bold(green(`Finished after {duration}`)), {
-      duration: `${format(this._measure.duration, { ignoreZero: true })}`,
+    this.#log.info(bold(green(`Finished after {duration}`)), {
+      duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
   }
 
   /**
    * Resets all tasks so that you can run them again.
    */
-  public reset(): void {
-    this._cache.forEach((task: Task) => task.reset());
+  reset(): void {
+    this.#cache.forEach((task: Task) => task.reset());
   }
 
   /**
    * Clears the cache. The handler will then have no more tasks to execute.
    */
-  public clear(): void {
-    this._cache.clear();
+  clear(): void {
+    this.#cache.clear();
   }
 
-  private _createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
-    if (this._cache.has(taskName)) {
-      const task: Task = this._cache.get(taskName) as Task;
+  #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
+    if (this.#cache.has(taskName)) {
+      const task: Task = this.#cache.get(taskName) as Task;
 
       if (task && task.needs && task.needs?.length > 0) {
-        task.needs.forEach((tn) => this._createPlan(tn, taskNames));
+        task.needs.forEach((tn) => this.#createPlan(tn, taskNames));
       }
 
       taskNames.push(taskName);

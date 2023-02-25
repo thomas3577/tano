@@ -41,8 +41,6 @@ tano my-task
 
 ## Todo
 
-- Documentation & Examples.
-- More tests.
 - Option to skip task, if no changes (Defines in the options). Non-volatile cache to remember last run.
 - cli: --force > To ignore "no changes"
 - cli: --abort-on-error

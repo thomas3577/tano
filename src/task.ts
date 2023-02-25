@@ -5,7 +5,7 @@ import { Logger, logger } from './logger.ts';
 import { Handler, handler } from './handler.ts';
 import { isCode, isCommand } from './helper.ts';
 
-import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
 
 type TaskType = 'command' | 'code' | undefined;
 
@@ -278,7 +278,23 @@ export class Task implements TaskParams {
   }
 
   async #executeCodeFunction(code: CodeFunction): Promise<void> {
-    return code.length > 0 ? await new Promise((resolve) => code(() => resolve())) : await Promise.resolve(code(() => {}));
+    return await new Promise((resolve, reject) => {
+      try {
+        if (code.length > 0) {
+          code((err: unknown) => {
+            if (err) {
+              reject(err);
+            }
+
+            return resolve();
+          });
+        } else {
+          resolve((code as CodeFunctionWithoutDone)());
+        }
+      } catch (err: unknown) {
+        reject(err);
+      }
+    });
   }
 
   async #executeCondition(condition: Condition): Promise<boolean> {

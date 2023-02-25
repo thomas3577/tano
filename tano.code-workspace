@@ -32,12 +32,6 @@
       "--allow-run",
       "--allow-env"
     ],
-    "deno.enablePaths": [
-      "./examples",
-      "./src",
-      "./mod.ts",
-      "./tano.ts"
-    ],
     "search.exclude": {
       "**/deno.lock": true
     },

@@ -1,11 +1,11 @@
 import { Task } from './task.ts';
 
+export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
+
 export interface TanoConfig {
   file: string;
   task: string;
 }
-
-export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
 export interface TaskOptions extends RunOptions {
   description?: string;
@@ -37,11 +37,12 @@ export interface CodeFile {
 }
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
+export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
+export type CodeFunctionWithoutDone = () => void | Promise<void>;
+export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
 export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
 export type Condition = (done: (result: boolean) => void) => (boolean | Promise<boolean>) | boolean;
 export type Command = string | Array<string>;
-export type CodeFunction = <T>(done?: (result: T) => T | void) => void | T | PromiseLike<T | void>;
 export type Code = CodeFunction | CodeFile;
 export type Options = CodeOptions | CommandOptions;
 export type Executor = Command | Code;

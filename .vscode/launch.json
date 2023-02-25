@@ -12,10 +12,11 @@
         "--allow-run",
         "--allow-env",
         "--inspect-brk",
-        "./tano.ts",
+        "../tano.ts",
         "--file",
-        "./examples/tanofile.ts"
+        "./tanofile.ts"
       ],
+      "cwd": "${workspaceFolder}/examples",
       "attachSimplePort": 9229
     }
   ]

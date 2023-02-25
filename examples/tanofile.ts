@@ -6,7 +6,7 @@ task(
   needs(
     task('01', `echo 'Hello World from cmd.'`, { repl: true }),
     task('02', () => console.log('Hello World from code at repl.'), { repl: true }),
-    task('03', { file: 'tanofile.code.ts' }, { cwd: './' }),
+    task('03', { file: 'tanofile.code.ts' }),
     task('04', async (): Promise<void> => {
       return await new Promise((r) => {
         setTimeout(() => {

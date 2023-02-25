@@ -35,4 +35,18 @@ describe(Task.name, () => {
 
     assertEquals(actual.status, 'success');
   });
+
+  it(`Should run the function with conditions (1).`, async () => {
+    const actual: Task = new Task('my-task-03', [], () => {}, {
+      condition: 1 + 2 === 4,
+    });
+
+    assertNotEquals(actual, null);
+    assertInstanceOf(actual, Task);
+    assertEquals(actual.name, 'my-task-03');
+
+    await actual.runThis();
+
+    assertEquals(actual.status, 'ready');
+  });
 });

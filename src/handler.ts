@@ -78,16 +78,7 @@ export class Handler {
    * @returns {Promise<void>} A promise that resolves to void.
    */
   async run(taskName: string = 'default'): Promise<void> {
-    this.#log.info(`Deno       v${Deno.version.deno}`);
-    this.#log.info(`TypeScript v${Deno.version.typescript}`);
-    this.#log.info(`V8         v${Deno.version.v8}`);
-    this.#log.info('');
-    this.#log.info(bold(green(`Starting...`)));
-
-    this.#finished = null;
-    this.#starting = performance.mark('starting_run', {
-      startTime: Date.now(),
-    });
+    this.#preRun();
 
     const taskNames: Array<string> = this.#createPlan(taskName);
 
@@ -95,15 +86,7 @@ export class Handler {
       await this.#cache.get(tn)?.runThis();
     }
 
-    this.#finished = performance.mark('finished_run', {
-      startTime: Date.now(),
-    });
-
-    this.#measure = performance.measure('run', 'starting_run', 'finished_run');
-
-    this.#log.info(bold(green(`Finished after {duration}`)), {
-      duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
-    });
+    this.#postRun();
   }
 
   /**
@@ -120,6 +103,31 @@ export class Handler {
     this.#cache.clear();
   }
 
+  #preRun(): void {
+    this.#log.info(`Deno       v${Deno.version.deno}`);
+    this.#log.info(`TypeScript v${Deno.version.typescript}`);
+    this.#log.info(`V8         v${Deno.version.v8}`);
+    this.#log.info('');
+    this.#log.info(bold(green(`Starting...`)));
+
+    this.#finished = null;
+    this.#starting = performance.mark('starting_run', {
+      startTime: Date.now(),
+    });
+  }
+
+  #postRun(): void {
+    this.#finished = performance.mark('finished_run', {
+      startTime: Date.now(),
+    });
+
+    this.#measure = performance.measure('run', 'starting_run', 'finished_run');
+
+    this.#log.info(bold(green(`Finished after {duration}`)), {
+      duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
+    });
+  }
+
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
     if (this.#cache.has(taskName)) {
       const task: Task = this.#cache.get(taskName) as Task;
@@ -129,6 +137,10 @@ export class Handler {
       }
 
       taskNames.push(taskName);
+    } else {
+      this.#log.warning('A task with the name {name} does not exist.', {
+        name: `'${taskName}'`,
+      });
     }
 
     return taskNames;

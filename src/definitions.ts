@@ -36,14 +36,19 @@ export interface CodeFile {
   file: string | URL;
 }
 
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type ConditionType1 = boolean;
+export type ConditionType2 = () => boolean | Promise<boolean>;
+export type ConditionType3 = (done: (result: boolean) => void) => void;
+export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
+
 export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
 export type CodeFunctionWithoutDone = () => void | Promise<void>;
 export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
-export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
-export type Condition = (done: (result: boolean) => void) => (boolean | Promise<boolean>) | boolean;
-export type Command = string | Array<string>;
 export type Code = CodeFunction | CodeFile;
+
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
+export type Command = string | Array<string>;
 export type Options = CodeOptions | CommandOptions;
 export type Executor = Command | Code;
 export type ExecutorOrOptions = Executor | Options;

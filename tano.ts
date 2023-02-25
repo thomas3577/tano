@@ -15,8 +15,8 @@ const cli = async () => {
 
     await import(importUrl);
     await handler.run(config.task);
-  } catch (_: unknown) {
-    log.error(`Aborted with errors.`);
+  } catch (err: unknown) {
+    log.error(`Aborted with errors. ${err}`);
   }
 };
 

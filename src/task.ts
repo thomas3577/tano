@@ -5,7 +5,7 @@ import { Logger, logger } from './logger.ts';
 import { Handler, handler } from './handler.ts';
 import { isCode, isCommand } from './helper.ts';
 
-import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
+import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, ConditionType2, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
 
 type TaskType = 'command' | 'code' | undefined;
 
@@ -157,7 +157,7 @@ export class Task implements TaskParams {
       throw new Error(`The task '${this.#name}' has already been run.`);
     }
 
-    const result: boolean = await this.#executeCondition(this.#options?.condition || ((): boolean => true));
+    const result: boolean = await this.#executeCondition(this.#options?.condition ?? ((): boolean => true));
     if (!result) {
       this.#log.warning('');
       this.#log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
@@ -298,6 +298,20 @@ export class Task implements TaskParams {
   }
 
   async #executeCondition(condition: Condition): Promise<boolean> {
-    return condition.length > 0 ? await new Promise((resolve) => condition((result: boolean) => resolve(result))) : await Promise.resolve(condition(() => true));
+    return await new Promise((resolve, reject) => {
+      try {
+        if (typeof condition === 'function') {
+          if (condition.length > 0) {
+            condition((result) => resolve(result));
+          } else {
+            resolve((condition as ConditionType2)());
+          }
+        } else {
+          resolve(condition === true);
+        }
+      } catch (err: unknown) {
+        reject(err);
+      }
+    });
   }
 }

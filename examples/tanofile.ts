@@ -43,6 +43,46 @@ task('unhappy-task-02', async () => {
   await Promise.reject('Shit!');
 });
 
+task('conditions-01', async () => {
+  await Promise.resolve('Yes!');
+}, {
+  condition: 1 + 2 === 4,
+});
+
+task('conditions-02', () => {}, {
+  condition: () => {
+    return false;
+  },
+});
+
+task('conditions-03', () => {}, {
+  condition: (done) => {
+    setTimeout(() => {
+      done(false);
+    }, 250);
+  },
+});
+
+task('conditions-04', async () => {
+  await Promise.resolve('Yes!');
+}, {
+  condition: 1 + 2 === 3,
+});
+
+task('conditions-05', () => {}, {
+  condition: () => {
+    return true;
+  },
+});
+
+task('conditions-06', () => {}, {
+  condition: (done) => {
+    setTimeout(() => {
+      done(true);
+    }, 250);
+  },
+});
+
 task(
   'few',
   needs(

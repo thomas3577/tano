@@ -8,10 +8,10 @@ task(
     task('02', () => console.log('Hello World from code at repl.'), { repl: true }),
     task('03', { file: 'tanofile.code.ts' }),
     task('04', async (): Promise<void> => {
-      return await new Promise((r) => {
+      return await new Promise((resolve) => {
         setTimeout(() => {
           console.log('Hello world delayed from async Promise.');
-          r();
+          resolve();
         }, 200);
       });
     }),
@@ -32,6 +32,16 @@ task(
   ),
   `echo 'The END!'`,
 );
+
+task('unhappy-task-01', (done) => {
+  setTimeout(() => {
+    done(new Error('Shit!'));
+  }, 250);
+});
+
+task('unhappy-task-02', async () => {
+  await Promise.reject('Shit!');
+});
 
 task(
   'few',

@@ -46,8 +46,6 @@ tano my-task
 - cli: --abort-on-error
 - cli: --help
 - Output-Callback-Functions "starts", "output", "error" (Defines in the options).
-- shorthand args?
-- Use of [private class features](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields)
 
 ## Documentation
 

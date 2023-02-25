@@ -9,42 +9,37 @@
       "denoland.vscode-deno",
       "davidanson.vscode-markdownlint",
       "yzhang.markdown-all-in-one",
-      "streetsidesoftware.code-spell-checker",
-      "adrianwilczynski.alpine-js-intellisense"
+      "streetsidesoftware.code-spell-checker"
     ]
   },
   "settings": {
     "editor.formatOnSave": true,
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
-    "editor.defaultFormatter": null,
-    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+    "editor.defaultFormatter": "denoland.vscode-deno",
     "typescript.preferences.quoteStyle": "single",
     "deno.lint": true,
     "deno.enable": true,
     "deno.unstable": true,
     "deno.config": "./deno.json",
+    "deno.testing.enable": true,
+    "deno.codeLens.references": false,
+    "deno.codeLens.referencesAllFunctions": false,
+    "deno.inlayHints.parameterNames.enabled": "none",
+    "deno.internalDebug": true,
+    "deno.testing.args": [
+      "--allow-read",
+      "--allow-run",
+      "--allow-env"
+    ],
     "deno.enablePaths": [
       "./examples",
       "./src",
       "./mod.ts",
       "./tano.ts"
     ],
-    "deno.codeLens.references": false,
-    "deno.codeLens.referencesAllFunctions": false,
-    "deno.inlayHints.parameterNames.enabled": "none",
-    "deno.internalDebug": true,
     "search.exclude": {
       "**/deno.lock": true
-    },
-    "[typescript]": {
-      "editor.defaultFormatter": "denoland.vscode-deno"
-    },
-    "[json]": {
-      "editor.defaultFormatter": "denoland.vscode-deno"
-    },
-    "[markdown]": {
-      "editor.defaultFormatter": "denoland.vscode-deno"
     }
   }
 }

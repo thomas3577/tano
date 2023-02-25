@@ -1,9 +1,8 @@
 {
   "tasks": {
-    "install": "deno install -A -f -n  tano --config ./deno.json  ./tano.ts",
+    "install": "deno install -A -f --config ./deno.json ./tano.ts",
     "run": "cd ./examples && deno run --allow-read --allow-run --allow-env ../tano.ts --file ./tanofile.ts",
-    "check": "deno fmt --check && deno lint",
-    "test": "deno test --allow-read --allow-run --allow-env"
+    "check": "deno fmt --check && deno lint"
   },
   "compilerOptions": {
     "strict": true
@@ -27,7 +26,9 @@
   },
   "fmt": {
     "files": {
-      "exclude": [".vscode/"]
+      "exclude": [
+        ".vscode/"
+      ]
     },
     "options": {
       "useTabs": false,

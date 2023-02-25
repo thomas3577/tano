@@ -17,20 +17,6 @@
         "./examples/tanofile.ts"
       ],
       "attachSimplePort": 9229
-    },
-    {
-      "name": "Test",
-      "request": "launch",
-      "type": "node",
-      "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "test",
-        "--allow-read",
-        "--allow-run",
-        "--allow-env",
-        "--inspect-brk"
-      ],
-      "attachSimplePort": 9229
     }
   ]
 }

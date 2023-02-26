@@ -249,11 +249,22 @@ export class Task implements TaskParams {
     const rawError: Uint8Array = await this.#process.stderrOutput();
 
     if (status.code === 0) {
+      if (this.#options?.output) {
+        const output: string = new TextDecoder().decode(rawOutput);
+
+        this.#options?.output(undefined, output);
+      }
+
       await Deno.stdout.write(rawOutput);
 
       this.#process.close();
     } else {
-      await Promise.reject(new TextDecoder().decode(rawError));
+      const error: string = new TextDecoder().decode(rawError);
+      if (this.#options?.output) {
+        this.#options?.output(error, undefined);
+      }
+
+      await Promise.reject(error);
 
       this.#process.kill();
     }

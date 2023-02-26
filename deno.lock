@@ -6,6 +6,7 @@
     "https://deno.land/std@0.178.0/bytes/copy.ts": "939d89e302a9761dcf1d9c937c7711174ed74c59eef40a1e4569a05c9de88219",
     "https://deno.land/std@0.178.0/datetime/_common.ts": "f5c1cb784c616151a3d8198a4ab29f65b7fe5c20a105d8979bde9558c7b52910",
     "https://deno.land/std@0.178.0/datetime/format.ts": "416807ca1971c5432bfa7d1e429b7c6360cb81fee598e8510dde6e7b0e819a57",
+    "https://deno.land/std@0.178.0/flags/mod.ts": "d1cdefa18472ef69858a17df5cf7c98445ed27ac10e1460183081303b0ebc270",
     "https://deno.land/std@0.178.0/fmt/colors.ts": "938c5d44d889fb82eff6c358bea8baa7e85950a16c9f6dae3ec3a7a729164471",
     "https://deno.land/std@0.178.0/fmt/duration.ts": "72365263bb3019021897e8c7a1903284de00534fc62ab28abc805ec881005f4c",
     "https://deno.land/std@0.178.0/fs/exists.ts": "b8c8a457b71e9d7f29b9d2f87aad8dba2739cbe637e8926d6ba6e92567875f8e",
@@ -28,6 +29,7 @@
     "https://deno.land/std@0.178.0/testing/_test_suite.ts": "30f018feeb3835f12ab198d8a518f9089b1bcb2e8c838a8b615ab10d5005465c",
     "https://deno.land/std@0.178.0/testing/asserts.ts": "984ab0bfb3faeed92ffaa3a6b06536c66811185328c5dd146257c702c41b01ab",
     "https://deno.land/std@0.178.0/testing/bdd.ts": "c5ca6d85940dbcc19b4d2bc3608d49ab65d81470aa91306d5efa4b0d5c945731",
-    "https://deno.land/std@0.178.0/types.d.ts": "220ed56662a0bd393ba5d124aa6ae2ad36a00d2fcbc0e8666a65f4606aaa9784"
+    "https://deno.land/std@0.178.0/types.d.ts": "220ed56662a0bd393ba5d124aa6ae2ad36a00d2fcbc0e8666a65f4606aaa9784",
+    "https://deno.land/std@0.178.0/version.ts": "df272134eebbfb1c0c012bab4eda1c05dc40e81fdb37b6e1dd176a1d1cdb4475"
   }
 }

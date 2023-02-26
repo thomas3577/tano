@@ -5,7 +5,7 @@ Yet another task runner cli with no dependencies and inspired by Gulp.
 ## Install
 
 ```bash
-deno install -A -f -n  tano --config ./deno.json  https://deno.land/x/install@v0.0.1/tano.ts
+deno install -A -f -n tano --config ./deno.json https://deno.land/x/install@v0.0.1/tano.ts
 ```
 
 ## Preparation
@@ -44,7 +44,6 @@ tano my-task
 - Option to skip task, if no changes (Defines in the options). Non-volatile cache to remember last run.
 - cli: --force > To ignore "no changes"
 - cli: --abort-on-error
-- cli: --help
 - Output-Callback-Functions "starts", "output", "error" (Defines in the options).
 
 ## Documentation

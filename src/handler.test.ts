@@ -86,4 +86,30 @@ describe(Handler.name, () => {
 
     assertEquals(handler.executed, 2);
   });
+
+  it(`Should abort at first error`, async () => {
+    try {
+      task('pre-task-one', () => {
+        throw new Error('ERROR! ERROR! ERROR!');
+      });
+      task('pre-task-two', `echo 'if you see the second pre-task, something went wrong'`);
+      task('default', needs('pre-task-one', 'pre-task-two'), `echo 'if you see me, something went wrong'`);
+
+      await handler.run();
+    } catch (error) {
+      assertInstanceOf(error, Error);
+    }
+  });
+
+  it(`Should NOT abort at first error`, async () => {
+    task('pre-task-one', () => {
+      throw new Error('ERROR! ERROR! ERROR!');
+    });
+    task('pre-task-two', `echo 'if you see the second pre-task, something went wrong'`);
+    task('default', needs('pre-task-one', 'pre-task-two'), `echo 'if you see me, something went wrong'`);
+
+    await handler.run('default', false);
+
+    assertEquals(handler.executed, 3);
+  });
 });

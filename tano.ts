@@ -15,7 +15,7 @@ const cli = async (): Promise<void> => {
     log.info(`Using tanofile ${importUrl}`);
 
     await import(importUrl);
-    await handler.run(config.task);
+    await handler.run(config.task, config.abortOnError);
   } catch (err: unknown) {
     log.error(`Aborted with errors. ${err}`);
   }

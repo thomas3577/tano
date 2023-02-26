@@ -77,13 +77,25 @@ export class Handler {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default'): Promise<void> {
+  async run(taskName: string = 'default', abortOnError: boolean = true): Promise<void> {
     this.#preRun();
 
     const taskNames: Array<string> = this.#createPlan(taskName);
 
+    console.warn('>>> abortOnError', abortOnError);
+    let abort = false;
     for (const tn of taskNames) {
-      await this.#cache.get(tn)?.runThis();
+      if (abort) {
+        break;
+      }
+
+      await this.#cache.get(tn)?.runThis()
+        .catch((err: unknown) => {
+          if (abortOnError) {
+            abort = true;
+            throw err;
+          }
+        });
     }
 
     this.#postRun();

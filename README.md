@@ -43,7 +43,6 @@ tano my-task
 
 - Option to skip task, if no changes (Defines in the options). Non-volatile cache to remember last run.
 - cli: --force > To ignore "no changes"
-- cli: --abort-on-error
 - Output-Callback-Functions "starts", "output", "error" (Defines in the options).
 
 ## Documentation

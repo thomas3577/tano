@@ -3,11 +3,12 @@ import { handler } from './src/handler.ts';
 import { setup } from './src/tano.config.ts';
 import { TanoConfig } from './src/definitions.ts';
 import { getImportUrl } from './src/tano.factory.ts';
+import { help } from './src/help.ts';
 
-const cli = async () => {
-  const config: TanoConfig = setup();
-  const log: Logger = logger();
+const config: TanoConfig = setup();
+const log: Logger = logger();
 
+const cli = async (): Promise<void> => {
   try {
     const importUrl: string = await getImportUrl(config.file);
 
@@ -21,5 +22,14 @@ const cli = async () => {
 };
 
 if (import.meta.main) {
-  await cli();
+  switch (config.action) {
+    case 'help':
+      help();
+      break;
+    case 'version':
+      break;
+    default:
+      await cli();
+      break;
+  }
 }

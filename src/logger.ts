@@ -28,11 +28,11 @@ const consoleHandler: ConsoleHandler = new handlers.ConsoleHandler('DEBUG', {
 export { Logger };
 
 export const logger = (): Logger => {
-  const silent: boolean = Deno.env.get('SILENT') === 'true';
+  const quiet: boolean = Deno.env.get('SILENT') === 'true';
   const logLevel: LogLevel = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LogLevel || 'INFO';
 
   setup({
-    handlers: silent ? undefined : {
+    handlers: quiet ? undefined : {
       console: consoleHandler,
     },
     loggers: {

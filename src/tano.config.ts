@@ -1,6 +1,7 @@
 import { parse } from 'std/flags/mod.ts';
+import { LogLevels } from 'std/log/mod.ts';
 
-import { TanoConfig } from './definitions.ts';
+import { TanoCliAction, TanoConfig } from './definitions.ts';
 
 export const setup = (): TanoConfig => {
   const flags = parse(Deno.args, {
@@ -8,26 +9,44 @@ export const setup = (): TanoConfig => {
       f: 'file',
       t: 'task',
       h: 'help',
+      q: 'quiet',
       l: 'log-level',
+      V: 'version',
     },
     string: ['file', 'task', 'log-level'],
-    boolean: ['force', 'help', 'silent', 'abort-on-error'],
+    boolean: ['force', 'help', 'quiet', 'abort-on-error', 'version'],
     default: {
       file: 'tanofile.ts',
-      silent: false,
+      quiet: false,
       'abort-on-error': true,
       'log-level': 'INFO',
     },
   });
 
-  Deno.env.set('ABORT_ON_ERROR', `${flags['abort-on-error']}`);
-  Deno.env.set('SILENT', `${flags.silent}`);
+  const task: string = flags.task || flags._[0] as string;
+  const logLevel: string = flags['log-level'].toUpperCase();
+  const abortOnError: boolean = flags['abort-on-error'];
+
+  Deno.env.set('ABORT_ON_ERROR', `${abortOnError}`);
+  Deno.env.set('SILENT', `${flags.quiet}`);
   Deno.env.set('FORCE', `${flags.force}`);
-  Deno.env.set('LOG_LEVEL', flags['log-level'].toUpperCase());
+  Deno.env.set('LOG_LEVEL', logLevel);
+
+  let action: TanoCliAction = 'run';
+  if (flags.version) {
+    action = 'version';
+  } else if (flags.help) {
+    action = 'help';
+  }
 
   const config: TanoConfig = {
     file: flags.file,
-    task: flags.task || flags._[0] as string,
+    task,
+    force: flags.force,
+    quiet: flags.quiet,
+    logLevel: logLevel as unknown as LogLevels,
+    abortOnError,
+    action,
   };
 
   return config;

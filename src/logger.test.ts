@@ -13,7 +13,7 @@ describe(`logger`, () => {
     assertEquals(actual.level, LogLevels.INFO);
   });
 
-  it(`Should be silent`, () => {
+  it(`Should be quiet`, () => {
     Deno.env.set('SILENT', 'true');
 
     const actual: Logger = logger();

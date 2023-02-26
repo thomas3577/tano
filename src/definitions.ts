@@ -1,10 +1,19 @@
+import { LogLevels } from 'std/log/mod.ts';
+
 import { Task } from './task.ts';
 
 export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
+export type TanoCliAction = 'run' | 'help' | 'version';
+
 export interface TanoConfig {
   file: string;
   task: string;
+  force: boolean;
+  quiet: boolean;
+  logLevel: LogLevels;
+  abortOnError: boolean;
+  action: TanoCliAction;
 }
 
 export interface TaskOptions extends RunOptions {

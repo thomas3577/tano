@@ -1,6 +1,6 @@
 # tano
 
-Just another task runner cli with no dependencies and inspired by Gulp.
+Yet another task runner cli with no dependencies and inspired by Gulp.
 
 ## Install
 

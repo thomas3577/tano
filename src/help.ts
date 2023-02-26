@@ -1,7 +1,14 @@
+import * as std from 'std/version.ts';
+import * as tano from './version.ts';
+
 export const help = () => {
   console.log(`
-    tano 0.0.1
+    tano                  v${tano.VERSION}
     Yet another task runner cli with no dependencies and inspired by Gulp.
+
+    deno                  v${Deno.version.deno}
+    typescript            v${Deno.version.typescript}
+    Deno standard library v${std.VERSION}
 
     To run the default task:
 
@@ -33,7 +40,7 @@ export const help = () => {
 
       -l, --log-level <LOG_LEVEL>
               To change the log level. Default is 'INFO'.
-              See https://deno.land/std@0.178.0/log/levels.ts
+              See https://deno.land/std@${std.VERSION}/log/levels.ts
 
       -V, --version
               Print version information

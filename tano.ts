@@ -27,6 +27,7 @@ if (import.meta.main) {
       help();
       break;
     case 'version':
+      console.log(`v${(await import('./src/version.ts')).VERSION}`);
       break;
     default:
       await cli();

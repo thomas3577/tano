@@ -33,7 +33,7 @@ export const help = () => {
 
       -l, --log-level <LOG_LEVEL>
               To change the log level. Default is 'INFO'.
-              See https://deno.land/std@0.159.0/log/levels.ts?s=LogLevels
+              See https://deno.land/std@0.178.0/log/levels.ts
 
       -V, --version
               Print version information

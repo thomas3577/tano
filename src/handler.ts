@@ -82,7 +82,6 @@ export class Handler {
 
     const taskNames: Array<string> = this.#createPlan(taskName);
 
-    console.warn('>>> abortOnError', abortOnError);
     let abort = false;
     for (const tn of taskNames) {
       if (abort) {

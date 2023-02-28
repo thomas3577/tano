@@ -52,7 +52,8 @@ const runCommand = async (command: Command, options: CommandOptions): Promise<vo
 
   if (status?.code === 0) {
     if (options?.output) {
-      const output: string = new TextDecoder().decode(rawOutput);
+      const textDecoder = new TextDecoder();
+      const output: string = textDecoder.decode(rawOutput);
 
       options?.output(undefined, output);
     }
@@ -126,13 +127,18 @@ const runProcess = async (command: Command, options: CommandOptions): Promise<Pr
       process.stderrOutput(),
     ]);
 
+    const textDecoder = new TextDecoder();
+    const error: string | undefined = rawError ? textDecoder.decode(rawError) : undefined;
+
     return {
       status,
       rawOutput,
-      error: rawError ? new TextDecoder().decode(rawError) : undefined,
+      error,
       process,
     };
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown err';
+
     return { error };
   }
 };

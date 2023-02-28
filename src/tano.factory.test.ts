@@ -10,8 +10,8 @@ describe(getImportUrl.name, () => {
 
     try {
       actual = await getImportUrl(fileOrUrl as unknown as string);
-    } catch (error) {
-      assertInstanceOf(error, TypeError);
+    } catch (err: unknown) {
+      assertInstanceOf(err, TypeError);
     }
 
     assertEquals(actual, 'init');
@@ -23,8 +23,8 @@ describe(getImportUrl.name, () => {
 
     try {
       actual = await getImportUrl(fileOrUrl as unknown as string);
-    } catch (error) {
-      assertInstanceOf(error, TypeError);
+    } catch (err: unknown) {
+      assertInstanceOf(err, TypeError);
     }
 
     assertEquals(actual, 'init');
@@ -36,8 +36,8 @@ describe(getImportUrl.name, () => {
 
     try {
       actual = await getImportUrl(fileOrUrl as unknown as string);
-    } catch (error) {
-      assertInstanceOf(error, Error);
+    } catch (err: unknown) {
+      assertInstanceOf(err, Error);
     }
 
     assertEquals(actual, 'init');

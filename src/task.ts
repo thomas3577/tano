@@ -9,6 +9,134 @@ import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command,
 
 type TaskType = 'command' | 'code' | undefined;
 
+type ProcessOutput = {
+  status?: Deno.ProcessStatus;
+  rawOutput?: Uint8Array;
+  error?: string;
+  process?: Deno.Process<Deno.RunOptions>;
+};
+
+const runCode = async (code: Code, options: CodeOptions): Promise<void> => {
+  if (typeof code === 'function') {
+    if (options?.repl) {
+      const funcAsString: string = code.toString();
+      const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
+
+      return await runCommand(command, options);
+    }
+
+    return await executeCodeFunction(code)
+      // TODO(thu): Currently no return value. It's always void.
+      .then((output) => {
+        if (options?.output) {
+          options?.output(undefined, output);
+        }
+      })
+      .catch((err: unknown) => {
+        if (options?.output) {
+          options?.output(err, undefined);
+        }
+
+        throw err;
+      });
+  }
+
+  const file: string = code.file instanceof URL ? code.file.toString() : code.file;
+  const command: Command = ['deno', 'run', ...(options?.args || []), file];
+
+  return await runCommand(command, options);
+};
+
+const runCommand = async (command: Command, options: CommandOptions): Promise<void> => {
+  const { status, rawOutput, error, process } = await runProcess(command, options);
+
+  if (status?.code === 0) {
+    if (options?.output) {
+      const output: string = new TextDecoder().decode(rawOutput);
+
+      options?.output(undefined, output);
+    }
+
+    await Deno.stdout.write(rawOutput as Uint8Array);
+
+    process?.close();
+  } else {
+    if (options?.output) {
+      options?.output(error, undefined);
+    }
+
+    await Promise.reject(error);
+
+    process?.kill();
+  }
+};
+
+const executeCondition = async (condition: Condition): Promise<boolean> => {
+  return await new Promise((resolve, reject) => {
+    try {
+      if (typeof condition === 'function') {
+        if (condition.length > 0) {
+          condition((result) => resolve(result));
+        } else {
+          resolve((condition as ConditionType2)());
+        }
+      } else {
+        resolve(condition === true);
+      }
+    } catch (err: unknown) {
+      reject(err);
+    }
+  });
+};
+
+const executeCodeFunction = async (code: CodeFunction): Promise<void> => {
+  return await new Promise((resolve, reject) => {
+    try {
+      if (code.length > 0) {
+        code((err: unknown) => {
+          if (err) {
+            reject(err);
+          }
+
+          return resolve();
+        });
+      } else {
+        resolve((code as CodeFunctionWithoutDone)());
+      }
+    } catch (err: unknown) {
+      reject(err);
+    }
+  });
+};
+
+const runProcess = async (command: Command, options: CommandOptions): Promise<ProcessOutput> => {
+  try {
+    const process: Deno.Process<Deno.RunOptions> = Deno.run({
+      cmd: Array.isArray(command) ? command : command.split(' '),
+      cwd: options?.cwd || Deno.cwd(),
+      env: options?.env,
+      stdout: options?.stdout || 'piped',
+      stderr: options?.stderr || 'piped',
+      stdin: options?.stdin || 'null',
+    });
+
+    const [status, rawOutput, rawError] = await Promise.all([
+      process.status(),
+      process.output(),
+      process.stderrOutput(),
+    ]);
+
+    return {
+      status,
+      rawOutput,
+      error: rawError ? new TextDecoder().decode(rawError) : undefined,
+      process,
+    };
+  } catch (error) {
+    return { error };
+  }
+};
+
 const toCommand = (commandOrCode?: Executor): Command => {
   return (isCommand(commandOrCode) ? commandOrCode : undefined as unknown) as Command;
 };
@@ -33,7 +161,6 @@ export class Task implements TaskParams {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
-  #process: null | Deno.Process = null;
 
   /**
    * Creates a new instance ot Task.
@@ -128,13 +255,6 @@ export class Task implements TaskParams {
   }
 
   /**
-   * Gets the current process.
-   */
-  get process(): null | Deno.Process {
-    return this.#process;
-  }
-
-  /**
    * Executes all dependent tasks and its own.
    *
    * @returns {Promise<void>} A promise that resolves to void.
@@ -157,7 +277,7 @@ export class Task implements TaskParams {
       throw new Error(`The task '${this.#name}' has already been run.`);
     }
 
-    const result: boolean = await this.#executeCondition(this.#options?.condition ?? ((): boolean => true));
+    const result: boolean = await executeCondition(this.#options?.condition ?? ((): boolean => true));
     if (!result) {
       this.#log.warning('');
       this.#log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
@@ -170,7 +290,7 @@ export class Task implements TaskParams {
     this.#preRun();
 
     await this.#run(this.#type, this.#executor, this.#options)
-      .catch((err) => {
+      .catch((err: unknown) => {
         this.#status = 'failed';
 
         this.#log.error(`${bold(red('Error'))} {name}: ${err}`, {
@@ -189,7 +309,6 @@ export class Task implements TaskParams {
   reset(): void {
     this.#starting = null;
     this.#finished = null;
-    this.#process = null;
     this.#status = 'ready';
   }
 
@@ -228,101 +347,9 @@ export class Task implements TaskParams {
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {
     if (type === 'command') {
-      await this.#runCommand(toCommand(executor), options);
-    } else if (this.#type === 'code') {
-      await this.#runCode(toCode(executor), options);
+      await runCommand(toCommand(executor), options);
+    } else if (type === 'code') {
+      await runCode(toCode(executor), options);
     }
-  }
-
-  async #runCommand(command: Command, options: CommandOptions): Promise<void> {
-    this.#process = Deno.run({
-      cmd: Array.isArray(command) ? command : command.split(' '),
-      cwd: options?.cwd || Deno.cwd(),
-      env: options?.env,
-      stdout: options?.stdout || 'piped',
-      stderr: options?.stderr || 'piped',
-      stdin: options?.stdin || 'null',
-    });
-
-    const status: Deno.ProcessStatus = await this.#process.status();
-    const rawOutput: Uint8Array = await this.#process.output();
-    const rawError: Uint8Array = await this.#process.stderrOutput();
-
-    if (status.code === 0) {
-      if (this.#options?.output) {
-        const output: string = new TextDecoder().decode(rawOutput);
-
-        this.#options?.output(undefined, output);
-      }
-
-      await Deno.stdout.write(rawOutput);
-
-      this.#process.close();
-    } else {
-      const error: string = new TextDecoder().decode(rawError);
-      if (this.#options?.output) {
-        this.#options?.output(error, undefined);
-      }
-
-      await Promise.reject(error);
-
-      this.#process.kill();
-    }
-  }
-
-  async #runCode(code: Code, options: CodeOptions): Promise<void> {
-    if (typeof code === 'function') {
-      if (options?.repl) {
-        const funcAsString = code.toString();
-        const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
-
-        return await this.#runCommand(command, options);
-      }
-
-      return await this.#executeCodeFunction(code);
-    }
-
-    const file: string = code.file instanceof URL ? code.file.toString() : code.file;
-    const command: Command = ['deno', 'run', ...(options?.args || []), file];
-
-    return await this.#runCommand(command, options);
-  }
-
-  async #executeCodeFunction(code: CodeFunction): Promise<void> {
-    return await new Promise((resolve, reject) => {
-      try {
-        if (code.length > 0) {
-          code((err: unknown) => {
-            if (err) {
-              reject(err);
-            }
-
-            return resolve();
-          });
-        } else {
-          resolve((code as CodeFunctionWithoutDone)());
-        }
-      } catch (err: unknown) {
-        reject(err);
-      }
-    });
-  }
-
-  async #executeCondition(condition: Condition): Promise<boolean> {
-    return await new Promise((resolve, reject) => {
-      try {
-        if (typeof condition === 'function') {
-          if (condition.length > 0) {
-            condition((result) => resolve(result));
-          } else {
-            resolve((condition as ConditionType2)());
-          }
-        } else {
-          resolve(condition === true);
-        }
-      } catch (err: unknown) {
-        reject(err);
-      }
-    });
   }
 }

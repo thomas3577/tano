@@ -1,4 +1,4 @@
-import { assertEquals } from 'std/testing/asserts.ts';
+import { assertEquals, assertNotEquals } from 'std/testing/asserts.ts';
 import { afterAll, afterEach, describe, it } from 'std/testing/bdd.ts';
 
 import { task } from './task.factory.ts';
@@ -297,6 +297,30 @@ describe(task.name, () => {
 
       assertEquals(actual.status, 'success');
       assertEquals(handler.executed, 2);
+    });
+
+    it(`Should gets an output`, async () => {
+      await new Promise<void>((resolve) => {
+        task('my-task-100', `echo 'First Task'`, {
+          output: (error: unknown, output: string): void => {
+            assertEquals(error, undefined);
+            assertEquals(output, 'First Task\n');
+            resolve();
+          },
+        }).run();
+      });
+    });
+
+    it(`Should gets an error output`, async () => {
+      await new Promise<void>((resolve) => {
+        task('my-task-100', `unknown-command`, {
+          output: (error: unknown, output: string): void => {
+            assertNotEquals(error, undefined);
+            assertEquals(output, undefined);
+            resolve();
+          },
+        }).run();
+      });
     });
   });
 });

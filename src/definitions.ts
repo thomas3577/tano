@@ -19,7 +19,7 @@ export interface TanoConfig {
 export interface TaskOptions extends RunOptions {
   description?: string;
   condition?: Condition;
-  output?: <T>(error: unknown, event: T) => void;
+  output?: (error: unknown, output: any) => void;
 }
 
 export interface CodeOptions extends TaskOptions {

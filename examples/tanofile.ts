@@ -105,9 +105,9 @@ task('output-01', `echo 'OUTPUT'`, {
 
 // TODO(thu): Should throw an error?
 task('output-02', ['exit', '1'], {
-  output: (error) => {
-    if (error) {
-      console.log('>>> error', error);
+  output: (err: unknown) => {
+    if (err) {
+      console.log('>>> error', err);
     }
   },
 });

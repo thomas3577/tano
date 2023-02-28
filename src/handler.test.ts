@@ -59,8 +59,8 @@ describe(Handler.name, () => {
     assertEquals(handler.executed, 2);
 
     await handler.run()
-      .catch((error) => {
-        assertInstanceOf(error, Error);
+      .catch((err: unknown) => {
+        assertInstanceOf(err, Error);
       });
 
     assertEquals(handler.executed, 2);
@@ -96,8 +96,8 @@ describe(Handler.name, () => {
       task('default', needs('pre-task-one', 'pre-task-two'), `echo 'if you see me, something went wrong'`);
 
       await handler.run();
-    } catch (error) {
-      assertInstanceOf(error, Error);
+    } catch (err: unknown) {
+      assertInstanceOf(err, Error);
     }
   });
 

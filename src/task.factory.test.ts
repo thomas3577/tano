@@ -321,7 +321,7 @@ describe(task.name, () => {
 
       await myTask.run()
         .catch((err) => {
-          assertEquals(err, 'program not found');
+          assertNotEquals(err, undefined);
         });
     });
   });

@@ -39,11 +39,6 @@ tano --task my-task
 tano my-task
 ```
 
-## Todo
-
-- Option to skip task, if no changes (Defines in the options). Non-volatile cache to remember last run.
-- cli: --force > To ignore "no changes"
-
 ## Documentation
 
 - [api](./docs/api.md)

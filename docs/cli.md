@@ -9,4 +9,3 @@
 | --log-level      | `string` | `INFO`        | More [here](https://deno.land/std@0.151.0/log/levels.ts?source). |
 | --quiet          |          |               | Turns off the logs.                                              |
 | --abort-on-error |          |               | Cancel after the first error.                                    |
-| --force          |          |               | Ignors "no changes"                                              |

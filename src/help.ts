@@ -47,8 +47,5 @@ export const help = () => {
 
           --abort-on-error
               Aborts all tasks at the first error. Default is 'true'
-
-          --force
-              Ignors 'no changes'
   `);
 };

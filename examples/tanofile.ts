@@ -102,12 +102,3 @@ task('output-01', `echo 'OUTPUT'`, {
     console.log('>>> result', result);
   },
 });
-
-// TODO(thu): Should throw an error?
-task('output-02', ['exit', '1'], {
-  output: (err: unknown) => {
-    if (err) {
-      console.log('>>> error', err);
-    }
-  },
-});

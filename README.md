@@ -1,16 +1,20 @@
 # tano
 
-Yet another task runner cli with no dependencies and inspired by Gulp.
+Yet another task runner cli with no dependencies, inspired by Gulp.
 
 ## Install
 
 ```bash
-deno install -A -f -n tano --config ./deno.json https://deno.land/x/install@v0.0.1/tano.ts
+deno install --allow-read --allow-run --allow-env -f -n tano --config ./deno.json https://deno.land/x/install@v0.0.1/tano.ts
 ```
+
+**Note:**
+
+Your tasks may need additional permissions.
 
 ## Preparation
 
-Create a TypeScript file with the name `tanofile.ts`, import the 'task' function and create your tasks.
+Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.
 
 ```TypeScript
 import { task, needs } from 'https://deno.land/x/install@v0.0.1/mod.ts';

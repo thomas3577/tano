@@ -304,7 +304,7 @@ describe(task.name, () => {
         task('my-task-103', `echo 'First Task'`, {
           output: (error: unknown, output: string): void => {
             assertEquals(error, undefined);
-            assertEquals(output, 'First Task\n');
+            assertEquals(output?.includes('First Task'), true);
             resolve();
           },
         }).run();

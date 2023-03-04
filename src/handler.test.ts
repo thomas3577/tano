@@ -1,11 +1,16 @@
 import { assertEquals, assertInstanceOf } from 'std/testing/asserts.ts';
-import { afterEach, describe, it } from 'std/testing/bdd.ts';
+import { afterEach, beforeAll, describe, it } from 'std/testing/bdd.ts';
+import { spy } from 'std/testing/mock.ts';
 
 import { Handler, handler } from './handler.ts';
 import { needs } from './needs.ts';
 import { task } from './task.factory.ts';
 
 describe(Handler.name, () => {
+  beforeAll(() => {
+    spy(Deno.writeTextFile);
+  });
+
   afterEach(() => {
     handler.clear();
   });

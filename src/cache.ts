@@ -4,20 +4,18 @@ export interface TaskRunData {
   lastRun?: number;
 }
 
-const toPath = (cwd: string): string => {
-  return format({
+const toPath = (cwd: string): string =>
+  format({
     root: '/',
     dir: join(cwd, '.tano'),
     name: 'cache',
     ext: '.json',
   });
-};
 
-const createDir = async (cwd: string): Promise<void> => {
+const createDir = async (cwd: string): Promise<void> =>
   await Deno.mkdir(join(cwd, '.tano'), {
     recursive: true,
   });
-};
 
 export const writeToCache = async (cwd: string, data: TaskRunData): Promise<void> => {
   const path: string = toPath(cwd);

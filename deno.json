@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env ../tano.ts --file ./tanofile.ts",
+    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
     "check": "deno fmt --check && deno lint"
   },
   "compilerOptions": {

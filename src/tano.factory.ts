@@ -1,10 +1,10 @@
-import { isAbsolute, join } from 'std/path/mod.ts';
+import { dirname, fromFileUrl, isAbsolute, join, toFileUrl } from 'std/path/mod.ts';
 
 export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
-  let importUrl: null | string = '';
+  let importUrl: null | URL = null;
 
   try {
-    importUrl = new URL(fileOrUrl).toString();
+    importUrl = new URL(fileOrUrl);
   } catch (_: unknown) {
     const importFile: string = fileOrUrl;
     const importPath: string = isAbsolute(importFile) ? importFile : join(Deno.cwd(), importFile);
@@ -18,8 +18,19 @@ export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
       throw err;
     }
 
-    importUrl = join('file:', importPath);
+    importUrl = toFileUrl(importPath);
   }
 
-  return importUrl;
+  return importUrl.toString();
+};
+
+export const getCwd = (importUrl: string): string => {
+  if (!importUrl.startsWith('file:')) {
+    return Deno.cwd();
+  }
+
+  const importPath: string = fromFileUrl(importUrl);
+  const importDirectory: string = dirname(importPath);
+
+  return importDirectory;
 };

@@ -11,6 +11,7 @@
         "--allow-read",
         "--allow-run",
         "--allow-env",
+        "--allow-write",
         "--inspect-brk",
         "../tano.ts",
         "--file",

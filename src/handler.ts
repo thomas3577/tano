@@ -1,5 +1,6 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
+import { readFromCache, TaskRunData, writeToCache } from './cache.ts';
 
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
@@ -11,6 +12,7 @@ export class Handler {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
+  #data: null | TaskRunData = null;
 
   /**
    * Gets the timestamp when the handler was created.
@@ -77,8 +79,10 @@ export class Handler {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', abortOnError: boolean = true): Promise<void> {
-    this.#preRun();
+  async run(taskName: string = 'default', abortOnError: boolean = true, cwd?: string): Promise<void> {
+    cwd = cwd ?? Deno.cwd();
+
+    await this.#preRun(cwd);
 
     const taskNames: Array<string> = this.#createPlan(taskName);
 
@@ -97,7 +101,7 @@ export class Handler {
         });
     }
 
-    this.#postRun();
+    await this.#postRun(cwd);
   }
 
   /**
@@ -114,7 +118,9 @@ export class Handler {
     this.#cache.clear();
   }
 
-  #preRun(): void {
+  async #preRun(cwd: string): Promise<void> {
+    this.#data = await readFromCache(cwd);
+
     this.#log.info(`Deno       v${Deno.version.deno}`);
     this.#log.info(`TypeScript v${Deno.version.typescript}`);
     this.#log.info(`V8         v${Deno.version.v8}`);
@@ -127,9 +133,11 @@ export class Handler {
     });
   }
 
-  #postRun(): void {
+  async #postRun(cwd: string): Promise<void> {
+    const finished: number = Date.now();
+
     this.#finished = performance.mark('finished_run', {
-      startTime: Date.now(),
+      startTime: finished,
     });
 
     this.#measure = performance.measure('run', 'starting_run', 'finished_run');
@@ -137,6 +145,12 @@ export class Handler {
     this.#log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
+
+    if (this.#data) {
+      this.#data.lastRun = finished;
+
+      await writeToCache(cwd, this.#data);
+    }
   }
 
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {

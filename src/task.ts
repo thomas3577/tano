@@ -12,6 +12,7 @@ type TaskType = 'command' | 'code' | undefined;
 type ProcessOutput = {
   status?: Deno.ProcessStatus;
   rawOutput?: Uint8Array;
+  rawError?: Uint8Array;
   error?: string;
   process?: Deno.Process<Deno.RunOptions>;
 };
@@ -48,22 +49,29 @@ const runCode = async (code: Code, options: CodeOptions): Promise<void> => {
 };
 
 const runCommand = async (command: Command, options: CommandOptions): Promise<void> => {
-  const { status, rawOutput, error, process } = await runProcess(command, options);
+  const { status, rawOutput, rawError, error, process } = await runProcess(command, options);
+  const textDecoder = new TextDecoder();
 
   if (status?.code === 0) {
     if (options?.output) {
-      const textDecoder = new TextDecoder();
       const output: string = textDecoder.decode(rawOutput);
+      const error: string = textDecoder.decode(rawError);
 
-      options?.output(undefined, output);
+      options?.output(error, output);
     }
 
-    await Deno.stdout.write(rawOutput as Uint8Array);
+    if (rawOutput && rawOutput?.length > 0) {
+      await Deno.stdout.write(rawOutput as Uint8Array);
+    }
+
+    if (rawError && rawError?.length > 0) {
+      await Deno.stderr.write(rawError as Uint8Array);
+    }
 
     process?.close();
   } else {
     if (options?.output) {
-      options?.output(error, undefined);
+      options?.output(error || textDecoder.decode(rawError), undefined);
     }
 
     await Promise.reject(error);
@@ -127,13 +135,10 @@ const runProcess = async (command: Command, options: CommandOptions): Promise<Pr
       process.stderrOutput(),
     ]);
 
-    const textDecoder = new TextDecoder();
-    const error: string | undefined = rawError ? textDecoder.decode(rawError) : undefined;
-
     return {
       status,
       rawOutput,
-      error,
+      rawError,
       process,
     };
   } catch (err: unknown) {
@@ -275,10 +280,12 @@ export class Task implements TaskParams {
    * @returns {Promise<void>} A promise that resolves to void.
    */
   async runThis(): Promise<void> {
+    // If no type is defined, nothing will be executed. It is possible and valid not to have a type.
     if (this.#type === undefined) {
       return;
     }
 
+    // If the status is not "ready", the task has already been executed or not reset.
     if (this.#status !== 'ready') {
       throw new Error(`The task '${this.#name}' has already been run.`);
     }

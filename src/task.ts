@@ -70,13 +70,14 @@ const runCommand = async (command: Command, options: CommandOptions): Promise<vo
 
     process?.close();
   } else {
+    const err: string = error || textDecoder.decode(rawError);
     if (options?.output) {
-      options?.output(error || textDecoder.decode(rawError), undefined);
+      options?.output(err, undefined);
     }
 
-    await Promise.reject(error);
-
     process?.kill();
+
+    await Promise.reject(err);
   }
 };
 

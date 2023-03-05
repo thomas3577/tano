@@ -1,7 +1,10 @@
+import { bold } from 'std/fmt/colors.ts';
+
 import { Logger, logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';
 import { setup } from './src/tano.config.ts';
 import { help } from './src/help.ts';
+import { VERSION } from './src/version.ts';
 
 import type { TanoConfig } from './src/definitions.ts';
 
@@ -18,11 +21,12 @@ log.debug('');
 const cli = async (): Promise<void> => {
   try {
     log.info(`Using tanofile ${config.file}`);
+    log.info(`Tano        v${VERSION}`);
 
     await import(config.file);
     await handler.run(config.task, config.failFast);
   } catch (err: unknown) {
-    log.error(`Aborted with errors. ${err}`);
+    log.error(bold('Aborted with errors.') + `${err ?? ''}`);
   }
 };
 
@@ -32,7 +36,7 @@ if (import.meta.main) {
       help();
       break;
     case 'version':
-      console.log(`v${(await import('./src/version.ts')).VERSION}`);
+      console.log(`v${VERSION}`);
       break;
     default:
       await cli();

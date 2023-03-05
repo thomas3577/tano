@@ -18,7 +18,7 @@ export const setup = async (): Promise<TanoConfig> => {
     default: {
       file: 'tanofile.ts',
       quiet: false,
-      'fail-fast': true,
+      'fail-fast': false,
       'log-level': 'INFO',
     },
   });

@@ -17,7 +17,7 @@ export interface TanoConfig {
 }
 
 export interface TaskRunData {
-  lastRun?: number;
+  lastRun?: string;
 }
 
 export interface TaskOptions extends RunOptions {

@@ -1,5 +1,6 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
+import { format as formatDate } from 'std/datetime/format.ts';
 import { readFromCache, writeToCache } from './cache.ts';
 
 import { Logger, logger } from './logger.ts';
@@ -122,23 +123,30 @@ export class Handler {
   async #preRun(cwd: string): Promise<void> {
     this.#data = await readFromCache(cwd);
 
-    this.#log.info(`Deno       v${Deno.version.deno}`);
-    this.#log.info(`TypeScript v${Deno.version.typescript}`);
-    this.#log.info(`V8         v${Deno.version.v8}`);
+    this.#log.info(`Deno        v${Deno.version.deno}`);
+    this.#log.info(`TypeScript  v${Deno.version.typescript}`);
+    this.#log.info(`V8          v${Deno.version.v8}`);
+
+    if (this.#data?.lastRun) {
+      this.#log.info(`Last run at ${this.#data.lastRun}`);
+    }
+
     this.#log.info('');
     this.#log.info(bold(green(`Starting...`)));
 
+    const dateNow = new Date();
+
     this.#finished = null;
     this.#starting = performance.mark('starting_run', {
-      startTime: Date.now(),
+      startTime: dateNow.getTime(),
     });
   }
 
   async #postRun(cwd: string): Promise<void> {
-    const finished: number = Date.now();
+    const dateNow = new Date();
 
     this.#finished = performance.mark('finished_run', {
-      startTime: finished,
+      startTime: dateNow.getTime(),
     });
 
     this.#measure = performance.measure('run', 'starting_run', 'finished_run');
@@ -148,7 +156,7 @@ export class Handler {
     });
 
     if (this.#data) {
-      this.#data.lastRun = finished;
+      this.#data.lastRun = dateNow.toISOString();
 
       await writeToCache(cwd, this.#data);
     }

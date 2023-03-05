@@ -1,7 +1,7 @@
 {
   "tasks": {
     "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
-    "check": "deno fmt --check && deno lint"
+    "check": "deno fmt --check && deno lint && deno test -A && deno task run"
   },
   "compilerOptions": {
     "strict": true
@@ -26,8 +26,8 @@
   "fmt": {
     "files": {
       "exclude": [
-        ".vscode",
-        ".tano",
+        ".vscode/",
+        ".tano/",
         "cspell.json"
       ]
     },

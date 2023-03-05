@@ -1,8 +1,7 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
-import { format as formatDate } from 'std/datetime/format.ts';
-import { readFromCache, writeToCache } from './cache.ts';
 
+import { readFromCache, writeToCache } from './cache.ts';
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
 import type { TaskRunData } from './definitions.ts';
@@ -81,8 +80,8 @@ export class Handler {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', abortOnError: boolean = true, cwd?: string): Promise<void> {
-    cwd = cwd ?? Deno.cwd();
+  async run(taskName: string = 'default', abortOnError: boolean = true): Promise<void> {
+    const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
 
     await this.#preRun(cwd);
 

@@ -266,7 +266,7 @@ export class Task implements TaskParams {
    * @returns {Promise<void>} A promise that resolves to void.
    */
   async run(abortOnError: boolean = false): Promise<void> {
-    await this.#handler.run(this.#name, abortOnError, Deno.cwd());
+    await this.#handler.run(this.#name, abortOnError);
   }
 
   /**

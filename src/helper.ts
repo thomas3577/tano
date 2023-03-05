@@ -1,4 +1,4 @@
-import { CodeFile, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './definitions.ts';
+import type { CodeFile, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './definitions.ts';
 
 export const isNeeds = (param?: NeedsOrExecutor): boolean => {
   return typeof param === 'object' && !(param as CodeFile)?.file && Array.isArray((param as Needs)?.values);

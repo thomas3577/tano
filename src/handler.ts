@@ -1,9 +1,10 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
-import { readFromCache, TaskRunData, writeToCache } from './cache.ts';
+import { readFromCache, writeToCache } from './cache.ts';
 
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
+import type { TaskRunData } from './definitions.ts';
 
 export class Handler {
   readonly #log: Logger = logger();

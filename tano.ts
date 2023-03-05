@@ -1,9 +1,9 @@
 import { Logger, logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';
 import { setup } from './src/tano.config.ts';
-import { TanoConfig } from './src/definitions.ts';
 import { getCwd, getImportUrl } from './src/tano.factory.ts';
 import { help } from './src/help.ts';
+import type { TanoConfig } from './src/definitions.ts';
 
 const config: TanoConfig = setup();
 const log: Logger = logger();

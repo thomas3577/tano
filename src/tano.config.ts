@@ -1,7 +1,7 @@
 import { parse } from 'std/flags/mod.ts';
 import { LogLevels } from 'std/log/mod.ts';
 
-import { TanoCliAction, TanoConfig } from './definitions.ts';
+import type { TanoCliAction, TanoConfig } from './definitions.ts';
 
 export const setup = (): TanoConfig => {
   const flags = parse(Deno.args, {

@@ -26,7 +26,8 @@
   "fmt": {
     "files": {
       "exclude": [
-        ".vscode/",
+        ".vscode",
+        ".tano",
         "cspell.json"
       ]
     },

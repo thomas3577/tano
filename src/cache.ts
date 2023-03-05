@@ -1,9 +1,5 @@
 import { format, join } from 'std/path/mod.ts';
 
-export interface TaskRunData {
-  lastRun?: number;
-}
-
 const toPath = (cwd: string): string =>
   format({
     root: '/',
@@ -17,27 +13,27 @@ const createDir = async (cwd: string): Promise<void> =>
     recursive: true,
   });
 
-export const writeToCache = async (cwd: string, data: TaskRunData): Promise<void> => {
+export const writeToCache = async <T>(cwd: string, obj: T | Record<string | number | symbol, never> = {}): Promise<void> => {
   const path: string = toPath(cwd);
 
-  await Deno.writeTextFile(path, JSON.stringify(data, null, 2), {
+  await Deno.writeTextFile(path, JSON.stringify(obj, null, 2), {
     create: true,
   });
 };
 
-export const readFromCache = async (cwd: string): Promise<TaskRunData> => {
+export const readFromCache = async <T>(cwd: string): Promise<T> => {
   const path: string = toPath(cwd);
 
   try {
     const text: string = await Deno.readTextFile(path);
-    const data: TaskRunData = JSON.parse(text);
+    const obj: T = JSON.parse(text);
 
-    return data;
+    return obj;
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {
       await createDir(cwd);
 
-      return await writeToCache(cwd, {}).then(() => ({}));
+      return await writeToCache(cwd).then(() => ({} as T));
     }
 
     throw err;

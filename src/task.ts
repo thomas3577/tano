@@ -3,7 +3,7 @@ import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
 import { Handler, handler } from './handler.ts';
-import { isCode, isCommand } from './helper.ts';
+import { isCode, isCommand } from './utils.ts';
 
 import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, ConditionType2, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
 

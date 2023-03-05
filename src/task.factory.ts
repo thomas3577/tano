@@ -1,5 +1,5 @@
 import { Task } from './task.ts';
-import { isExecutor, isNeeds } from './helper.ts';
+import { isExecutor, isNeeds } from './utils.ts';
 
 import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, TaskDefinition, TaskParams } from './definitions.ts';
 

@@ -30,7 +30,7 @@ export const setup = async (): Promise<TanoConfig> => {
   const cwd: string = getCwd(file);
 
   Deno.env.set('ABORT_ON_ERROR', `${abortOnError}`);
-  Deno.env.set('SILENT', `${flags.quiet}`);
+  Deno.env.set('QUIET', `${flags.quiet}`);
   Deno.env.set('FORCE', `${flags.force}`);
   Deno.env.set('LOG_LEVEL', logLevel);
   Deno.env.set('TANO_CWD', cwd);

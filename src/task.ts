@@ -265,8 +265,8 @@ export class Task implements TaskParams {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(abortOnError: boolean = false): Promise<void> {
-    await this.#handler.run(this.#name, abortOnError);
+  async run(failFast: boolean = false): Promise<void> {
+    await this.#handler.run(this.#name, failFast);
   }
 
   /**
@@ -319,7 +319,6 @@ export class Task implements TaskParams {
   }
 
   #preRun(): void {
-    this.#log.info('');
     this.#log.info(`Starting {name}...`, {
       name: `'${gray(this.#name)}'`,
     });

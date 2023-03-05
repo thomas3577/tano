@@ -7,7 +7,7 @@ export type TanoCliAction = 'run' | 'help' | 'version';
 export interface TanoConfig {
   file: string;
   task: string;
-  abortOnError: boolean;
+  failFast: boolean;
   action: TanoCliAction;
 }
 

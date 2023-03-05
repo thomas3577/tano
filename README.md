@@ -43,8 +43,13 @@ tano --task my-task
 tano my-task
 ```
 
+## Help
+
+```bash
+tano --help
+```
+
 ## Documentation
 
 - [api](./docs/api.md)
-- [cli](./docs/cli.md)
 - [examples](./docs/examples.md)

@@ -45,7 +45,7 @@ export const help = () => {
       -V, --version
               Print version information
 
-          --abort-on-error
+          --fail-fast
               Aborts all tasks at the first error. Default is 'true'
   `);
 };

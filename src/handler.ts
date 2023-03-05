@@ -80,7 +80,7 @@ export class Handler {
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', abortOnError: boolean = true): Promise<void> {
+  async run(taskName: string = 'default', failFast: boolean = true): Promise<void> {
     const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
 
     await this.#preRun(cwd);
@@ -95,7 +95,7 @@ export class Handler {
 
       await this.#cache.get(tn)?.runThis()
         .catch((err: unknown) => {
-          if (abortOnError) {
+          if (failFast) {
             abort = true;
             throw err;
           }

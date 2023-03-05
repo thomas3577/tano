@@ -14,22 +14,22 @@ export const setup = async (): Promise<TanoConfig> => {
       V: 'version',
     },
     string: ['file', 'task', 'log-level'],
-    boolean: ['force', 'help', 'quiet', 'abort-on-error', 'version'],
+    boolean: ['force', 'help', 'quiet', 'fail-fast', 'version'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
-      'abort-on-error': true,
+      'fail-fast': true,
       'log-level': 'INFO',
     },
   });
 
   const task: string = flags.task || flags._[0] as string;
   const logLevel: string = flags['log-level'].toUpperCase();
-  const abortOnError: boolean = flags['abort-on-error'];
+  const failFast: boolean = flags['fail-fast'];
   const file: string = await getImportUrl(flags.file);
   const cwd: string = getCwd(file);
 
-  Deno.env.set('ABORT_ON_ERROR', `${abortOnError}`);
+  Deno.env.set('FAIL-FAST', `${failFast}`);
   Deno.env.set('QUIET', `${flags.quiet}`);
   Deno.env.set('FORCE', `${flags.force}`);
   Deno.env.set('LOG_LEVEL', logLevel);
@@ -45,7 +45,7 @@ export const setup = async (): Promise<TanoConfig> => {
   const config: TanoConfig = {
     file,
     task,
-    abortOnError,
+    failFast,
     action,
   };
 

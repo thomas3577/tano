@@ -3,7 +3,7 @@ import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
 import { Handler, handler } from './handler.ts';
-import { isCode, isCommand } from './utils.ts';
+import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 
 import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, ConditionType2, Executor, Options, TaskParams, TaskStatus } from './definitions.ts';
 
@@ -54,8 +54,8 @@ const runCommand = async (command: Command, options: CommandOptions): Promise<vo
 
   if (status?.code === 0) {
     if (options?.output) {
-      const output: string = textDecoder.decode(rawOutput);
-      const error: string = textDecoder.decode(rawError);
+      const output: string | undefined = textDecoder.decode(rawOutput) || undefined;
+      const error: string | undefined = textDecoder.decode(rawError) || undefined;
 
       options?.output(error, output);
     }
@@ -147,14 +147,6 @@ const runProcess = async (command: Command, options: CommandOptions): Promise<Pr
 
     return { error };
   }
-};
-
-const toCommand = (commandOrCode?: Executor): Command => {
-  return (isCommand(commandOrCode) ? commandOrCode : undefined as unknown) as Command;
-};
-
-const toCode = (commandOrCode?: Executor): Code => {
-  return (isCode(commandOrCode) ? commandOrCode : undefined as unknown) as Code;
 };
 
 /**

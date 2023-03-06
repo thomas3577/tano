@@ -241,7 +241,7 @@ describe(task.name, () => {
     });
 
     it(`Task Var 24`, () => {
-      const file = new URL('file://test.ts');
+      const file = new URL('file://var/test.ts');
       const codeFile: CodeFile = { file };
       const myTask: Task = task('my-task-24', codeFile);
 

@@ -5,15 +5,19 @@ import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command,
 const log: Logger = logger();
 
 export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
-  log.debug('Run code');
+  log.debug('Run code...');
 
   if (typeof code === 'function') {
     if (options?.repl) {
+      log.debug('Run code with repl.');
+
       const funcAsString: string = code.toString();
       const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
       await runCommand(command, options);
     } else {
+      log.debug('Run code function.');
+
       await executeCodeFunction(code)
         // TODO(thu): Currently no return value. It's always void.
         .then((output) => {
@@ -30,13 +34,15 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
         });
     }
   } else {
+    log.debug('Run code from file.');
+
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
     await runCommand(command, options);
   }
 
-  log.debug('Run code completed');
+  log.debug('Run code completed.');
 };
 
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
@@ -73,7 +79,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
     await Promise.reject(err);
   }
 
-  log.debug('Run command completed');
+  log.debug('Run command completed.');
 };
 
 export const executeCondition = async (condition: Condition): Promise<boolean> => {
@@ -121,7 +127,7 @@ export const executeCodeFunction = async (code: CodeFunction): Promise<void> => 
     }
   });
 
-  log.debug('Execute code function completed');
+  log.debug('Execute code function completed.');
 };
 
 const runProcess = async (command: Command, options?: CommandOptions): Promise<ProcessOutput> => {
@@ -143,7 +149,7 @@ const runProcess = async (command: Command, options?: CommandOptions): Promise<P
       process.stderrOutput(),
     ]);
 
-    log.debug('Run process completed');
+    log.debug('Run process completed.');
 
     return {
       status,

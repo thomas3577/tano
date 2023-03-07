@@ -20,7 +20,7 @@ log.debug('');
 
 const cli = async (): Promise<void> => {
   try {
-    log.info(`Using tanofile ${config.file}`);
+    log.info(`Using       ${config.file}`);
     log.info(`Tano        v${VERSION}`);
 
     await import(config.file);

@@ -23,13 +23,15 @@ describe(runCode.name, () => {
   });
 
   it(`if runCode(() => {})`, async () => {
-    const actual = await runCode(() => {}).then(() => true);
+    const actual = await runCode(() => {})
+      .then(() => true);
 
     assertEquals(actual, true);
   });
 
-  it(`if runCode({ file: '../examples/tanofile.code.ts' })`, async () => {
-    const actual = await runCode({ file: '../examples/tanofile.code.ts' }).then(() => true);
+  it(`if runCode({ file: './examples/tanofile.code.ts' })`, async () => {
+    const actual = await runCode({ file: './examples/tanofile.code.ts' })
+      .then(() => true);
 
     assertEquals(actual, true);
   });

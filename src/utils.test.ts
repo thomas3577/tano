@@ -1,9 +1,9 @@
 import { assertEquals } from 'std/testing/asserts.ts';
 import { describe, it } from 'std/testing/bdd.ts';
 
-import { isCode, isCommand, isExecutor, isNeeds } from './utils.ts';
+import { isCode, isCommand, isExecutor, isNeeds, toCode, toCommand } from './utils.ts';
 
-import type { NeedsOrExecutor } from './definitions.ts';
+import type { Executor, NeedsOrExecutor } from './definitions.ts';
 
 describe(isNeeds.name, () => {
   it(`if isNeeds(undefined)`, () => {
@@ -283,5 +283,100 @@ describe(isExecutor.name, () => {
     const actual = isExecutor(param);
 
     assertEquals(actual, true);
+  });
+});
+
+describe(toCommand.name, () => {
+  it(`if toCommand(undefined)`, () => {
+    const executor = undefined;
+    const actual = toCommand(executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`if toCommand(null)`, () => {
+    const executor = null;
+    const actual = toCommand(executor as unknown as Executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`if toCommand('')`, () => {
+    const executor = '';
+    const actual = toCommand(executor);
+
+    assertEquals(actual, '');
+  });
+
+  it(`if toCommand('ls')`, () => {
+    const executor = 'ls';
+    const actual = toCommand(executor);
+
+    assertEquals(actual, 'ls');
+  });
+
+  it(`if toCommand('ls --all')`, () => {
+    const executor = 'ls --all';
+    const actual = toCommand(executor);
+
+    assertEquals(actual, 'ls --all');
+  });
+
+  it(`if toCommand(['ls', '--all'])`, () => {
+    const executor = ['ls', '--all'];
+    const actual = toCommand(executor);
+
+    assertEquals(actual, ['ls', '--all']);
+  });
+
+  it(`if toCommand(() => {})`, () => {
+    const executor = () => {};
+    const actual = toCommand(executor);
+
+    assertEquals(actual, undefined);
+  });
+});
+
+describe(toCode.name, () => {
+  it(`toCode(undefined)`, () => {
+    const executor = undefined;
+    const actual = toCode(executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`toCode(null)`, () => {
+    const executor = null;
+    const actual = toCode(executor as unknown as Executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`toCode('')`, () => {
+    const executor = '';
+    const actual = toCode(executor as unknown as Executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`toCode([''])`, () => {
+    const executor = [''];
+    const actual = toCode(executor as unknown as Executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`toCode(() => {})`, () => {
+    const executor = () => {};
+    const actual = toCode(executor as unknown as Executor);
+
+    assertEquals(actual, executor);
+  });
+
+  it(`toCode({ file: 'test.ts' })`, () => {
+    const executor = { file: 'test.ts' };
+    const actual = toCode(executor as unknown as Executor);
+
+    assertEquals(actual, { file: 'test.ts' });
   });
 });

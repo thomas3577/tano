@@ -125,6 +125,7 @@ export class Handler {
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);
     this.#log.info(`V8          v${Deno.version.v8}`);
+    this.#log.info(`std         v${(await import('std/version.ts')).VERSION}`);
 
     if (this.#data?.lastRun) {
       this.#log.info(`Last run at ${this.#data.lastRun}`);

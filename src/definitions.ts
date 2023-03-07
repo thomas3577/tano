@@ -1,5 +1,15 @@
 import { Task } from './task.ts';
 
+export type TaskType = 'command' | 'code' | undefined;
+
+export type ProcessOutput = {
+  status?: Deno.ProcessStatus;
+  rawOutput?: Uint8Array;
+  rawError?: Uint8Array;
+  error?: string;
+  process?: Deno.Process<Deno.RunOptions>;
+};
+
 export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
 export type TanoCliAction = 'run' | 'help' | 'version';

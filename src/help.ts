@@ -47,5 +47,8 @@ export const help = () => {
 
           --fail-fast
               Aborts all tasks at the first error. Default is 'true'
+
+          --force
+              Also executes the tasks that have not been changed since the last run.
   `);
 };

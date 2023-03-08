@@ -14,7 +14,7 @@ export const setup = async (): Promise<TanoConfig> => {
       V: 'version',
     },
     string: ['file', 'task', 'log-level'],
-    boolean: ['force', 'help', 'quiet', 'fail-fast', 'version'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
@@ -31,7 +31,6 @@ export const setup = async (): Promise<TanoConfig> => {
 
   Deno.env.set('FAIL-FAST', `${failFast}`);
   Deno.env.set('QUIET', `${flags.quiet}`);
-  Deno.env.set('FORCE', `${flags.force}`);
   Deno.env.set('LOG_LEVEL', logLevel);
   Deno.env.set('TANO_CWD', cwd);
 

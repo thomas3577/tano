@@ -22,6 +22,10 @@ export const isCodeFile = (codeFile: CodeFile): boolean => {
     (typeof codeFile.file === 'string' && codeFile.file.match(/\.js|\.ts$/) !== null || codeFile.file instanceof URL && codeFile.file.toString().match(/\.js|\.ts$/) !== null);
 };
 
+export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
+  return (isExecutor(param) ? param : undefined as unknown) as Executor;
+};
+
 export const toCommand = (executor?: Executor): Command => {
   return (isCommand(executor) ? executor : undefined as unknown) as Command;
 };

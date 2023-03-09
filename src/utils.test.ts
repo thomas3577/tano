@@ -1,7 +1,7 @@
 import { assertEquals } from 'std/testing/asserts.ts';
 import { describe, it } from 'std/testing/bdd.ts';
 
-import { isCode, isCommand, isExecutor, isNeeds, toCode, toCommand } from './utils.ts';
+import { isCode, isCommand, isExecutor, isNeeds, toCode, toCommand, toExecutor } from './utils.ts';
 
 import type { Executor, NeedsOrExecutor } from './definitions.ts';
 
@@ -283,6 +283,71 @@ describe(isExecutor.name, () => {
     const actual = isExecutor(param);
 
     assertEquals(actual, true);
+  });
+});
+
+describe(toExecutor.name, () => {
+  it(`if toExecutor(undefined)`, () => {
+    const executor = undefined;
+    const actual = toExecutor(executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`if toExecutor(null)`, () => {
+    const executor = null;
+    const actual = toExecutor(executor as unknown as Executor);
+
+    assertEquals(actual, undefined);
+  });
+
+  it(`if toExecutor('')`, () => {
+    const executor = '';
+    const actual = toExecutor(executor);
+
+    assertEquals(actual, '');
+  });
+
+  it(`if toExecutor('ls')`, () => {
+    const executor = 'ls';
+    const actual = toExecutor(executor);
+
+    assertEquals(actual, 'ls');
+  });
+
+  it(`if toExecutor('ls --all')`, () => {
+    const executor = 'ls --all';
+    const actual = toExecutor(executor);
+
+    assertEquals(actual, 'ls --all');
+  });
+
+  it(`if toExecutor(['ls', '--all'])`, () => {
+    const executor = ['ls', '--all'];
+    const actual = toExecutor(executor);
+
+    assertEquals(actual, ['ls', '--all']);
+  });
+
+  it(`toExecutor([''])`, () => {
+    const executor = [''];
+    const actual = toExecutor(executor as unknown as Executor);
+
+    assertEquals(actual, ['']);
+  });
+
+  it(`toExecutor(() => {})`, () => {
+    const executor = () => {};
+    const actual = toExecutor(executor as unknown as Executor);
+
+    assertEquals(actual, executor);
+  });
+
+  it(`toExecutor({ file: 'test.ts' })`, () => {
+    const executor = { file: 'test.ts' };
+    const actual = toExecutor(executor as unknown as Executor);
+
+    assertEquals(actual, { file: 'test.ts' });
   });
 });
 

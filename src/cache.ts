@@ -22,9 +22,8 @@ export const writeToCache = async <T>(cwd: string, obj: T | Record<string | numb
 };
 
 export const readFromCache = async <T>(cwd: string): Promise<T> => {
-  const path: string = toPath(cwd);
-
   try {
+    const path: string = toPath(cwd);
     const text: string = await Deno.readTextFile(path);
     const obj: T = JSON.parse(text);
 

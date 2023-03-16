@@ -3,7 +3,7 @@ import { describe, it } from 'std/testing/bdd.ts';
 
 import { executeCodeFunction, executeCondition, runCode, runCommand } from './runners.ts';
 
-import type { Code, CodeFunction, Command, Condition } from './definitions.ts';
+import type { Code, CodeFunction, Command, Condition } from './types.ts';
 
 describe(runCode.name, () => {
   it(`if runCode(undefined)`, async () => {

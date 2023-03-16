@@ -6,7 +6,7 @@ import { Handler, handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
 
-import type { Command, Executor, Options, TaskParams, TaskStatus, TaskType } from './definitions.ts';
+import type { Command, Executor, Options, TaskParams, TaskStatus, TaskType } from './types.ts';
 
 /**
  * Creates a new Task.

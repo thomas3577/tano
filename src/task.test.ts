@@ -71,7 +71,7 @@ describe(Task.name, () => {
 
   it(`Should not run if conditions false. (3)`, async () => {
     const actual: Task = new Task('my-task', [], () => {}, {
-      condition: (done) => setTimeout(() => done(false), 100),
+      condition: (done: any) => setTimeout(() => done(false), 100),
     });
 
     assertNotEquals(actual, null);

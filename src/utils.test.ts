@@ -3,7 +3,7 @@ import { describe, it } from 'std/testing/bdd.ts';
 
 import { isCode, isCommand, isExecutor, isNeeds, toCode, toCommand, toExecutor } from './utils.ts';
 
-import type { Executor, NeedsOrExecutor } from './definitions.ts';
+import type { Executor, NeedsOrExecutor } from './types.ts';
 
 describe(isNeeds.name, () => {
   it(`if isNeeds(undefined)`, () => {

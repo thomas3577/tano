@@ -6,7 +6,7 @@ import { setup } from './src/tano.config.ts';
 import { help } from './src/help.ts';
 import { VERSION } from './src/version.ts';
 
-import type { TanoConfig } from './src/definitions.ts';
+import type { TanoConfig } from './src/types.ts';
 
 const config: TanoConfig = await setup();
 const log: Logger = logger();

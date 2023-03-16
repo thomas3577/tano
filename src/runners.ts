@@ -1,6 +1,6 @@
 import { Logger, logger } from './logger.ts';
 
-import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessOutput } from './definitions.ts';
+import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessOutput } from './types.ts';
 
 const log: Logger = logger();
 

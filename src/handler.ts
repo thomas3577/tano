@@ -4,7 +4,7 @@ import { format } from 'std/fmt/duration.ts';
 import { readFromCache, writeToCache } from './cache.ts';
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
-import type { TaskRunData } from './definitions.ts';
+import type { TaskRunData } from './types.ts';
 
 export class Handler {
   readonly #log: Logger = logger();

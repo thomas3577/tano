@@ -13,18 +13,14 @@ const createDir = async (cwd: string): Promise<void> =>
     recursive: true,
   });
 
-export const writeToCache = async <T>(cwd: string, obj: T | Record<string | number | symbol, never> = {}): Promise<void> => {
-  const path: string = toPath(cwd);
-
-  await Deno.writeTextFile(path, JSON.stringify(obj, null, 2), {
+export const writeToCache = async <T>(cwd: string, obj: T | Record<string | number | symbol, never> = {}): Promise<void> =>
+  await Deno.writeTextFile(toPath(cwd), JSON.stringify(obj, null, 2), {
     create: true,
   });
-};
 
 export const readFromCache = async <T>(cwd: string): Promise<T> => {
-  const path: string = toPath(cwd);
-
   try {
+    const path: string = toPath(cwd);
     const text: string = await Deno.readTextFile(path);
     const obj: T = JSON.parse(text);
 

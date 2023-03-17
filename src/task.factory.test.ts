@@ -6,7 +6,7 @@ import { handler } from './handler.ts';
 import { Task } from './task.ts';
 import { needs } from './needs.ts';
 
-import type { CodeFile, TaskParams } from './definitions.ts';
+import type { CodeFile, TaskParams } from './types.ts';
 
 describe(task.name, () => {
   describe('create tasks', () => {
@@ -320,7 +320,7 @@ describe(task.name, () => {
       });
 
       await myTask.run()
-        .catch((err) => {
+        .catch((err: Error) => {
           assertNotEquals(err, undefined);
         });
     });

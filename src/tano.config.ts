@@ -1,7 +1,8 @@
 import { parse } from 'std/flags/mod.ts';
 
 import { getCwd, getImportUrl } from './tano.factory.ts';
-import type { TanoCliAction, TanoConfig } from './definitions.ts';
+
+import type { TanoCliAction, TanoConfig } from './types.ts';
 
 export const setup = async (): Promise<TanoConfig> => {
   const flags = parse(Deno.args, {
@@ -14,7 +15,7 @@ export const setup = async (): Promise<TanoConfig> => {
       V: 'version',
     },
     string: ['file', 'task', 'log-level'],
-    boolean: ['force', 'help', 'quiet', 'fail-fast', 'version'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
@@ -31,7 +32,6 @@ export const setup = async (): Promise<TanoConfig> => {
 
   Deno.env.set('FAIL-FAST', `${failFast}`);
   Deno.env.set('QUIET', `${flags.quiet}`);
-  Deno.env.set('FORCE', `${flags.force}`);
   Deno.env.set('LOG_LEVEL', logLevel);
   Deno.env.set('TANO_CWD', cwd);
 

@@ -1,4 +1,4 @@
-import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './definitions.ts';
+import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './types.ts';
 
 export const isNeeds = (param?: NeedsOrExecutor): boolean => {
   return typeof param === 'object' && !(param as CodeFile)?.file && Array.isArray((param as Needs)?.values);
@@ -20,6 +20,10 @@ export const isCodeFile = (codeFile: CodeFile): boolean => {
   return typeof codeFile === 'object' &&
     !!codeFile.file &&
     (typeof codeFile.file === 'string' && codeFile.file.match(/\.js|\.ts$/) !== null || codeFile.file instanceof URL && codeFile.file.toString().match(/\.js|\.ts$/) !== null);
+};
+
+export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
+  return (isExecutor(param) ? param : undefined as unknown) as Executor;
 };
 
 export const toCommand = (executor?: Executor): Command => {

@@ -13,18 +13,8 @@ describe(`logger`, () => {
     assertEquals(actual.level, LogLevels.INFO);
   });
 
-  it(`Should be quiet`, () => {
-    Deno.env.set('SILENT', 'true');
-
-    const actual: Logger = logger();
-
-    assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 0);
-    assertEquals(actual.level, LogLevels.INFO);
-  });
-
   it(`Should have log level 'ERROR' (1)`, () => {
-    Deno.env.set('SILENT', 'false');
+    Deno.env.set('QUIET', 'false');
     Deno.env.set('LOG_LEVEL', 'ERROR');
 
     const actual: Logger = logger();
@@ -35,7 +25,7 @@ describe(`logger`, () => {
   });
 
   it(`Should have log level 'ERROR' (1)`, () => {
-    Deno.env.set('SILENT', 'false');
+    Deno.env.set('QUIET', 'false');
     Deno.env.set('LOG_LEVEL', 'error');
 
     const actual: Logger = logger();

@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts --log-level DEBUG"
+    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"
   },
   "compilerOptions": {
     "strict": true

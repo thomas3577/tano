@@ -26,7 +26,6 @@ export interface TaskRunData {
 }
 
 export interface TaskOptions extends RunOptions {
-  description?: string;
   condition?: Condition;
   output?: (error: unknown, output: any) => void;
 }

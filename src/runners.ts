@@ -48,6 +48,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
   log.debug('Run command...');
 
+  const quiet: boolean = Deno.env.get('QUIET') === 'true';
   const { status, rawOutput, rawError, error, process } = await runProcess(command, options);
   const textDecoder = new TextDecoder();
 
@@ -59,7 +60,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
       options?.output(error, output);
     }
 
-    if (rawOutput && rawOutput?.length > 0) {
+    if (!quiet && rawOutput && rawOutput?.length > 0) {
       await Deno.stdout.write(rawOutput as Uint8Array);
     }
 

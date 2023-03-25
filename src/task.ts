@@ -1,4 +1,4 @@
-import { bold, gray, red } from 'std/fmt/colors.ts';
+import { bold, gray, green, red } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
@@ -182,10 +182,6 @@ export class Task implements TaskParams {
       name: `'${gray(this.#name)}'`,
     });
 
-    if (this.#options?.description) {
-      this.#log.info(`Description: ${gray(this.#options.description)}`);
-    }
-
     this.#finished = null;
     this.#starting = performance.mark(`starting_${this.#name}`, {
       startTime: Date.now(),
@@ -205,7 +201,7 @@ export class Task implements TaskParams {
 
     this.#log.info(`Finished {name} after {duration}`, {
       name: `'${gray(this.#name)}'`,
-      duration: `${bold(format(this.#measure.duration, { ignoreZero: true }))}`,
+      duration: `${bold(green(format(this.#measure.duration, { ignoreZero: true })))}`,
     });
   }
 

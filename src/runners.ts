@@ -55,9 +55,9 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   if (status?.code === 0) {
     if (options?.output) {
       const output: string | undefined = textDecoder.decode(rawOutput) || undefined;
-      const error: string | undefined = textDecoder.decode(rawError) || undefined;
+      const err: string | undefined = textDecoder.decode(rawError) || undefined;
 
-      options?.output(error, output);
+      options?.output(err, output);
     }
 
     if (!quiet && rawOutput && rawOutput?.length > 0) {

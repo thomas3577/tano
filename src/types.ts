@@ -1,5 +1,8 @@
 import { Task } from './task.ts';
 
+/**
+ * There are two types of task. Commands, i.e. command line commands and code (JavaScript/TypeScript).
+ */
 export type TaskType = 'command' | 'code' | undefined;
 
 export type ProcessOutput = {
@@ -10,10 +13,19 @@ export type ProcessOutput = {
   process?: Deno.Process<Deno.RunOptions>;
 };
 
+/**
+ * RunOptions are almost the same as the Deno.RunOptions with the difference that we exclude the attribute "cmd" because we handle this outside of these options.
+ */
 export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
+/**
+ * These are the tano actions that you can run through the CLI.
+ */
 export type TanoCliAction = 'run' | 'help' | 'version';
 
+/**
+ * These are the tano options that you can specify either via environment variables or args.
+ */
 export interface TanoConfig {
   file: string;
   task: string;
@@ -21,20 +33,32 @@ export interface TanoConfig {
   action: TanoCliAction;
 }
 
+/**
+ * These are the parameters that are created in the working directory each time the tasks are executed.
+ */
 export interface TaskRunData {
   lastRun?: string;
 }
 
+/**
+ * These are the additional task run options (besides the `RunOptions`)
+ */
 export interface TaskOptions extends RunOptions {
   condition?: Condition;
-  output?: (error: unknown, output: any) => void;
+  output?: (err: unknown, output: any) => void;
 }
 
+/**
+ * These are the additional task run options for code tasks (besides the `TaskOptions`)
+ */
 export interface CodeOptions extends TaskOptions {
   repl?: boolean;
   args?: Array<string>;
 }
 
+/**
+ * These are the additional task run options for command tasks (besides the `TaskOptions`)
+ */
 export interface CommandOptions extends TaskOptions {
   [key: string]: any;
 }

@@ -16,7 +16,7 @@ import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
 task('default', `ls`);
 ```
 
-## 02 Run command line from another working directory
+## 02 Run command line from different working directory
 
 **tanofile.ts:**
 

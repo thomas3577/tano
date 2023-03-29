@@ -27,9 +27,24 @@ export type TanoCliAction = 'run' | 'help' | 'version';
  * These are the tano options that you can specify either via environment variables or args.
  */
 export interface TanoConfig {
+  /**
+   * The path to the tanofile.
+   */
   file: string;
+
+  /**
+   * Name of the task to be executed.
+   */
   task: string;
+
+  /**
+   * If `true`, it will be aborted at the first error.
+   */
   failFast: boolean;
+
+  /**
+   * The CLI action.
+   */
   action: TanoCliAction;
 }
 
@@ -37,6 +52,9 @@ export interface TanoConfig {
  * These are the parameters that are created in the working directory each time the tasks are executed.
  */
 export interface TaskRunData {
+  /**
+   * Defines the timestamp when the task was last executed. The timestamp is in ISO string format.
+   */
   lastRun?: string;
 }
 
@@ -44,7 +62,14 @@ export interface TaskRunData {
  * These are the additional task run options (besides the `RunOptions`)
  */
 export interface TaskOptions extends RunOptions {
+  /**
+   * You can specify a function that returns a boolean. As a condition whether a task must be executed or skipped. If `true`, the task is executed.
+   */
   condition?: Condition;
+
+  /**
+   * Callback function to get to output from the task.
+   */
   output?: (err: unknown, output: any) => void;
 }
 
@@ -52,7 +77,15 @@ export interface TaskOptions extends RunOptions {
  * These are the additional task run options for code tasks (besides the `TaskOptions`)
  */
 export interface CodeOptions extends TaskOptions {
+  /**
+   * If you want, you can run your code with Deno repl.
+   * This has the advantage that the code is executed in a separate process. But there are also some disadvantages :-)
+   */
   repl?: boolean;
+
+  /**
+   * If your runs a TypeScript/JavaScript file, you can add Deno args here.
+   */
   args?: Array<string>;
 }
 
@@ -63,18 +96,42 @@ export interface CommandOptions extends TaskOptions {
   [key: string]: any;
 }
 
+/**
+ * The task parameters.
+ */
 export interface TaskParams {
+  /**
+   * The name of the task. This name have to be unique.
+   */
   name: string;
+
+  /**
+   * Defines the tasks that must be performed beforehand.
+   */
   needs?: Array<string>;
+
+  /**
+   * Options depending on the executor type.
+   */
   options?: TaskOptions;
+
+  /**
+   * There are two different types of tasks. Code tasks and command tasks.
+   */
   executor?: Executor;
 }
 
 export interface Needs {
+  /**
+   * List of task names or task objects.
+   */
   values: Array<string | TaskParams>;
 }
 
 export interface CodeFile {
+  /**
+   * If the `code` is a TypeScript/JavaScript file.
+   */
   file: string | URL;
 }
 

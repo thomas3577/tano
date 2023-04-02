@@ -14,7 +14,8 @@ export type ProcessOutput = {
 };
 
 /**
- * RunOptions are almost the same as the Deno.RunOptions with the difference that we exclude the attribute "cmd" because we handle this outside of these options.
+ * RunOptions are almost the same as the Deno.RunOptions with the difference that we exclude the attribute "cmd"
+ * because we handle this outside of these options.
  */
 export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
@@ -68,7 +69,18 @@ export interface TaskOptions extends RunOptions {
   condition?: Condition;
 
   /**
+   * The source to which this task surely refers. You can use `glob` for this.
+   *
+   * @remarks
+   * `source` is only necessary if a task is to be executed only if something has changed at the source.
+   */
+  source?: string[];
+
+  /**
    * Callback function to get to output from the task.
+   *
+   * @remarks
+   * Unstable! The output property will probably change again.
    */
   output?: (err: unknown, output: any) => void;
 }
@@ -93,6 +105,9 @@ export interface CodeOptions extends TaskOptions {
  * These are the additional task run options for command tasks (besides the `TaskOptions`)
  */
 export interface CommandOptions extends TaskOptions {
+  /**
+   * Note! Currently there are no command specific properties.
+   */
   [key: string]: any;
 }
 

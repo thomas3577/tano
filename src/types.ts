@@ -5,6 +5,12 @@ import { Task } from './task.ts';
  */
 export type TaskType = 'command' | 'code' | undefined;
 
+export interface IGlobHashOptions {
+  include: string[];
+  exclude?: string[];
+  jail?: string;
+}
+
 export type ProcessOutput = {
   status?: Deno.ProcessStatus;
   rawOutput?: Uint8Array;
@@ -74,7 +80,7 @@ export interface TaskOptions extends RunOptions {
    * @remarks
    * `source` is only necessary if a task is to be executed only if something has changed at the source.
    */
-  source?: string[];
+  source?: string | string[] | IGlobHashOptions;
 
   /**
    * Callback function to get to output from the task.

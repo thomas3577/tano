@@ -6,6 +6,9 @@ import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
 import type { TaskRunData } from './types.ts';
 
+/**
+ * The task handler.
+ */
 export class Handler {
   readonly #log: Logger = logger();
   readonly #created: Date = new Date();
@@ -60,7 +63,7 @@ export class Handler {
   /**
    * Adds a task to the cache.
    *
-   * @param task - A task to add.
+   * @param {Task} task A task to add.
    */
   add(task: Task): void {
     if (this.#cache.has(task.name)) {
@@ -76,7 +79,8 @@ export class Handler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
-   * @param taskName {string} [optionalParam='default'] Name of the task.
+   * @param {String} taskName [optionalParam='default'] Name of the task.
+   * @param {Boolean} failFast [optionalParam=true] If `true`, then it will be aborted after the first error.
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */

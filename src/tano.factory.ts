@@ -10,7 +10,7 @@ export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
     const importPath: string = isAbsolute(importFile) ? importFile : join(Deno.cwd(), importFile);
 
     try {
-      const stat = await Deno.stat(importPath);
+      const stat: Deno.FileInfo = await Deno.stat(importPath);
       if (!stat.isFile) {
         throw new Error(`The path ${importPath} is not a file.`);
       }

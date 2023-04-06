@@ -2,6 +2,7 @@ import { format } from 'std/datetime/format.ts';
 import { getLogger, handlers, Logger, LogRecord, setup } from 'std/log/mod.ts';
 import { ConsoleHandler } from 'std/log/handlers.ts';
 import { gray, white } from 'std/fmt/colors.ts';
+
 import { consoleMock } from './console.ts';
 
 type LogLevel = 'INFO' | 'NOTSET' | 'DEBUG' | 'WARNING' | 'ERROR' | 'CRITICAL' | undefined;

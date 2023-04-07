@@ -1,23 +1,52 @@
 import { Task } from './task.ts';
 
+/**
+ * Great idea from Peter Kröner <peter@peterkroener.de> to make Properties optional.
+ */
 export type Optional<Source, Keys extends keyof Source> =
   & {
     [Key in Keys]?: Source[Key];
   }
   & Pick<Source, Exclude<keyof Source, Keys>>;
 
-export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'jail'>;
+export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root'>;
+
+/**
+ * Defines the files that must be included in the hash.
+ *
+ * @remarks
+ * Internal type of The GlobHashOptions. The `root` property does have to be set.
+ */
+export interface GlobHashOptionsStrict {
+  /**
+   * Array of glob rules.
+   */
+  include: string[];
+
+  /**
+   * Array of glob rules.
+   */
+  exclude?: string[];
+
+  /**
+   * The directory in which the glob rules should be applied.
+   * If a glob rule wants to include files outside the root directory, these files will be ignored.
+   */
+  root: string;
+}
+
+/**
+ * Defines the files that must be included in the hash.
+ *
+ * @remarks
+ * The `root` property does not have to be set. Default is `.`.
+ */
+export type GlobHashSource = boolean | string | string[] | GlobHashOptions;
 
 /**
  * There are two types of task. Commands, i.e. command line commands and code (JavaScript/TypeScript).
  */
 export type TaskType = 'command' | 'code' | undefined;
-
-export interface GlobHashOptionsStrict {
-  include: string[];
-  exclude?: string[];
-  jail: string;
-}
 
 export type ProcessOutput = {
   status?: Deno.ProcessStatus;
@@ -90,7 +119,7 @@ export interface TaskOptions extends RunOptions {
    * @remarks
    * `source` is only necessary if a task is to be executed only if something has changed at the source.
    */
-  source?: string | string[] | GlobHashOptionsStrict;
+  source?: GlobHashSource;
 
   /**
    * Callback function to get to output from the task.

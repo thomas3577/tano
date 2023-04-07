@@ -1,8 +1,8 @@
 import { normalize, resolve } from 'std/path/mod.ts';
 import { globToRegExp } from 'std/path/glob.ts';
-import { walk, WalkEntry } from 'std/fs/walk.ts';
+import { walk, WalkEntry, WalkOptions } from 'std/fs/walk.ts';
 
-import { GlobHashOptions, GlobHashOptionsStrict } from './types.ts';
+import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.ts';
 
 /**
  * Strictly sequential processing of Promises.
@@ -40,43 +40,18 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
 };
 
 /**
- * A utility to deny access to files outside
- * a given base path. Works by checking if all
- * the filenames start with the base path.
- *
- * @param {Array} files A list of absolute paths.
- * @param {String} jailPath The jail path.
- *
- * @return {String} An error message, undefined otherwise.
- */
-const jail = (files: string[], jailPath: string): Error | undefined => {
-  if (!jailPath) {
-    return;
-  }
-
-  if (typeof jailPath !== 'string') {
-    return new Error('Invalid jail path.');
-  }
-
-  for (let i = 0; i < files.length; i++) {
-    if (files[i].substring(0, jailPath.length) !== jailPath) {
-      return new Error('Attemp to read outside the permitted path.');
-    }
-  }
-};
-
-/**
  * Resolves an array of globs to a sorted array of file paths.
  *
  * @param {Array<String>} globs An array of globs.
- * @param {String} jailPath The jail path.
+ * @param {String} root The root path.
  *
  * @returns {Promise<Array<string>>} A promise to resolve the globs.
  */
-const resolveGlobs = async (globs: string[], jailPath: string): Promise<string[]> => {
+const resolveGlobs = async (globs: string[], root: string): Promise<string[]> => {
   const files: string[] = [];
   const match: RegExp[] = globs.map((g) => globToRegExp(g));
-  const iterator: AsyncIterableIterator<WalkEntry> = walk(jailPath, { match });
+  const options: WalkOptions = { match };
+  const iterator: AsyncIterableIterator<WalkEntry> = walk(root, options);
 
   for await (const entry of iterator) {
     if (entry.isFile) {
@@ -107,13 +82,17 @@ const hashFiles = async (fileInfos: Deno.FileInfo[]): Promise<string> => {
 /**
  * Parsed `source` and converts a strict glob-hash options object.
  *
- * @param source A string, Array of string or the GlobHashOptions.
+ * @param source A boolean, string, array of string or the GlobHashSource.
  *
- * @returns An object of type GlobHashOptionsStrict.
+ * @returns An object of type GlobHashOptions.
  */
-const parseOptions = (source?: string | string[] | GlobHashOptions): undefined | GlobHashOptionsStrict => {
+const parseOptions = (source?: GlobHashSource): undefined | GlobHashOptionsStrict => {
   if (!source) {
     return undefined;
+  }
+
+  if (typeof source === 'boolean' && source === true) {
+    source = ['**'];
   }
 
   if (typeof source === 'string') {
@@ -126,10 +105,9 @@ const parseOptions = (source?: string | string[] | GlobHashOptions): undefined |
     };
   }
 
-  const options: GlobHashOptionsStrict = {
-    ...source,
-    jail: resolve(normalize(source.jail || '.')),
-  };
+  const options: GlobHashOptionsStrict = source as GlobHashOptionsStrict;
+
+  options.root = resolve(normalize((source as GlobHashOptions)?.root || '.'));
 
   return options;
 };
@@ -141,14 +119,14 @@ const parseOptions = (source?: string | string[] | GlobHashOptions): undefined |
  *
  * @returns {String} A computed hash
  */
-export const computeHash = async (source?: string | string[] | GlobHashOptions): Promise<undefined | string> => {
+export const computeHash = async (source?: GlobHashSource): Promise<undefined | string> => {
   const options: undefined | GlobHashOptionsStrict = parseOptions(source);
   if (!options) {
     return undefined;
   }
 
-  const includes: string[] = await resolveGlobs(options.include, options.jail);
-  const excludes: string[] = await resolveGlobs(options.exclude || [], options.jail);
+  const includes: string[] = await resolveGlobs(options.include, options.root);
+  const excludes: string[] = await resolveGlobs(options.exclude || [], options.root);
 
   const files: string[] = includes
     .filter((item: string) => excludes.indexOf(item) === -1)
@@ -159,11 +137,6 @@ export const computeHash = async (source?: string | string[] | GlobHashOptions):
 
       return memo;
     }, []);
-
-  const jailError: Error | undefined = jail(files, options.jail);
-  if (jailError) {
-    throw jailError;
-  }
 
   if (files.length === 0) {
     throw new Error('No files were matched using the provided globs.');

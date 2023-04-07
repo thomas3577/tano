@@ -1,7 +1,10 @@
 import { readFromCache, writeToCache } from './cache.ts';
 import { computeHash } from './glob.ts';
-import { GlobHashOptionsStrict, TanoRunData, TaskRunData } from './types.ts';
+import { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
 
+/**
+ * To determine if there are file changes in the glob area.
+ */
 export class Changes {
   #cwd: string = '.';
   #data: undefined | TanoRunData;
@@ -10,7 +13,18 @@ export class Changes {
     this.#cwd = cwd;
   }
 
-  async update(taskName: string, timestamp: Date, source?: string | string[] | GlobHashOptionsStrict): Promise<void> {
+  async hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean> {
+    if (!source) {
+      return true;
+    }
+
+    const oldHash = await this.#getHash(taskName);
+    const newHash = await computeHash(source);
+
+    return newHash !== oldHash;
+  }
+
+  async update(taskName: string, timestamp: Date, source?: GlobHashSource): Promise<void> {
     if (!this.#data) {
       return;
     }
@@ -30,6 +44,10 @@ export class Changes {
     const data = await this.#getAll();
 
     return data?.tasks[taskName];
+  }
+
+  async #getHash(taskName: string): Promise<undefined | string> {
+    return (await this.get(taskName))?.hash;
   }
 
   async #getAll(): Promise<undefined | TanoRunData> {

@@ -92,6 +92,12 @@ export interface TanoConfig {
   action: TanoCliAction;
 }
 
+/**
+ * This is the parameters that is stored when a task is completed.
+ *
+ * @remarks
+ * The path where the data will be stored is `{cwd}/.tano/cache.json`.
+ */
 export interface TaskRunData {
   hash?: string;
   lastRun: string;
@@ -99,6 +105,9 @@ export interface TaskRunData {
 
 /**
  * These are the parameters that are created in the working directory each time the tasks are executed.
+ *
+ * @remarks
+ * The path where the data will be stored is `{cwd}/.tano/cache.json`.
  */
 export interface TanoRunData {
   tasks: Record<string, TaskRunData>;
@@ -195,9 +204,36 @@ export interface CodeFile {
   file: string | URL;
 }
 
+/**
+ * A simple condition.
+ *
+ * @example
+ * 1 === 1;
+ */
 export type ConditionType1 = boolean;
+
+/**
+ * A function which returns a boolean or a promise of type boolean.
+ *
+ * @example
+ * () => 1 === 1;
+ *
+ * @example
+ * () => Promise.resolve(1 === 1);
+ */
 export type ConditionType2 = () => boolean | Promise<boolean>;
+
+/**
+ * A function with a callback function which returns a boolean.
+ *
+ * @example
+ * (done) => done(1 === 1);
+ */
 export type ConditionType3 = (done: (result: boolean) => void) => void;
+
+/**
+ * Type of all possible condition types.
+ */
 export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
 
 export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;

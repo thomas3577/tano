@@ -7,9 +7,9 @@ import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.
 /**
  * Strictly sequential processing of Promises.
  *
- * @param {Array<Promise<T>>} promises A list of promises.
+ * @param {Array<Promise<T>>} promises - A list of promises.
  *
- * @returns {Iterable<Promise<T>>} A iterable list of promises.
+ * @returns {Iterable<Promise<T>>} - A iterable list of promises.
  */
 const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
   let counter = 0;
@@ -24,7 +24,7 @@ const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
 /**
  * Gets a list files infos.
  *
- * @param {Array<String>} paths An array of paths.
+ * @param {Array<String>} paths - An array of paths.
  *
  * @returns {Promise<Array<Deno.FileInfo>>} filtered list of file infos.
  */
@@ -42,8 +42,8 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
 /**
  * Resolves an array of globs to a sorted array of file paths.
  *
- * @param {Array<String>} globs An array of globs.
- * @param {String} root The root path.
+ * @param {Array<String>} globs - An array of globs.
+ * @param {String} root - The root path.
  *
  * @returns {Promise<Array<string>>} A promise to resolve the globs.
  */
@@ -65,7 +65,7 @@ const resolveGlobs = async (globs: string[], root: string): Promise<string[]> =>
 /**
  * Hashes the contents of an array of file infos.
  *
- * @param {Array<Deno.FileInfo>} fileInfos An array of file infos.
+ * @param {Array<Deno.FileInfo>} fileInfos - An array of file infos.
  *
  * @returns {Promise<String>} A promise to hash the input.
  */
@@ -82,9 +82,9 @@ const hashFiles = async (fileInfos: Deno.FileInfo[]): Promise<string> => {
 /**
  * Parsed `source` and converts a strict glob-hash options object.
  *
- * @param source A boolean, string, array of string or the GlobHashSource.
+ * @param {GlobHashSource} source - A boolean, string, array of string or the GlobHashSource.
  *
- * @returns An object of type GlobHashOptions.
+ * @returns {GlobHashOptionsStrict} An object of type GlobHashOptionsStrict.
  */
 const parseOptions = (source?: GlobHashSource): undefined | GlobHashOptionsStrict => {
   if (!source) {
@@ -115,7 +115,7 @@ const parseOptions = (source?: GlobHashSource): undefined | GlobHashOptionsStric
 /**
  * Creates a hash by glob options.
  *
- * @param source A string, Array of string or the GlobHashOptions.
+ * @param {GlobHashSource} source - A string, Array of string or the GlobHashOptions.
  *
  * @returns {String} A computed hash
  */

@@ -6,10 +6,10 @@ import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, Task
 /**
  * Creates a new task.
  *
- * @param param1 {string | Task | TaskParams}
- * @param param2 {Needs | Command | Code}
- * @param param3 {Command | Code | Options}
- * @param param4 {Options}
+ * @param {string | Task | TaskParams} param1
+ * @param {Needs | Command | Code} param2
+ * @param {Command | Code | Options} param3
+ * @param {Options} param4
  *
  * @returns {Task} The reference to the created task.
  */

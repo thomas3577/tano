@@ -10,8 +10,8 @@ const log: Logger = logger();
  * @remarks
  * This can be a function or a path to a JavaScript/TypeScript file.
  *
- * @param {Code} code The code which should be executed.
- * @param {CodeOptions} options [optionalParam=undefined] Options.
+ * @param {Code} code - The code which should be executed.
+ * @param {CodeOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<void>}
  */
@@ -59,8 +59,8 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
 /**
  * Runs a command.
  *
- * @param {Command} command The command which should be executed.
- * @param {CommandOptions} options [optionalParam=undefined] Options.
+ * @param {Command} command - The command which should be executed.
+ * @param {CommandOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<void>}
  */
@@ -105,7 +105,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 /**
  * Runs code as a condition.
  *
- * @param {Condition} condition The code which should be executed.
+ * @param {Condition} condition - The code which should be executed.
  *
  * @remarks
  * It is important that the code returns a boolean.
@@ -139,7 +139,7 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
 /**
  * Runs a code function.
  *
- * @param {CodeFunction} code The code which should be executed.
+ * @param {CodeFunction} code - The code which should be executed.
  *
  * @returns {Promise<void>}
  */

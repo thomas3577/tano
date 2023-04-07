@@ -70,7 +70,7 @@ export class Handler {
   /**
    * Adds a task to the cache.
    *
-   * @param {Task} task A task to add.
+   * @param {Task} task - A task to add.
    */
   add(task: Task): void {
     if (this.#cache.has(task.name)) {
@@ -86,8 +86,8 @@ export class Handler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
-   * @param {String} taskName [optionalParam='default'] Name of the task.
-   * @param {Boolean} failFast [optionalParam=true] If `true`, then it will be aborted after the first error.
+   * @param {String} taskName - [optionalParam='default'] Name of the task.
+   * @param {Boolean} failFast - [optionalParam=true] If `true`, then it will be aborted after the first error.
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */

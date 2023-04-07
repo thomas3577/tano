@@ -90,6 +90,12 @@ export interface TanoConfig {
    * The CLI action.
    */
   action: TanoCliAction;
+
+  /**
+   * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
+   * But if you now set `force` to true, this task will be executed anyway.
+   */
+  force: boolean;
 }
 
 /**

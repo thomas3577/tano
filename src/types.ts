@@ -1,14 +1,22 @@
 import { Task } from './task.ts';
 
+export type Optional<Source, Keys extends keyof Source> =
+  & {
+    [Key in Keys]?: Source[Key];
+  }
+  & Pick<Source, Exclude<keyof Source, Keys>>;
+
+export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'jail'>;
+
 /**
  * There are two types of task. Commands, i.e. command line commands and code (JavaScript/TypeScript).
  */
 export type TaskType = 'command' | 'code' | undefined;
 
-export interface IGlobHashOptions {
+export interface GlobHashOptionsStrict {
   include: string[];
   exclude?: string[];
-  jail?: string;
+  jail: string;
 }
 
 export type ProcessOutput = {
@@ -55,14 +63,16 @@ export interface TanoConfig {
   action: TanoCliAction;
 }
 
+export interface TaskRunData {
+  hash?: string;
+  lastRun: string;
+}
+
 /**
  * These are the parameters that are created in the working directory each time the tasks are executed.
  */
-export interface TaskRunData {
-  /**
-   * Defines the timestamp when the task was last executed. The timestamp is in ISO string format.
-   */
-  lastRun?: string;
+export interface TanoRunData {
+  tasks: Record<string, TaskRunData>;
 }
 
 /**
@@ -80,7 +90,7 @@ export interface TaskOptions extends RunOptions {
    * @remarks
    * `source` is only necessary if a task is to be executed only if something has changed at the source.
    */
-  source?: string | string[] | IGlobHashOptions;
+  source?: string | string[] | GlobHashOptionsStrict;
 
   /**
    * Callback function to get to output from the task.

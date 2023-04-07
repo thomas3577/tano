@@ -1,26 +1,46 @@
-import { walk, WalkEntry } from 'std/fs/mod.ts';
-import { join } from 'std/path/mod.ts';
+import { readFromCache, writeToCache } from './cache.ts';
+import { computeHash } from './glob.ts';
+import { GlobHashOptionsStrict, TanoRunData, TaskRunData } from './types.ts';
 
-export const checkChanges = async (path: string, lastRun: string): Promise<boolean> => {
-  let hasChanges: boolean = false;
+export class Changes {
+  #cwd: string = '.';
+  #data: undefined | TanoRunData;
 
-  const lastRunDate: Date = new Date(lastRun);
-  const iterator: AsyncIterableIterator<WalkEntry> = walk(path, {
-    includeDirs: false,
-  });
-
-  for await (const entry of iterator) {
-    const fileInfo: Deno.FileInfo = await Deno.stat(entry.path);
-
-    if (
-      fileInfo.isFile &&
-      fileInfo.mtime &&
-      !entry.path.endsWith(join('.tano', 'cache.json')) &&
-      fileInfo.mtime >= lastRunDate
-    ) {
-      hasChanges = true;
-    }
+  constructor(cwd: string) {
+    this.#cwd = cwd;
   }
 
-  return hasChanges;
-};
+  async update(taskName: string, timestamp: Date, source?: string | string[] | GlobHashOptionsStrict): Promise<void> {
+    if (!this.#data) {
+      return;
+    }
+
+    const lastRun: string = timestamp.toISOString();
+    const hash: undefined | string = await computeHash(source);
+
+    this.#data.tasks[taskName] = {
+      lastRun,
+      hash,
+    };
+
+    await writeToCache(this.#cwd, this.#data);
+  }
+
+  async get(taskName: string): Promise<undefined | TaskRunData> {
+    const data = await this.#getAll();
+
+    return data?.tasks[taskName];
+  }
+
+  async #getAll(): Promise<undefined | TanoRunData> {
+    if (!this.#data) {
+      this.#data = await readFromCache<TanoRunData>(this.#cwd);
+    }
+
+    if (!this.#data.tasks) {
+      this.#data.tasks = {};
+    }
+
+    return this.#data;
+  }
+}

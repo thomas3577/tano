@@ -165,7 +165,7 @@ export class Task implements TaskParams {
         throw err;
       });
 
-    this.#postRun();
+    await this.#postRun();
   }
 
   /**
@@ -190,7 +190,7 @@ export class Task implements TaskParams {
     this.#status = 'running';
   }
 
-  #postRun(): void {
+  async #postRun(): Promise<void> {
     this.#status = 'success';
 
     this.#finished = performance.mark(`finished_${this.#name}`, {
@@ -203,6 +203,8 @@ export class Task implements TaskParams {
       name: `'${gray(this.#name)}'`,
       duration: `${bold(green(format(this.#measure.duration, { ignoreZero: true })))}`,
     });
+
+    await this.#handler.changes?.update(this.#name, new Date(), this.#options.source);
   }
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {

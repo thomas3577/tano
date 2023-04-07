@@ -1,9 +1,9 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
-import { readFromCache, writeToCache } from './cache.ts';
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
+import { Changes } from './changes.ts';
 import type { TaskRunData } from './types.ts';
 
 /**
@@ -16,7 +16,7 @@ export class Handler {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
-  #data: null | TaskRunData = null;
+  #changed: null | Changes = null;
 
   /**
    * Gets the timestamp when the handler was created.
@@ -61,6 +61,13 @@ export class Handler {
   }
 
   /**
+   * Managed the tano data.
+   */
+  get changes(): null | Changes {
+    return this.#changed;
+  }
+
+  /**
    * Adds a task to the cache.
    *
    * @param {Task} task A task to add.
@@ -87,7 +94,9 @@ export class Handler {
   async run(taskName: string = 'default', failFast: boolean = true): Promise<void> {
     const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
 
-    await this.#preRun(cwd);
+    this.#changed = new Changes(cwd);
+
+    await this.#preRun(taskName);
 
     const taskNames: Array<string> = this.#createPlan(taskName);
 
@@ -106,7 +115,7 @@ export class Handler {
         });
     }
 
-    await this.#postRun(cwd);
+    this.#postRun();
   }
 
   /**
@@ -123,16 +132,16 @@ export class Handler {
     this.#cache.clear();
   }
 
-  async #preRun(cwd: string): Promise<void> {
-    this.#data = await readFromCache(cwd);
+  async #preRun(taskName: string): Promise<void> {
+    const data: undefined | TaskRunData = await this.#changed?.get(taskName);
 
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);
     this.#log.info(`V8          v${Deno.version.v8}`);
     this.#log.info(`std         v${(await import('std/version.ts')).VERSION}`);
 
-    if (this.#data?.lastRun) {
-      this.#log.info(`Last run at ${this.#data.lastRun}`);
+    if (data?.lastRun) {
+      this.#log.info(`Last run at ${data?.lastRun}`);
     }
 
     this.#log.info('');
@@ -146,7 +155,7 @@ export class Handler {
     });
   }
 
-  async #postRun(cwd: string): Promise<void> {
+  #postRun(): void {
     const dateNow = new Date();
 
     this.#finished = performance.mark('finished_run', {
@@ -158,12 +167,6 @@ export class Handler {
     this.#log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
-
-    if (this.#data) {
-      this.#data.lastRun = dateNow.toISOString();
-
-      await writeToCache(cwd, this.#data);
-    }
   }
 
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {

@@ -52,7 +52,7 @@ describe(Task.name, () => {
 
     await actual.runThis();
 
-    assertEquals(actual.status, 'ready');
+    assertEquals(actual.status, 'skipped');
   });
 
   it(`Should not run if conditions false. (2)`, async () => {
@@ -66,7 +66,7 @@ describe(Task.name, () => {
 
     await actual.runThis();
 
-    assertEquals(actual.status, 'ready');
+    assertEquals(actual.status, 'skipped');
   });
 
   it(`Should not run if conditions false. (3)`, async () => {
@@ -80,7 +80,7 @@ describe(Task.name, () => {
 
     await actual.runThis();
 
-    assertEquals(actual.status, 'ready');
+    assertEquals(actual.status, 'skipped');
   });
 
   it(`Should not run if conditions false. (4)`, async () => {
@@ -96,7 +96,7 @@ describe(Task.name, () => {
 
     await actual.runThis();
 
-    assertEquals(actual.status, 'ready');
+    assertEquals(actual.status, 'skipped');
   });
 
   it(`Should not run if conditions false. (5)`, async () => {
@@ -112,6 +112,6 @@ describe(Task.name, () => {
 
     await actual.runThis();
 
-    assertEquals(actual.status, 'ready');
+    assertEquals(actual.status, 'skipped');
   });
 });

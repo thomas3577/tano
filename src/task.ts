@@ -147,8 +147,9 @@ export class Task implements TaskParams {
       throw new Error(`The task '${this.#name}' has already been run.`);
     }
 
-    const skippedBySource: boolean = force !== true && (await this.#handler.changes?.hasChanged(this.#name)) === true;
+    const skippedBySource: boolean = force !== true && this.#options?.source !== undefined && (await this.#handler.changes?.hasChanged(this.#name)) === true;
     if (skippedBySource) {
+      this.#status = 'skipped';
       this.#log.warning('');
       this.#log.warning(`Task {name} skipped by 'source'. No files have been changed since the last run.`, {
         name: `'${gray(this.#name)}'`,
@@ -159,6 +160,7 @@ export class Task implements TaskParams {
 
     const skippedByCondition: boolean = !(await executeCondition(this.#options?.condition ?? ((): boolean => true)));
     if (skippedByCondition) {
+      this.#status = 'skipped';
       this.#log.warning('');
       this.#log.warning(`Task {name} skipped by condition. The conditions of this task were not matched.`, {
         name: `'${gray(this.#name)}'`,
@@ -180,7 +182,7 @@ export class Task implements TaskParams {
         throw err;
       });
 
-    await this.#postRun();
+    await this.#postRun(this.#options);
   }
 
   /**
@@ -205,7 +207,7 @@ export class Task implements TaskParams {
     this.#status = 'running';
   }
 
-  async #postRun(): Promise<void> {
+  async #postRun(options: Options): Promise<void> {
     this.#status = 'success';
 
     this.#finished = performance.mark(`finished_${this.#name}`, {
@@ -219,7 +221,9 @@ export class Task implements TaskParams {
       duration: `${bold(green(format(this.#measure.duration, { ignoreZero: true })))}`,
     });
 
-    await this.#handler.changes?.update(this.#name, new Date(), this.#options.source);
+    if (options?.source) {
+      await this.#handler.changes?.update(this.#name, new Date(), options.source);
+    }
   }
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {

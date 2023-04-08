@@ -88,10 +88,11 @@ export class Handler {
    *
    * @param {String} taskName - [optionalParam='default'] Name of the task.
    * @param {Boolean} failFast - [optionalParam=true] If `true`, then it will be aborted after the first error.
+   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', failFast: boolean = true): Promise<void> {
+  async run(taskName: string = 'default', failFast: boolean = true, force: boolean = false): Promise<void> {
     const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
 
     this.#changed = new Changes(cwd);
@@ -106,7 +107,7 @@ export class Handler {
         break;
       }
 
-      await this.#cache.get(tn)?.runThis()
+      await this.#cache.get(tn)?.runThis(force)
         .catch((err: unknown) => {
           if (failFast) {
             abort = true;

@@ -248,7 +248,7 @@ export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
 export type Code = CodeFunction | CodeFile;
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export type TaskStatus = 'ready' | 'running' | 'success' | 'failed';
+export type TaskStatus = 'ready' | 'skipped' | 'running' | 'success' | 'failed';
 export type Command = string | Array<string>;
 export type Options = CodeOptions | CommandOptions;
 export type Executor = Command | Code;

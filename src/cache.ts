@@ -7,7 +7,7 @@ import { format, join } from 'std/path/mod.ts';
  *
  * @returns {String} The created path.
  */
-const toPath = (cwd: string): string =>
+export const toPath = (cwd: string): string =>
   format({
     root: '/',
     dir: join(cwd, '.tano'),

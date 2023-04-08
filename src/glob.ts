@@ -11,7 +11,7 @@ import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.
  *
  * @returns {Iterable<Promise<T>>} - A iterable list of promises.
  */
-const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
+export const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
   let counter = 0;
 
   return (function* (): Iterable<Promise<T>> {

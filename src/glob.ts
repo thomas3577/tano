@@ -83,10 +83,11 @@ const hashFiles = async (fileInfos: Deno.FileInfo[]): Promise<string> => {
  * Parsed `source` and converts a strict glob-hash options object.
  *
  * @param {GlobHashSource} source - A boolean, string, array of string or the GlobHashSource.
+ * @param {Array<String>} additionalExcludes - Additional excludes only for internals.
  *
  * @returns {GlobHashOptionsStrict} An object of type GlobHashOptionsStrict.
  */
-const parseOptions = (source?: GlobHashSource): undefined | GlobHashOptionsStrict => {
+const parseOptions = (source?: GlobHashSource, additionalExcludes?: string[]): undefined | GlobHashOptionsStrict => {
   if (!source) {
     return undefined;
   }
@@ -108,6 +109,7 @@ const parseOptions = (source?: GlobHashSource): undefined | GlobHashOptionsStric
   const options: GlobHashOptionsStrict = source as GlobHashOptionsStrict;
 
   options.root = resolve(normalize((source as GlobHashOptions)?.root || '.'));
+  options.exclude = [...(options.exclude || []), ...(additionalExcludes || [])];
 
   return options;
 };
@@ -116,11 +118,12 @@ const parseOptions = (source?: GlobHashSource): undefined | GlobHashOptionsStric
  * Creates a hash by glob options.
  *
  * @param {GlobHashSource} source - A string, Array of string or the GlobHashOptions.
+ * @param {Array<String>} additionalExcludes - Additional excludes only for internals.
  *
  * @returns {String} A computed hash
  */
-export const computeHash = async (source?: GlobHashSource): Promise<undefined | string> => {
-  const options: undefined | GlobHashOptionsStrict = parseOptions(source);
+export const computeHash = async (source?: GlobHashSource, additionalExcludes?: string[]): Promise<undefined | string> => {
+  const options: undefined | GlobHashOptionsStrict = parseOptions(source, additionalExcludes);
   if (!options) {
     return undefined;
   }

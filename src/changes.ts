@@ -1,4 +1,4 @@
-import { readFromCache, writeToCache } from './cache.ts';
+import { readFromCache, toPath, writeToCache } from './cache.ts';
 import { computeHash } from './glob.ts';
 import { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
 
@@ -6,11 +6,13 @@ import { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
  * To determine if there are file changes in the glob area.
  */
 export class Changes {
-  #cwd: string = '.';
+  readonly #cwd: string = '.';
+  readonly #cachePath: string;
   #data: undefined | TanoRunData;
 
   constructor(cwd: string) {
     this.#cwd = cwd;
+    this.#cachePath = toPath(cwd);
   }
 
   async hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean> {
@@ -18,10 +20,10 @@ export class Changes {
       return true;
     }
 
-    const oldHash = await this.#getHash(taskName);
-    const newHash = await computeHash(source);
+    const hash = await computeHash(source, [this.#cachePath]);
+    const lastHash = await this.#getHash(taskName);
 
-    return newHash !== oldHash;
+    return hash !== lastHash;
   }
 
   async update(taskName: string, timestamp: Date, source?: GlobHashSource): Promise<void> {
@@ -30,7 +32,7 @@ export class Changes {
     }
 
     const lastRun: string = timestamp.toISOString();
-    const hash: undefined | string = await computeHash(source);
+    const hash: undefined | string = await computeHash(source, [this.#cachePath]);
 
     this.#data.tasks[taskName] = {
       lastRun,

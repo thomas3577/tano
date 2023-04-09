@@ -105,8 +105,20 @@ export interface TanoConfig {
  * The path where the data will be stored is `{cwd}/.tano/cache.json`.
  */
 export interface TaskRunData {
-  hash?: string;
+  /**
+   * Timestamp of the last execution of the task.
+   */
   lastRun: string;
+
+  /**
+   * Status of the last execution of the task.
+   */
+  lastStatus: TaskStatus;
+
+  /**
+   * Checksum of all files by GlobHashOptions.
+   */
+  hash?: string;
 }
 
 /**

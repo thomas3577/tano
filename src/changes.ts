@@ -1,3 +1,4 @@
+import { TaskStatus } from '../mod.ts';
 import { readFromCache, toPath, writeToCache } from './cache.ts';
 import { computeHash } from './glob.ts';
 import { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
@@ -26,7 +27,7 @@ export class Changes {
     return hash !== lastHash;
   }
 
-  async update(taskName: string, timestamp: Date, source?: GlobHashSource): Promise<void> {
+  async update(taskName: string, timestamp: Date, status: TaskStatus, source?: GlobHashSource): Promise<void> {
     if (!this.#data) {
       return;
     }
@@ -36,6 +37,7 @@ export class Changes {
 
     this.#data.tasks[taskName] = {
       lastRun,
+      lastStatus: status,
       hash,
     };
 

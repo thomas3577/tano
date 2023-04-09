@@ -221,9 +221,7 @@ export class Task implements TaskParams {
       duration: `${bold(green(format(this.#measure.duration, { ignoreZero: true })))}`,
     });
 
-    if (options?.source) {
-      await this.#handler.changes?.update(this.#name, new Date(), options.source);
-    }
+    await this.#handler.changes?.update(this.#name, new Date(), this.#status, options?.source);
   }
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {

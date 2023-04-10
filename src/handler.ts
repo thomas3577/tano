@@ -16,7 +16,7 @@ export class Handler {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
-  #changed: null | Changes = null;
+  #changes: null | Changes = null;
 
   /**
    * Gets the timestamp when the handler was created.
@@ -57,14 +57,20 @@ export class Handler {
    * Gets the number of executed tasks.
    */
   get executed(): number {
-    return Array.from(this.#cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running').length;
+    return Array.from(this.#cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running' && value.status !== 'skipped').length;
   }
 
   /**
    * Managed the tano data.
    */
   get changes(): null | Changes {
-    return this.#changed;
+    if (!this.#changes) {
+      const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
+
+      this.#changes = new Changes(cwd);
+    }
+
+    return this.#changes;
   }
 
   /**
@@ -93,10 +99,6 @@ export class Handler {
    * @returns {Promise<void>} A promise that resolves to void.
    */
   async run(taskName: string = 'default', failFast: boolean = true, force: boolean = false): Promise<void> {
-    const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
-
-    this.#changed = new Changes(cwd);
-
     await this.#preRun(taskName);
 
     const taskNames: Array<string> = this.#createPlan(taskName);
@@ -134,7 +136,7 @@ export class Handler {
   }
 
   async #preRun(taskName: string): Promise<void> {
-    const data: undefined | TaskRunData = await this.#changed?.get(taskName);
+    const data: undefined | TaskRunData = await this.changes?.get(taskName);
 
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);

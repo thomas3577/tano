@@ -114,4 +114,18 @@ describe(Task.name, () => {
 
     assertEquals(actual.status, 'skipped');
   });
+
+  it(`Should not run if files not changed.`, async () => {
+    const actual: Task = new Task('my-task-with-source', [], () => {}, {
+      source: './examples/**',
+    });
+
+    assertNotEquals(actual, null);
+    assertInstanceOf(actual, Task);
+    assertEquals(actual.name, 'my-task-with-source');
+
+    await actual.runThis();
+
+    assertEquals(actual.status, 'skipped');
+  });
 });

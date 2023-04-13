@@ -1,3 +1,5 @@
+import { GlobToRegExpOptions } from 'std/path/glob.ts';
+
 import { Task } from './task.ts';
 
 /**
@@ -9,7 +11,7 @@ export type Optional<Source, Keys extends keyof Source> =
   }
   & Pick<Source, Exclude<keyof Source, Keys>>;
 
-export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root'>;
+export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root' | 'globToRegExpOptions'>;
 
 /**
  * Defines the files that must be included in the hash.
@@ -33,6 +35,11 @@ export interface GlobHashOptionsStrict {
    * If a glob rule wants to include files outside the root directory, these files will be ignored.
    */
   root: string;
+
+  /**
+   * (optional) Deno GlobToRegExpOptions
+   */
+  globToRegExpOptions?: GlobToRegExpOptions;
 }
 
 /**

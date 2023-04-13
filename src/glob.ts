@@ -1,5 +1,5 @@
 import { normalize, resolve } from 'std/path/mod.ts';
-import { globToRegExp, normalizeGlob } from 'std/path/glob.ts';
+import { globToRegExp, GlobToRegExpOptions, normalizeGlob } from 'std/path/glob.ts';
 import { walk, WalkEntry, WalkOptions } from 'std/fs/walk.ts';
 
 import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.ts';
@@ -44,17 +44,18 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
  *
  * @param {Array<String>} globs - An array of globs.
  * @param {String} root - The root path.
+ * @param {GlobToRegExpOptions} - Options for the GlobToRegExp
  *
  * @returns {Promise<Array<string>>} A promise to resolve the globs.
  */
-const resolveGlobs = async (globs: string[], root: string): Promise<string[]> => {
+const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?: GlobToRegExpOptions): Promise<string[]> => {
+  globToRegExpOptions = globToRegExpOptions || {
+    globstar: false,
+    caseInsensitive: false,
+  };
+
   const files: string[] = [];
-  const match: RegExp[] = globs.map((g) =>
-    globToRegExp(resolve(normalizeGlob(g)), {
-      globstar: false,
-      caseInsensitive: false,
-    })
-  );
+  const match: RegExp[] = globs.map((g) => globToRegExp(resolve(normalizeGlob(g)), globToRegExpOptions));
 
   const options: WalkOptions = { match };
   const iterator: AsyncIterableIterator<WalkEntry> = walk(root, options);
@@ -134,8 +135,8 @@ export const computeHash = async (source?: GlobHashSource, additionalExcludes?: 
     return undefined;
   }
 
-  const includes: string[] = await resolveGlobs(options.include, options.root);
-  const excludes: string[] = await resolveGlobs(options.exclude || [], options.root);
+  const includes: string[] = await resolveGlobs(options.include, options.root, options.globToRegExpOptions);
+  const excludes: string[] = await resolveGlobs(options.exclude || [], options.root, options.globToRegExpOptions);
 
   const files: string[] = includes
     .filter((item: string) => excludes.indexOf(item) === -1)

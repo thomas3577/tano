@@ -147,7 +147,7 @@ export class Task implements TaskParams {
       throw new Error(`The task '${this.#name}' has already been run.`);
     }
 
-    const skippedBySource: boolean = force !== true && this.#options?.source !== undefined && (await this.#handler.changes?.hasChanged(this.#name)) === true;
+    const skippedBySource: boolean = force !== true && (await this.#handler.changes?.hasChanged(this.#name, this.#options?.source)) !== true;
     if (skippedBySource) {
       this.#status = 'skipped';
       this.#log.warning('');

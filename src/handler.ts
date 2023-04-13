@@ -65,7 +65,7 @@ export class Handler {
    */
   get changes(): null | Changes {
     if (!this.#changes) {
-      const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
+      const cwd: undefined | string = Deno.env.get('TANO_CWD');
 
       this.#changes = new Changes(cwd);
     }

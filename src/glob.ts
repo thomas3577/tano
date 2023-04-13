@@ -1,5 +1,5 @@
 import { normalize, resolve } from 'std/path/mod.ts';
-import { globToRegExp } from 'std/path/glob.ts';
+import { globToRegExp, normalizeGlob } from 'std/path/glob.ts';
 import { walk, WalkEntry, WalkOptions } from 'std/fs/walk.ts';
 
 import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.ts';
@@ -11,7 +11,7 @@ import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.
  *
  * @returns {Iterable<Promise<T>>} - A iterable list of promises.
  */
-export const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
+const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
   let counter = 0;
 
   return (function* (): Iterable<Promise<T>> {
@@ -49,7 +49,13 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
  */
 const resolveGlobs = async (globs: string[], root: string): Promise<string[]> => {
   const files: string[] = [];
-  const match: RegExp[] = globs.map((g) => globToRegExp(g));
+  const match: RegExp[] = globs.map((g) =>
+    globToRegExp(resolve(normalizeGlob(g)), {
+      globstar: false,
+      caseInsensitive: false,
+    })
+  );
+
   const options: WalkOptions = { match };
   const iterator: AsyncIterableIterator<WalkEntry> = walk(root, options);
 

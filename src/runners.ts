@@ -4,6 +4,17 @@ import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command,
 
 const log: Logger = logger();
 
+/**
+ * Runs code.
+ *
+ * @remarks
+ * This can be a function or a path to a JavaScript/TypeScript file.
+ *
+ * @param {Code} code - The code which should be executed.
+ * @param {CodeOptions} options - [optionalParam=undefined] Options.
+ *
+ * @returns {Promise<void>}
+ */
 export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
   log.debug('Run code...');
 
@@ -45,21 +56,30 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
   log.debug('Run code completed.');
 };
 
+/**
+ * Runs a command.
+ *
+ * @param {Command} command - The command which should be executed.
+ * @param {CommandOptions} options - [optionalParam=undefined] Options.
+ *
+ * @returns {Promise<void>}
+ */
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
   log.debug('Run command...');
 
+  const quiet: boolean = Deno.env.get('QUIET') === 'true';
   const { status, rawOutput, rawError, error, process } = await runProcess(command, options);
   const textDecoder = new TextDecoder();
 
   if (status?.code === 0) {
     if (options?.output) {
       const output: string | undefined = textDecoder.decode(rawOutput) || undefined;
-      const error: string | undefined = textDecoder.decode(rawError) || undefined;
+      const err: string | undefined = textDecoder.decode(rawError) || undefined;
 
-      options?.output(error, output);
+      options?.output(err, output);
     }
 
-    if (rawOutput && rawOutput?.length > 0) {
+    if (!quiet && rawOutput && rawOutput?.length > 0) {
       await Deno.stdout.write(rawOutput as Uint8Array);
     }
 
@@ -82,6 +102,16 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   log.debug('Run command completed.');
 };
 
+/**
+ * Runs code as a condition.
+ *
+ * @param {Condition} condition - The code which should be executed.
+ *
+ * @remarks
+ * It is important that the code returns a boolean.
+ *
+ * @returns {Promise<Boolean>} If `true`, the task will be executed. Otherwise it will be skipped.
+ */
 export const executeCondition = async (condition: Condition): Promise<boolean> => {
   log.debug('Execute condition...');
 
@@ -106,6 +136,13 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
   return result;
 };
 
+/**
+ * Runs a code function.
+ *
+ * @param {CodeFunction} code - The code which should be executed.
+ *
+ * @returns {Promise<void>}
+ */
 export const executeCodeFunction = async (code: CodeFunction): Promise<void> => {
   log.debug('Execute code function...');
 

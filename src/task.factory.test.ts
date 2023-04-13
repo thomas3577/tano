@@ -302,8 +302,8 @@ describe(task.name, () => {
     it(`Should gets an output`, async () => {
       await new Promise<void>((resolve) => {
         task('my-task-103', `echo 'First Task'`, {
-          output: (error: unknown, output: string): void => {
-            assertEquals(error, undefined);
+          output: (err: unknown, output: string): void => {
+            assertEquals(err, undefined);
             assertEquals(output?.includes('First Task'), true);
             resolve();
           },
@@ -313,8 +313,8 @@ describe(task.name, () => {
 
     it(`Should gets an error output`, async () => {
       const myTask = task('my-task-104', `unknown-command`, {
-        output: (error: unknown, output: string): void => {
-          assertNotEquals(error, undefined);
+        output: (err: unknown, output: string): void => {
+          assertNotEquals(err, undefined);
           assertEquals(output, undefined);
         },
       });

@@ -24,9 +24,10 @@ const cli = async (): Promise<void> => {
     log.info(`Tano        v${VERSION}`);
 
     await import(config.file);
-    await handler.run(config.task, config.failFast);
+    await handler.run(config.task, config.failFast, config.force);
   } catch (err: unknown) {
-    log.error(bold('Aborted with errors.') + `${err ?? ''}`);
+    log.error(bold('Aborted with errors.'));
+    log.error(err);
   }
 };
 

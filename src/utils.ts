@@ -1,35 +1,91 @@
 import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './types.ts';
 
+/**
+ * Checks if a parameter is of type `Needs`.
+ *
+ * @param {Object} param - A object to check.
+ *
+ * @returns {Boolean} if `true` the object is of type `Needs`.
+ */
 export const isNeeds = (param?: NeedsOrExecutor): boolean => {
   return typeof param === 'object' && !(param as CodeFile)?.file && Array.isArray((param as Needs)?.values);
 };
 
+/**
+ * Checks if a parameter is of type `Executor`.
+ *
+ * @param {Object} param - A object to check.
+ *
+ * @returns {Boolean} if `true` the object is of type `Executor`.
+ */
 export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean => {
   return isCommand(param as Executor) || isCode(param as Executor);
 };
 
-export const isCommand = (executor?: Executor): boolean => {
-  return typeof executor === 'string' || (typeof executor === 'object' && Array.isArray(executor));
+/**
+ * Checks if a parameter is of type `Command`.
+ *
+ * @param {Object} param - A object to check.
+ *
+ * @returns {Boolean} if `true` the object is of type `Command`.
+ */
+export const isCommand = (param?: Executor): boolean => {
+  return typeof param === 'string' || (typeof param === 'object' && Array.isArray(param));
 };
 
-export const isCode = (executor?: Executor): boolean => {
-  return !!executor && (isCodeFile(executor as CodeFile) || typeof executor === 'function');
+/**
+ * Checks if a parameter is of type `Code`.
+ *
+ * @param {Object} param - A object to check.
+ *
+ * @returns {Boolean} if `true` the object is of type `Code`.
+ */
+export const isCode = (param?: Executor): boolean => {
+  return !!param && (isCodeFile(param as CodeFile) || typeof param === 'function');
 };
 
-export const isCodeFile = (codeFile: CodeFile): boolean => {
-  return typeof codeFile === 'object' &&
-    !!codeFile.file &&
-    (typeof codeFile.file === 'string' && codeFile.file.match(/\.js|\.ts$/) !== null || codeFile.file instanceof URL && codeFile.file.toString().match(/\.js|\.ts$/) !== null);
+/**
+ * Checks if a parameter is of type `CodeFile`.
+ *
+ * @param {Object} param - A object to check.
+ *
+ * @returns {Boolean} if `true` the object is of type `CodeFile`.
+ */
+export const isCodeFile = (param: CodeFile): boolean => {
+  return typeof param === 'object' &&
+    !!param.file &&
+    (typeof param.file === 'string' && param.file.match(/\.js|\.ts$/) !== null || param.file instanceof URL && param.file.toString().match(/\.js|\.ts$/) !== null);
 };
 
+/**
+ * Just a converter that converts Objects of type NeedsOrExecutor or ExecutorOrOptions to Executor.
+ *
+ * @param {Object} param - A object to convert.
+ *
+ * @returns {Object} An object of type Executor.
+ */
 export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
   return (isExecutor(param) ? param : undefined as unknown) as Executor;
 };
 
-export const toCommand = (executor?: Executor): Command => {
-  return (isCommand(executor) ? executor : undefined as unknown) as Command;
+/**
+ * Just a converter that converts Objects of type Executor to Command.
+ *
+ * @param {Object} param - A object to convert.
+ *
+ * @returns {Object} An object of type Command.
+ */
+export const toCommand = (param?: Executor): Command => {
+  return (isCommand(param) ? param : undefined as unknown) as Command;
 };
 
-export const toCode = (executor?: Executor): Code => {
-  return (isCode(executor) ? executor : undefined as unknown) as Code;
+/**
+ * Just a converter that converts Objects of type Executor to Code.
+ *
+ * @param {Object} param - A object to convert.
+ *
+ * @returns {Object} An object of type Code.
+ */
+export const toCode = (param?: Executor): Code => {
+  return (isCode(param) ? param : undefined as unknown) as Code;
 };

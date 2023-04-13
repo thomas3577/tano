@@ -1,11 +1,14 @@
 import { bold, green } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
-import { readFromCache, writeToCache } from './cache.ts';
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
+import { Changes } from './changes.ts';
 import type { TaskRunData } from './types.ts';
 
+/**
+ * The task handler.
+ */
 export class Handler {
   readonly #log: Logger = logger();
   readonly #created: Date = new Date();
@@ -13,7 +16,7 @@ export class Handler {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
-  #data: null | TaskRunData = null;
+  #changes: null | Changes = null;
 
   /**
    * Gets the timestamp when the handler was created.
@@ -54,13 +57,26 @@ export class Handler {
    * Gets the number of executed tasks.
    */
   get executed(): number {
-    return Array.from(this.#cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running').length;
+    return Array.from(this.#cache).filter(([_, value]) => value.status !== 'ready' && value.status !== 'running' && value.status !== 'skipped').length;
+  }
+
+  /**
+   * Managed the tano data.
+   */
+  get changes(): null | Changes {
+    if (!this.#changes) {
+      const cwd: undefined | string = Deno.env.get('TANO_CWD');
+
+      this.#changes = new Changes(cwd);
+    }
+
+    return this.#changes;
   }
 
   /**
    * Adds a task to the cache.
    *
-   * @param task - A task to add.
+   * @param {Task} task - A task to add.
    */
   add(task: Task): void {
     if (this.#cache.has(task.name)) {
@@ -76,14 +92,14 @@ export class Handler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
-   * @param taskName {string} [optionalParam='default'] Name of the task.
+   * @param {String} taskName - [optionalParam='default'] Name of the task.
+   * @param {Boolean} failFast - [optionalParam=true] If `true`, then it will be aborted after the first error.
+   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', failFast: boolean = true): Promise<void> {
-    const cwd: string = Deno.env.get('TANO_CWD') || Deno.cwd();
-
-    await this.#preRun(cwd);
+  async run(taskName: string = 'default', failFast: boolean = true, force: boolean = false): Promise<void> {
+    await this.#preRun(taskName);
 
     const taskNames: Array<string> = this.#createPlan(taskName);
 
@@ -93,7 +109,7 @@ export class Handler {
         break;
       }
 
-      await this.#cache.get(tn)?.runThis()
+      await this.#cache.get(tn)?.runThis(force)
         .catch((err: unknown) => {
           if (failFast) {
             abort = true;
@@ -102,7 +118,7 @@ export class Handler {
         });
     }
 
-    await this.#postRun(cwd);
+    this.#postRun();
   }
 
   /**
@@ -119,16 +135,16 @@ export class Handler {
     this.#cache.clear();
   }
 
-  async #preRun(cwd: string): Promise<void> {
-    this.#data = await readFromCache(cwd);
+  async #preRun(taskName: string): Promise<void> {
+    const data: undefined | TaskRunData = await this.changes?.get(taskName);
 
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);
     this.#log.info(`V8          v${Deno.version.v8}`);
     this.#log.info(`std         v${(await import('std/version.ts')).VERSION}`);
 
-    if (this.#data?.lastRun) {
-      this.#log.info(`Last run at ${this.#data.lastRun}`);
+    if (data?.lastRun) {
+      this.#log.info(`Last run at ${data?.lastRun}`);
     }
 
     this.#log.info('');
@@ -142,7 +158,7 @@ export class Handler {
     });
   }
 
-  async #postRun(cwd: string): Promise<void> {
+  #postRun(): void {
     const dateNow = new Date();
 
     this.#finished = performance.mark('finished_run', {
@@ -154,12 +170,6 @@ export class Handler {
     this.#log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
-
-    if (this.#data) {
-      this.#data.lastRun = dateNow.toISOString();
-
-      await writeToCache(cwd, this.#data);
-    }
   }
 
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {

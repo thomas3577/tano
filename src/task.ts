@@ -1,4 +1,4 @@
-import { bold, gray, red } from 'std/fmt/colors.ts';
+import { bold, gray, green, red } from 'std/fmt/colors.ts';
 import { format } from 'std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
@@ -29,7 +29,7 @@ export class Task implements TaskParams {
    * Creates a new instance ot Task.
    *
    * @param {string | TaskParams} nameOrTask - The name or an object which provides all task parameters.
-   * @param {string[]=[]} needs - Defines the dependencies which should be executed before this task.
+   * @param {Array<string>} needs - Defines the dependencies which should be executed before this task.
    * @param {Command | Code} executor - A command, function or JS/TS-file to execute.
    * @param {Options} options - Options, depending on whether the executor is of type Command or Code.
    */
@@ -120,18 +120,23 @@ export class Task implements TaskParams {
   /**
    * Executes all dependent tasks and its own.
    *
+   * @param {Boolean} failFast - [optionalParam=true] If `true`, then it will be aborted after the first error.
+   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
+   *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(failFast: boolean = false): Promise<void> {
-    await this.#handler.run(this.#name, failFast);
+  async run(failFast: boolean = true, force: boolean = false): Promise<void> {
+    await this.#handler.run(this.#name, failFast, force);
   }
 
   /**
    * Executes only this task (without the dependencies).
    *
+   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
+   *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async runThis(): Promise<void> {
+  async runThis(force: boolean = false): Promise<void> {
     // If no type is defined, nothing will be executed. It is possible and valid not to have a type.
     if (this.#type === undefined) {
       return;
@@ -142,10 +147,22 @@ export class Task implements TaskParams {
       throw new Error(`The task '${this.#name}' has already been run.`);
     }
 
-    const result: boolean = await executeCondition(this.#options?.condition ?? ((): boolean => true));
-    if (!result) {
+    const skippedBySource: boolean = force !== true && (await this.#handler.changes?.hasChanged(this.#name, this.#options?.source)) !== true;
+    if (skippedBySource) {
+      this.#status = 'skipped';
       this.#log.warning('');
-      this.#log.warning(`Task {name} not started. The conditions of this task were not matched.`, {
+      this.#log.warning(`Task {name} skipped by 'source'. No files have been changed since the last run.`, {
+        name: `'${gray(this.#name)}'`,
+      });
+
+      return;
+    }
+
+    const skippedByCondition: boolean = !(await executeCondition(this.#options?.condition ?? ((): boolean => true)));
+    if (skippedByCondition) {
+      this.#status = 'skipped';
+      this.#log.warning('');
+      this.#log.warning(`Task {name} skipped by condition. The conditions of this task were not matched.`, {
         name: `'${gray(this.#name)}'`,
       });
 
@@ -165,7 +182,7 @@ export class Task implements TaskParams {
         throw err;
       });
 
-    this.#postRun();
+    await this.#postRun(this.#options);
   }
 
   /**
@@ -182,10 +199,6 @@ export class Task implements TaskParams {
       name: `'${gray(this.#name)}'`,
     });
 
-    if (this.#options?.description) {
-      this.#log.info(`Description: ${gray(this.#options.description)}`);
-    }
-
     this.#finished = null;
     this.#starting = performance.mark(`starting_${this.#name}`, {
       startTime: Date.now(),
@@ -194,7 +207,7 @@ export class Task implements TaskParams {
     this.#status = 'running';
   }
 
-  #postRun(): void {
+  async #postRun(options: Options): Promise<void> {
     this.#status = 'success';
 
     this.#finished = performance.mark(`finished_${this.#name}`, {
@@ -205,8 +218,10 @@ export class Task implements TaskParams {
 
     this.#log.info(`Finished {name} after {duration}`, {
       name: `'${gray(this.#name)}'`,
-      duration: `${bold(format(this.#measure.duration, { ignoreZero: true }))}`,
+      duration: `${bold(green(format(this.#measure.duration, { ignoreZero: true })))}`,
     });
+
+    await this.#handler.changes?.update(this.#name, new Date(), this.#status, options?.source);
   }
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {

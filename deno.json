@@ -1,12 +1,12 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts --log-level DEBUG"
+    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"
   },
   "compilerOptions": {
     "strict": true
   },
   "imports": {
-    "std/": "https://deno.land/std@0.180.0/"
+    "std/": "https://deno.land/std@0.183.0/"
   },
   "lint": {
     "rules": {
@@ -25,8 +25,9 @@
   "fmt": {
     "files": {
       "exclude": [
-        ".vscode/",
-        ".tano/",
+        ".vscode/**",
+        ".tano/cache.json",
+        "examples/.tano/cache.json",
         "cspell.json"
       ]
     },

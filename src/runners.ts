@@ -1,6 +1,6 @@
 import { Logger, logger } from './logger.ts';
 
-import type { Code, CodeFunction, CodeFunctionWithoutDone, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessOutput } from './types.ts';
+import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessOutput } from './types.ts';
 
 const log: Logger = logger();
 
@@ -15,7 +15,7 @@ const log: Logger = logger();
  *
  * @returns {Promise<void>}
  */
-export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
+export const runCode = async <T>(code: Code, options?: CodeOptions): Promise<void> => {
   log.debug('Run code...');
 
   if (typeof code === 'function') {
@@ -30,7 +30,6 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
       log.debug('Run code function.');
 
       await executeCodeFunction(code)
-        // TODO(thu): Currently no return value. It's always void.
         .then((output) => {
           if (options?.output) {
             options?.output(undefined, output);
@@ -141,12 +140,12 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
  *
  * @param {CodeFunction} code - The code which should be executed.
  *
- * @returns {Promise<void>}
+ * @returns {Promise<void | T>}
  */
-export const executeCodeFunction = async (code: CodeFunction): Promise<void> => {
+export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void | T> => {
   log.debug('Execute code function...');
 
-  await new Promise<void>((resolve, reject) => {
+  const output = await new Promise<void | T>((resolve, reject) => {
     try {
       if (code.length > 0) {
         code((err: unknown) => {
@@ -154,10 +153,10 @@ export const executeCodeFunction = async (code: CodeFunction): Promise<void> => 
             reject(err);
           }
 
-          return resolve();
+          resolve();
         });
       } else {
-        resolve((code as CodeFunctionWithoutDone)());
+        resolve((code as <T>() => Promise<void | T>)());
       }
     } catch (err: unknown) {
       reject(err);
@@ -165,6 +164,8 @@ export const executeCodeFunction = async (code: CodeFunction): Promise<void> => 
   });
 
   log.debug('Execute code function completed.');
+
+  return output;
 };
 
 const runProcess = async (command: Command, options?: CommandOptions): Promise<ProcessOutput> => {

@@ -3,6 +3,7 @@ import { afterEach, describe, it } from 'std/testing/bdd.ts';
 
 import { handler } from './handler.ts';
 import { Task } from './task.ts';
+import { Options } from './types.ts';
 
 describe(Task.name, () => {
   afterEach(() => {
@@ -18,7 +19,9 @@ describe(Task.name, () => {
   });
 
   it(`Should run the command line.`, async () => {
-    const actual: Task = new Task('task-test-02', [], `echo 'Runs my task'`);
+    const needs: any[] = [];
+
+    const actual: Task = new Task('task-test-02', needs, `echo 'Runs my task'`);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
@@ -29,8 +32,11 @@ describe(Task.name, () => {
     assertEquals(actual.status, 'success');
   });
 
-  it(`Should run the function.`, async () => {
-    const actual: Task = new Task('task-test-03', [], () => {});
+  it(`Should run the function. (1)`, async () => {
+    const func = () => {};
+    const needs: any[] = [];
+
+    const actual: Task = new Task('task-test-03', needs, func);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
@@ -41,24 +47,33 @@ describe(Task.name, () => {
     assertEquals(actual.status, 'success');
   });
 
-  it(`Should not run if conditions false. (1)`, async () => {
-    const actual: Task = new Task('task-test-04', [], () => {}, {
-      condition: 1 + 2 === 4,
-    });
+  it(`Should run the function. (2)`, (done) => {
+    const func = () => Promise.resolve('my output');
+    const needs: any[] = [];
+    const options: Options = {
+      output: (_, event) => {
+        assertEquals(event, 'my output');
+        done;
+      },
+    };
+
+    const actual: Task = new Task('task-test-04', needs, func, options);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
     assertEquals(actual.name, 'task-test-04');
 
-    await actual.runThis();
-
-    assertEquals(actual.status, 'skipped');
+    actual.runThis();
   });
 
-  it(`Should not run if conditions false. (2)`, async () => {
-    const actual: Task = new Task('task-test-05', [], () => {}, {
-      condition: () => false,
-    });
+  it(`Should not run if conditions false. (1)`, async () => {
+    const func = () => {};
+    const needs: any[] = [];
+    const options: Options = {
+      condition: 1 + 2 === 4,
+    };
+
+    const actual: Task = new Task('task-test-05', needs, func, options);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
@@ -69,10 +84,14 @@ describe(Task.name, () => {
     assertEquals(actual.status, 'skipped');
   });
 
-  it(`Should not run if conditions false. (3)`, async () => {
-    const actual: Task = new Task('task-test-06', [], () => {}, {
-      condition: (done: any) => setTimeout(() => done(false), 100),
-    });
+  it(`Should not run if conditions false. (2)`, async () => {
+    const func = () => {};
+    const needs: any[] = [];
+    const options: Options = {
+      condition: () => false,
+    };
+
+    const actual: Task = new Task('task-test-06', needs, func, options);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
@@ -83,12 +102,14 @@ describe(Task.name, () => {
     assertEquals(actual.status, 'skipped');
   });
 
-  it(`Should not run if conditions false. (4)`, async () => {
-    const actual: Task = new Task('task-test-07', [], () => {}, {
-      condition: async () => {
-        return await Promise.resolve(false);
-      },
-    });
+  it(`Should not run if conditions false. (3)`, async () => {
+    const func = () => {};
+    const needs: any[] = [];
+    const options: Options = {
+      condition: (done: any) => setTimeout(() => done(false), 100),
+    };
+
+    const actual: Task = new Task('task-test-07', needs, func, options);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
@@ -99,16 +120,40 @@ describe(Task.name, () => {
     assertEquals(actual.status, 'skipped');
   });
 
-  it(`Should not run if conditions false. (5)`, async () => {
-    const actual: Task = new Task('task-test-08', [], () => {}, {
-      condition: () => {
-        return Promise.resolve(false);
+  it(`Should not run if conditions false. (4)`, async () => {
+    const func = () => {};
+    const needs: any[] = [];
+    const options: Options = {
+      condition: async () => {
+        return await Promise.resolve(false);
       },
-    });
+    };
+
+    const actual: Task = new Task('task-test-08', needs, func, options);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);
     assertEquals(actual.name, 'task-test-08');
+
+    await actual.runThis();
+
+    assertEquals(actual.status, 'skipped');
+  });
+
+  it(`Should not run if conditions false. (5)`, async () => {
+    const func = () => {};
+    const needs: any[] = [];
+    const options: Options = {
+      condition: () => {
+        return Promise.resolve(false);
+      },
+    };
+
+    const actual: Task = new Task('task-test-09', needs, func, options);
+
+    assertNotEquals(actual, null);
+    assertInstanceOf(actual, Task);
+    assertEquals(actual.name, 'task-test-09');
 
     await actual.runThis();
 

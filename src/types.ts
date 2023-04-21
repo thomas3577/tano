@@ -262,7 +262,7 @@ export type ConditionType3 = (done: (result: boolean) => void) => void;
 export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
 
 export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
-export type CodeFunctionWithoutDone = () => void | Promise<void>;
+export type CodeFunctionWithoutDone = <T>() => void | T | Promise<void | T>;
 export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
 export type Code = CodeFunction | CodeFile;
 

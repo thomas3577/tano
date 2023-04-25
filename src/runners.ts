@@ -150,7 +150,7 @@ export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void |
       if (code.length > 0) {
         code((err: unknown) => {
           if (err) {
-            reject(err);
+            throw err;
           }
 
           resolve();
@@ -196,7 +196,7 @@ const runProcess = async (command: Command, options?: CommandOptions): Promise<P
       process,
     };
   } catch (err: unknown) {
-    const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown err';
+    const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown error';
 
     return { error };
   }

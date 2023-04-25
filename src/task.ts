@@ -225,10 +225,13 @@ export class Task implements TaskParams {
   }
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {
-    if (type === 'command') {
-      await runCommand(toCommand(executor), options);
-    } else if (type === 'code') {
-      await runCode(toCode(executor), options);
+    switch (type) {
+      case 'command':
+        await runCommand(toCommand(executor), options);
+        break;
+      case 'code':
+        await runCode(toCode(executor), options);
+        break;
     }
   }
 }

@@ -6,7 +6,7 @@ import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, Task
 /**
  * Creates a new task.
  *
- * @param {string | Task | TaskParams} param1
+ * @param {String | Task | TaskParams} param1
  * @param {Needs | Command | Code} param2
  * @param {Command | Code | Options} param3
  * @param {Options} param4
@@ -41,7 +41,5 @@ export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?
     options = param4;
   }
 
-  const instance: Task = new Task(param1, needs, executor, options);
-
-  return instance as Task;
+  return new Task(param1, needs, executor, options);
 };

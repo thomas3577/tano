@@ -6,7 +6,7 @@
     "strict": true
   },
   "imports": {
-    "std/": "https://deno.land/std@0.184.0/"
+    "std/": "https://deno.land/std@0.185.0/"
   },
   "lint": {
     "rules": {

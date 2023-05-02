@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"
+    "run": "cd ./examples && deno run --unstable --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"
   },
   "compilerOptions": {
     "strict": true
@@ -23,20 +23,16 @@
     }
   },
   "fmt": {
-    "files": {
-      "exclude": [
-        ".vscode/**",
-        ".tano/cache.json",
-        "examples/.tano/cache.json",
-        "cspell.json"
-      ]
-    },
-    "options": {
-      "useTabs": false,
-      "lineWidth": 240,
-      "indentWidth": 2,
-      "singleQuote": true,
-      "proseWrap": "preserve"
-    }
+    "useTabs": false,
+    "lineWidth": 360,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "exclude": [
+      ".vscode/**",
+      ".tano/cache.json",
+      "examples/.tano/cache.json",
+      "cspell.json"
+    ]
   }
 }

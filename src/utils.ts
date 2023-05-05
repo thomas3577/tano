@@ -89,3 +89,20 @@ export const toCommand = (param?: Executor): Command => {
 export const toCode = (param?: Executor): Code => {
   return (isCode(param) ? param : undefined as unknown) as Code;
 };
+
+/**
+ * Strictly sequential processing of Promises.
+ *
+ * @param {Array<Promise<T>>} promises - A list of promises.
+ *
+ * @returns {Iterable<Promise<T>>} - A iterable list of promises.
+ */
+export const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
+  let counter = 0;
+
+  return (function* (): Iterable<Promise<T>> {
+    while (++counter < promises.length) {
+      yield promises[counter];
+    }
+  })();
+};

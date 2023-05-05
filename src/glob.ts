@@ -3,23 +3,7 @@ import { globToRegExp, GlobToRegExpOptions, normalizeGlob } from 'std/path/glob.
 import { walk, WalkEntry, WalkOptions } from 'std/fs/walk.ts';
 
 import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.ts';
-
-/**
- * Strictly sequential processing of Promises.
- *
- * @param {Array<Promise<T>>} promises - A list of promises.
- *
- * @returns {Iterable<Promise<T>>} - A iterable list of promises.
- */
-const sequential = <T>(promises: Promise<T>[]): Iterable<Promise<T>> => {
-  let counter = 0;
-
-  return (function* (): Iterable<Promise<T>> {
-    while (++counter < promises.length) {
-      yield promises[counter];
-    }
-  })();
-};
+import { sequential } from './utils.ts';
 
 /**
  * Gets a list files infos.

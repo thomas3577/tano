@@ -172,6 +172,7 @@ const runProcess = async (command: Command, options?: CommandOptions): Promise<P
   log.debug('Run process...');
 
   try {
+    // deno-lint-ignore no-deprecated-deno-api
     const process: Deno.Process<Deno.RunOptions> = Deno.run({
       cmd: Array.isArray(command) ? command : command.split(' '),
       cwd: options?.cwd || Deno.cwd(),

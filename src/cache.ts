@@ -1,4 +1,5 @@
 import { format, join } from 'std/path/mod.ts';
+import { exists } from 'std/fs/exists.ts';
 
 import { sequential } from './utils.ts';
 import { TanoRunData, TaskRunData } from './types.ts';
@@ -21,6 +22,9 @@ const createDir = async (dir: string): Promise<void> => await Deno.mkdir(dir, { 
  */
 const toTaskName = (key: Deno.KvKey): undefined | string => key.at(1) as string;
 
+/**
+ * The tano cache.
+ */
 export class TanoCache {
   readonly #dir: string;
   readonly #path: string;
@@ -35,7 +39,10 @@ export class TanoCache {
     });
   }
 
-  public get path(): string {
+  /**
+   * The path where the database is stored.
+   */
+  get path(): string {
     return this.#path;
   }
 
@@ -44,36 +51,27 @@ export class TanoCache {
    *
    * @returns {Promise<TanoRunData>} The tano run data.
    */
-  public async read(): Promise<TanoRunData> {
+  async read(): Promise<TanoRunData> {
     const data: TanoRunData = {
       tasks: {},
     };
 
-    try {
-      const db: Deno.Kv = await Deno.openKv(this.#path);
-      const tasks: Record<string, TaskRunData> = {};
-      const entries: Deno.KvListIterator<TaskRunData> = db.list<TaskRunData>({ prefix: ['users'] });
+    const db: Deno.Kv = await this.#openKy();
+    const tasks: Record<string, TaskRunData> = {};
+    const entries: Deno.KvListIterator<TaskRunData> = db.list<TaskRunData>({ prefix: ['users'] });
 
-      for await (const entry of entries) {
-        const taskName: undefined | string = toTaskName(entry.key);
-        if (taskName) {
-          tasks[taskName] = entry.value as TaskRunData;
-        }
+    for await (const entry of entries) {
+      const taskName: undefined | string = toTaskName(entry.key);
+      if (taskName) {
+        tasks[taskName] = entry.value as TaskRunData;
       }
-
-      data.tasks = tasks;
-
-      return data;
-    } catch (err) {
-      if (err instanceof Deno.errors.NotFound) {
-        await createDir(this.#dir);
-        await this.write();
-
-        return data;
-      }
-
-      throw err;
     }
+
+    data.tasks = tasks;
+
+    db?.close();
+
+    return data;
   }
 
   /**
@@ -83,11 +81,21 @@ export class TanoCache {
    *
    * @returns {Promise<void>}
    */
-  public async write(data?: TanoRunData): Promise<void> {
-    const db: Deno.Kv = await Deno.openKv(this.#path);
+  async write(data?: TanoRunData): Promise<void> {
+    const db: Deno.Kv = await this.#openKy();
 
-    for (const promise of sequential(Object.entries(data || {}).map(([key, value]) => db.set(['task', key], value)))) {
+    for (const promise of sequential(Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value)))) {
       await promise;
     }
+
+    db?.close();
+  }
+
+  async #openKy(): Promise<Deno.Kv> {
+    if (!await exists(this.#dir)) {
+      await createDir(this.#dir);
+    }
+
+    return await Deno.openKv(this.#path);
   }
 }

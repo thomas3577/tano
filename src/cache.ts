@@ -1,66 +1,101 @@
 import { format, join } from 'std/path/mod.ts';
+import { exists } from 'std/fs/exists.ts';
 
-/**
- * Creates a file path for the tano cache file.
- *
- * @param {String} cwd - Current working directory.
- *
- * @returns {String} The created path.
- */
-export const toPath = (cwd: string): string =>
-  format({
-    root: '/',
-    dir: join(cwd, '.tano'),
-    name: 'cache',
-    ext: '.json',
-  });
+import { sequential } from './utils.ts';
+import { TanoRunData, TaskRunData } from './types.ts';
 
 /**
  * Creates the directory to the tano cache.
  *
- * @param {String} cwd - Current working directory.
+ * @param {String} dir - The directory in which the database is located.
  *
  * @returns {Promise<void>}
  */
-const createDir = async (cwd: string): Promise<void> =>
-  await Deno.mkdir(join(cwd, '.tano'), {
-    recursive: true,
-  });
+const createDir = async (dir: string): Promise<void> => await Deno.mkdir(dir, { recursive: true });
 
 /**
- * Writes an object as a JSON file to the Tano cache directory.
+ * Converts a KvKey in a Taskname.
  *
- * @param {String} cwd - Current working directory.
- * @param {Object} obj - The object to store.
+ * @param key {Deno.KvKey} - The key from which the task name is to be taken.
  *
- * @returns {Promise<void>}
+ * @returns  {String} - The Taskname
  */
-export const writeToCache = async <T>(cwd: string, obj: T | Record<string | number | symbol, never> = {}): Promise<void> =>
-  await Deno.writeTextFile(toPath(cwd), JSON.stringify(obj, null, 2), {
-    create: true,
-  });
+const toTaskName = (key: Deno.KvKey): undefined | string => key.at(1) as string;
 
 /**
- * Reads a object from a JSON file.
- *
- * @param {String} cwd - Current working directory.
- *
- * @returns {Promise<T>} The specific object.
+ * The tano cache.
  */
-export const readFromCache = async <T>(cwd: string): Promise<T> => {
-  try {
-    const path: string = toPath(cwd);
-    const text: string = await Deno.readTextFile(path);
-    const obj: T = JSON.parse(text);
+export class TanoCache {
+  readonly #dir: string;
+  readonly #path: string;
 
-    return obj;
-  } catch (err) {
-    if (err instanceof Deno.errors.NotFound) {
-      await createDir(cwd);
+  constructor(cwd: string) {
+    this.#dir = join(cwd, '.tano');
+    this.#path = format({
+      root: '/',
+      dir: this.#dir,
+      name: 'cache',
+      ext: '.db',
+    });
+  }
 
-      return await writeToCache(cwd).then(() => ({} as T));
+  /**
+   * The path where the database is stored.
+   */
+  get path(): string {
+    return this.#path;
+  }
+
+  /**
+   * Reads the tano run data from Kv.
+   *
+   * @returns {Promise<TanoRunData>} The tano run data.
+   */
+  async read(): Promise<TanoRunData> {
+    const data: TanoRunData = {
+      tasks: {},
+    };
+
+    const db: Deno.Kv = await this.#openKy();
+    const tasks: Record<string, TaskRunData> = {};
+    const entries: Deno.KvListIterator<TaskRunData> = db.list<TaskRunData>({ prefix: ['users'] });
+
+    for await (const entry of entries) {
+      const taskName: undefined | string = toTaskName(entry.key);
+      if (taskName) {
+        tasks[taskName] = entry.value as TaskRunData;
+      }
     }
 
-    throw err;
+    data.tasks = tasks;
+
+    db?.close();
+
+    return data;
   }
-};
+
+  /**
+   * Writes tano run data to Kv.
+   *
+   * @param {TanoRunData} data - The tano run data.
+   *
+   * @returns {Promise<void>}
+   */
+  async write(data?: TanoRunData): Promise<void> {
+    const db: Deno.Kv = await this.#openKy();
+
+    for (const promise of sequential(Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value)))) {
+      await promise;
+    }
+
+    db?.close();
+  }
+
+  async #openKy(): Promise<Deno.Kv> {
+    if (!await exists(this.#dir)) {
+      await createDir(this.#dir);
+    }
+
+    return await Deno.openKv(this.#path);
+  }
+}

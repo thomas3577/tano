@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --unstable --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"
+    "run": "cd ./examples && deno run --unstable --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
+    "test": "deno test --unstable --allow-read --allow-run --allow-env --allow-write"
   },
   "compilerOptions": {
     "strict": true

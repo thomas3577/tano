@@ -1,13 +1,14 @@
 {
   "tasks": {
     "run": "cd ./examples && deno run --unstable --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
+    "cache": "deno cache --lock=deno.lock --lock-write ./src/deps.ts",
     "test": "deno test --unstable --allow-read --allow-run --allow-env --allow-write"
   },
   "compilerOptions": {
     "strict": true
   },
   "imports": {
-    "std/": "https://deno.land/std@0.187.0/"
+    "std/": "https://deno.land/std@0.188.0/"
   },
   "lint": {
     "rules": {

@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf } from 'std/testing/asserts.ts';
+import { assertEquals, assertInstanceOf } from 'std/assert/mod.ts';
 import { describe, it } from 'std/testing/bdd.ts';
 import { LogLevels } from 'std/log/levels.ts';
 

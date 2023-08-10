@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf } from 'std/testing/asserts.ts';
+import { assertEquals, assertInstanceOf } from 'std/assert/mod.ts';
 import { afterEach, beforeAll, describe, it } from 'std/testing/bdd.ts';
 import { spy } from 'std/testing/mock.ts';
 

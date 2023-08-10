@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf, assertNotEquals } from 'std/testing/asserts.ts';
+import { assertEquals, assertInstanceOf, assertNotEquals } from 'std/assert/mod.ts';
 import { afterEach, describe, it } from 'std/testing/bdd.ts';
 
 import { handler } from './handler.ts';

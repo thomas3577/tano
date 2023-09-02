@@ -41,6 +41,8 @@ export class TanoCache {
 
   /**
    * The path where the database is stored.
+   *
+   * @returns {String} The database path.
    */
   get path(): string {
     return this.#path;

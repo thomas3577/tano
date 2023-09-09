@@ -48,6 +48,10 @@ export class Changes {
     return data?.tasks[taskName];
   }
 
+  async dispose(): Promise<void> {
+    await this.#cache.dispose();
+  }
+
   async #getHash(taskName: string): Promise<undefined | string> {
     return (await this.get(taskName))?.hash;
   }

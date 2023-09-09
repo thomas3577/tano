@@ -28,6 +28,7 @@ const toTaskName = (key: Deno.KvKey): undefined | string => key.at(1) as string;
 export class TanoCache {
   readonly #dir: string;
   readonly #path: string;
+  #db: Deno.Kv | null = null;
 
   constructor(cwd: string) {
     this.#dir = join(cwd, '.tano');
@@ -89,11 +90,22 @@ export class TanoCache {
     }
   }
 
+  async dispose(): Promise<void> {
+    const db: Deno.Kv = await this.#openKy();
+
+    db.close();
+    this.#db = null;
+  }
+
   async #openKy(): Promise<Deno.Kv> {
     if (!await exists(this.#dir)) {
       await createDir(this.#dir);
     }
 
-    return await Deno.openKv(this.#path);
+    if (!this.#db) {
+      this.#db = await Deno.openKv(this.#path);
+    }
+
+    return this.#db;
   }
 }

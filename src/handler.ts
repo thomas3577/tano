@@ -118,7 +118,7 @@ export class Handler {
         });
     }
 
-    this.#postRun();
+    await this.#postRun();
   }
 
   /**
@@ -158,7 +158,7 @@ export class Handler {
     });
   }
 
-  #postRun(): void {
+  async #postRun(): Promise<void> {
     const dateNow = new Date();
 
     this.#finished = performance.mark('finished_run', {
@@ -170,6 +170,8 @@ export class Handler {
     this.#log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
+
+    await this.#changes?.dispose();
   }
 
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {

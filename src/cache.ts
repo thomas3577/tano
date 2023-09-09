@@ -71,8 +71,6 @@ export class TanoCache {
 
     data.tasks = tasks;
 
-    db?.close();
-
     return data;
   }
 
@@ -89,8 +87,6 @@ export class TanoCache {
     for (const promise of sequential(Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value)))) {
       await promise;
     }
-
-    db?.close();
   }
 
   async #openKy(): Promise<Deno.Kv> {

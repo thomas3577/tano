@@ -55,12 +55,8 @@ export type GlobHashSource = boolean | string | string[] | GlobHashOptions;
  */
 export type TaskType = 'command' | 'code' | undefined;
 
-export type ProcessOutput = {
-  status?: Deno.ProcessStatus;
-  rawOutput?: Uint8Array;
-  rawError?: Uint8Array;
+export type ProcessError = {
   error?: string;
-  process?: Deno.Process<Deno.RunOptions>;
 };
 
 /**
@@ -141,7 +137,7 @@ export interface TanoRunData {
 /**
  * These are the additional task run options (besides the `RunOptions`)
  */
-export interface TaskOptions extends RunOptions {
+export interface TaskOptions extends Deno.CommandOptions {
   /**
    * You can specify a function that returns a boolean. As a condition whether a task must be executed or skipped. If `true`, the task is executed.
    */

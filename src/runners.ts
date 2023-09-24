@@ -1,6 +1,6 @@
 import { Logger, logger } from './logger.ts';
 
-import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessOutput } from './types.ts';
+import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
 
 const log: Logger = logger();
 
@@ -61,44 +61,47 @@ export const runCode = async <T>(code: Code, options?: CodeOptions): Promise<voi
  * @param {Command} command - The command which should be executed.
  * @param {CommandOptions} options - [optionalParam=undefined] Options.
  *
- * @returns {Promise<void>}
+ * @returns {Promise<number>}
  */
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
   log.debug('Run command...');
 
-  const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const { status, rawOutput, rawError, error, process } = await runProcess(command, options);
   const textDecoder = new TextDecoder();
+  const quiet: boolean = Deno.env.get('QUIET') === 'true';
+  const processOrError: Deno.ChildProcess | ProcessError = getProcess(command, options);
+  const process: Deno.ChildProcess = processOrError as Deno.ChildProcess;
 
-  if (status?.code === 0) {
+  if ('error' in processOrError) {
+    console.error(processOrError.error);
+
     if (options?.output) {
-      const output: string | undefined = textDecoder.decode(rawOutput) || undefined;
-      const err: string | undefined = textDecoder.decode(rawError) || undefined;
-
-      options?.output(err, output);
+      options?.output(processOrError.error, undefined);
     }
-
-    if (!quiet && rawOutput && rawOutput?.length > 0) {
-      await Deno.stdout.write(rawOutput as Uint8Array);
-    }
-
-    if (rawError && rawError?.length > 0) {
-      await Deno.stderr.write(rawError as Uint8Array);
-    }
-
-    process?.close();
-  } else {
-    const err: string = error || textDecoder.decode(rawError);
-    if (options?.output) {
-      options?.output(err, undefined);
-    }
-
-    process?.kill();
-
-    await Promise.reject(err);
   }
 
-  log.debug('Run command completed.');
+  for await (const line of process.stdout) {
+    if (!quiet) {
+      await Deno.stdout.write(line);
+    }
+
+    if (options?.output) {
+      options?.output(undefined, textDecoder.decode(line));
+    }
+  }
+
+  for await (const line of process.stderr) {
+    await Deno.stderr.write(line);
+
+    if (options?.output) {
+      options?.output(textDecoder.decode(line), undefined);
+    }
+  }
+
+  process.stdin.close();
+
+  const status: Deno.CommandStatus = await process.status;
+
+  log.debug(`Run command completed with code '${status.code}'.`);
 };
 
 /**
@@ -168,34 +171,22 @@ export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void |
   return output;
 };
 
-const runProcess = async (command: Command, options?: CommandOptions): Promise<ProcessOutput> => {
-  log.debug('Run process...');
-
+const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
   try {
-    // deno-lint-ignore no-deprecated-deno-api
-    const process: Deno.Process<Deno.RunOptions> = Deno.run({
-      cmd: Array.isArray(command) ? command : command.split(' '),
+    const args: string[] = Array.isArray(command) ? command : command.split(' ');
+
+    command = args.shift() as string;
+
+    const cmd: Deno.Command = new Deno.Command(command, {
+      args,
       cwd: options?.cwd || Deno.cwd(),
       env: options?.env,
       stdout: options?.stdout || 'piped',
       stderr: options?.stderr || 'piped',
-      stdin: options?.stdin || 'null',
+      stdin: options?.stdin || 'piped',
     });
 
-    const [status, rawOutput, rawError] = await Promise.all([
-      process.status(),
-      process.output(),
-      process.stderrOutput(),
-    ]);
-
-    log.debug('Run process completed.');
-
-    return {
-      status,
-      rawOutput,
-      rawError,
-      process,
-    };
+    return cmd.spawn();
   } catch (err: unknown) {
     const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown error';
 

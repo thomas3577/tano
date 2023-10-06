@@ -35,14 +35,14 @@ export class Task implements TaskParams {
    */
   constructor(nameOrTask: string | TaskParams, needs: Array<string> = [], executor?: Executor, options?: Options) {
     const task: TaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as TaskParams : {
-      name: nameOrTask as string,
+      name: nameOrTask,
       needs,
       executor,
       options,
     };
 
     this.#name = task.name;
-    this.#needs = task.needs as Array<string>;
+    this.#needs = task.needs ?? [];
     this.#executor = task.executor as Command;
     this.#options = task.options as Options;
     this.#handler.add(this);
@@ -172,7 +172,7 @@ export class Task implements TaskParams {
     this.#preRun();
 
     await this.#run(this.#type, this.#executor, this.#options)
-      .catch((err: unknown) => {
+      .catch((err) => {
         this.#status = 'failed';
 
         this.#log.error(`${bold(red('Error'))} {name}: ${err}`, {

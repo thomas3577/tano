@@ -10,7 +10,6 @@ export * as format from 'std/datetime/format.ts';
 export * as log from 'std/log/mod.ts';
 export * as handlers from 'std/log/handlers.ts';
 export * as flags from 'std/flags/mod.ts';
-
 export * as asserts from 'std/testing/asserts.ts';
 export * as bdd from 'std/testing/bdd.ts';
 export * as mock from 'std/testing/mock.ts';

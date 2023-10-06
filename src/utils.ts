@@ -52,9 +52,11 @@ export const isCode = (param?: Executor): boolean => {
  * @returns {Boolean} if `true` the object is of type `CodeFile`.
  */
 export const isCodeFile = (param: CodeFile): boolean => {
+  const regex = new RegExp(/\.(js|ts)$/);
+
   return typeof param === 'object' &&
     !!param.file &&
-    (typeof param.file === 'string' && param.file.match(/\.js|\.ts$/) !== null || param.file instanceof URL && param.file.toString().match(/\.js|\.ts$/) !== null);
+    (typeof param.file === 'string' && regex.exec(param.file) !== null || param.file instanceof URL && regex.exec(param.file.toString()) !== null);
 };
 
 /**

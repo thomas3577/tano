@@ -57,7 +57,7 @@ describe(isNeeds.name, () => {
 
   it(`if isNeeds([])`, () => {
     const param: unknown = [];
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as NeedsOrExecutor);
 
     assertEquals(actual, false);
   });
@@ -115,13 +115,13 @@ describe(isCommand.name, () => {
 
   it(`isCommand(null)`, () => {
     const param = null;
-    const actual = isCommand(param as any);
+    const actual = isCommand(param as unknown as any);
 
     assertEquals(actual, false);
   });
 
   it(`isCommand(() => {})`, () => {
-    const param = () => {};
+    const param = () => {/* do nothing */};
     const actual = isCommand(param);
 
     assertEquals(actual, false);
@@ -193,7 +193,7 @@ describe(isCode.name, () => {
   });
 
   it(`isCode(() => {})`, () => {
-    const param = () => {};
+    const param = () => {/* do nothing */};
     const actual = isCode(param);
 
     assertEquals(actual, true);
@@ -272,7 +272,7 @@ describe(isCode.name, () => {
 
 describe(isExecutor.name, () => {
   it(`isExecutor(() => {})`, () => {
-    const param = () => {};
+    const param = () => {/* do nothing */};
     const actual = isExecutor(param);
 
     assertEquals(actual, true);
@@ -337,7 +337,7 @@ describe(toExecutor.name, () => {
   });
 
   it(`toExecutor(() => {})`, () => {
-    const executor = () => {};
+    const executor = () => {/* do nothing */};
     const actual = toExecutor(executor as unknown as Executor);
 
     assertEquals(actual, executor);
@@ -395,7 +395,7 @@ describe(toCommand.name, () => {
   });
 
   it(`if toCommand(() => {})`, () => {
-    const executor = () => {};
+    const executor = () => {/* do nothing */};
     const actual = toCommand(executor);
 
     assertEquals(actual, undefined);
@@ -432,7 +432,7 @@ describe(toCode.name, () => {
   });
 
   it(`toCode(() => {})`, () => {
-    const executor = () => {};
+    const executor = () => {/* do nothing */};
     const actual = toCode(executor as unknown as Executor);
 
     assertEquals(actual, executor);

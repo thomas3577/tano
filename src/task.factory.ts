@@ -15,7 +15,7 @@ import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, Task
  */
 export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?: NeedsOrExecutor, param3?: ExecutorOrOptions, param4?: Options): Task => {
   if (param1 instanceof Task) {
-    return param1 as Task;
+    return param1;
   }
 
   if (typeof param1 === 'object') {

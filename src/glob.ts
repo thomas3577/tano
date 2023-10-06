@@ -2,7 +2,7 @@ import { normalize, resolve } from 'std/path/mod.ts';
 import { globToRegExp, GlobToRegExpOptions, normalizeGlob } from 'std/path/glob.ts';
 import { walk, WalkEntry, WalkOptions } from 'std/fs/walk.ts';
 
-import { GlobHashOptions, GlobHashOptionsStrict, GlobHashSource } from './types.ts';
+import { GlobHashOptionsStrict, GlobHashSource } from './types.ts';
 import { sequential } from './utils.ts';
 
 /**
@@ -99,7 +99,7 @@ const parseOptions = (source?: GlobHashSource, additionalExcludes?: string[]): u
 
   const options: GlobHashOptionsStrict = source as GlobHashOptionsStrict;
 
-  options.root = resolve(normalize((source as GlobHashOptions)?.root || '.'));
+  options.root = resolve(normalize(source?.root || '.'));
   options.exclude = [...(options.exclude || []), ...(additionalExcludes || [])];
 
   return options;

@@ -15,7 +15,7 @@ const log: Logger = logger();
  *
  * @returns {Promise<void>}
  */
-export const runCode = async <T>(code: Code, options?: CodeOptions): Promise<void> => {
+export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
   log.debug('Run code...');
 
   if (typeof code === 'function') {
@@ -35,7 +35,7 @@ export const runCode = async <T>(code: Code, options?: CodeOptions): Promise<voi
             options?.output(undefined, output);
           }
         })
-        .catch((err: unknown) => {
+        .catch((err) => {
           if (options?.output) {
             options?.output(err, undefined);
           }
@@ -174,10 +174,7 @@ export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void |
 const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
   try {
     const args: string[] = Array.isArray(command) ? command : command.split(' ');
-
-    command = args.shift() as string;
-
-    const cmd: Deno.Command = new Deno.Command(command, {
+    const cmd: Deno.Command = new Deno.Command(args.shift() as string | URL, {
       args,
       cwd: options?.cwd || Deno.cwd(),
       env: options?.env,

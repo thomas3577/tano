@@ -110,7 +110,7 @@ export class Handler {
       }
 
       await this.#cache.get(tn)?.runThis(force)
-        .catch((err: unknown) => {
+        .catch((err) => {
           if (failFast) {
             abort = true;
             throw err;
@@ -178,7 +178,7 @@ export class Handler {
     if (this.#cache.has(taskName)) {
       const task: Task = this.#cache.get(taskName) as Task;
 
-      if (task && task.needs && task.needs?.length > 0) {
+      if (task?.needs?.length > 0) {
         task.needs.forEach((tn) => this.#createPlan(tn, taskNames));
       }
 

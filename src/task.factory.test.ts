@@ -317,7 +317,7 @@ describe(task.name, () => {
       });
 
       await myTask.run()
-        .catch((err: Error) => {
+        .catch((err) => {
           assertNotEquals(err, undefined);
         });
     });

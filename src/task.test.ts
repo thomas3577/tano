@@ -33,7 +33,7 @@ describe(Task.name, () => {
   });
 
   it(`Should run the function. (1)`, async () => {
-    const func = () => {};
+    const func = () => {/* do nothing */};
     const needs: any[] = [];
 
     const actual: Task = new Task('task-test-03', needs, func);
@@ -47,27 +47,30 @@ describe(Task.name, () => {
     assertEquals(actual.status, 'success');
   });
 
-  it(`Should run the function. (2)`, (done) => {
+  it(`Should run the function. (2)`, async () => {
     const func = () => Promise.resolve('my output');
     const needs: any[] = [];
-    const options: Options = {
-      output: (_, event) => {
-        assertEquals(event, 'my output');
-        done;
-      },
-    };
 
-    const actual: Task = new Task('task-test-04', needs, func, options);
+    await new Promise((resolve) => {
+      const options: Options = {
+        output: (_, event) => {
+          assertEquals(event, 'my output');
+          resolve(true);
+        },
+      };
 
-    assertNotEquals(actual, null);
-    assertInstanceOf(actual, Task);
-    assertEquals(actual.name, 'task-test-04');
+      const actual: Task = new Task('task-test-04', needs, func, options);
 
-    actual.runThis();
+      assertNotEquals(actual, null);
+      assertInstanceOf(actual, Task);
+      assertEquals(actual.name, 'task-test-04');
+
+      actual.runThis();
+    });
   });
 
   it(`Should not run if conditions false. (1)`, async () => {
-    const func = () => {};
+    const func = () => {/* do nothing */};
     const needs: any[] = [];
     const options: Options = {
       condition: 1 + 2 === 4,
@@ -85,7 +88,7 @@ describe(Task.name, () => {
   });
 
   it(`Should not run if conditions false. (2)`, async () => {
-    const func = () => {};
+    const func = () => {/* do nothing */};
     const needs: any[] = [];
     const options: Options = {
       condition: () => false,
@@ -103,7 +106,7 @@ describe(Task.name, () => {
   });
 
   it(`Should not run if conditions false. (3)`, async () => {
-    const func = () => {};
+    const func = () => {/* do nothing */};
     const needs: any[] = [];
     const options: Options = {
       condition: (done: any) => setTimeout(() => done(false), 100),
@@ -121,7 +124,7 @@ describe(Task.name, () => {
   });
 
   it(`Should not run if conditions false. (4)`, async () => {
-    const func = () => {};
+    const func = () => {/* do nothing */};
     const needs: any[] = [];
     const options: Options = {
       condition: async () => {
@@ -141,7 +144,7 @@ describe(Task.name, () => {
   });
 
   it(`Should not run if conditions false. (5)`, async () => {
-    const func = () => {};
+    const func = () => {/* do nothing */};
     const needs: any[] = [];
     const options: Options = {
       condition: () => {

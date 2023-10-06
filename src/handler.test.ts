@@ -64,7 +64,7 @@ describe(Handler.name, () => {
     assertEquals(handler.executed, 2);
 
     await handler.run()
-      .catch((err: unknown) => {
+      .catch((err) => {
         assertInstanceOf(err, Error);
       });
 

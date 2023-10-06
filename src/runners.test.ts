@@ -144,7 +144,7 @@ describe(executeCondition.name, () => {
   });
 
   it(`if executeCondition(() => Promise.reject())`, async () => {
-    const condition = () => Promise.reject();
+    const condition = () => Promise.reject(new Error('my error'));
     const actual = await executeCondition(condition)
       .catch(() => false);
 
@@ -181,7 +181,7 @@ describe(executeCodeFunction.name, () => {
   });
 
   it(`if executeCodeFunction(() => {})`, async () => {
-    const code = () => {};
+    const code = () => {/* do nothing */};
     const actual = await executeCodeFunction(code as unknown as CodeFunction)
       .then(() => true)
       .catch(() => false);
@@ -199,7 +199,7 @@ describe(executeCodeFunction.name, () => {
   });
 
   it(`if executeCodeFunction(() => Promise.reject())`, async () => {
-    const code = () => Promise.reject();
+    const code = () => Promise.reject(new Error('my error'));
     const actual = await executeCodeFunction(code as unknown as CodeFunction)
       .then(() => true)
       .catch(() => false);

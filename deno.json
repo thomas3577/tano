@@ -33,6 +33,7 @@
     "exclude": [
       ".vscode/**",
       ".tano/cache.json",
+      "deno.lock",
       "examples/.tano/cache.json",
       "cspell.json"
     ]

@@ -104,6 +104,7 @@ export class Handler {
     const taskNames: Array<string> = this.#createPlan(taskName);
 
     let abort = false;
+
     for (const tn of taskNames) {
       if (abort) {
         break;
@@ -118,7 +119,7 @@ export class Handler {
         });
     }
 
-    await this.#postRun();
+    this.#postRun();
   }
 
   /**
@@ -158,7 +159,7 @@ export class Handler {
     });
   }
 
-  async #postRun(): Promise<void> {
+  #postRun(): void {
     const dateNow = new Date();
 
     this.#finished = performance.mark('finished_run', {
@@ -170,8 +171,6 @@ export class Handler {
     this.#log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
-
-    await this.#changes?.dispose();
   }
 
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {

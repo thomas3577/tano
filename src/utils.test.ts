@@ -308,25 +308,25 @@ describe(toExecutor.name, () => {
     assertEquals(actual, '');
   });
 
-  it(`if toExecutor('ls')`, () => {
-    const executor = 'ls';
+  it(`if toExecutor('pwsh -c ls')`, () => {
+    const executor = 'pwsh -c ls';
     const actual = toExecutor(executor);
 
-    assertEquals(actual, 'ls');
+    assertEquals(actual, 'bash -c ls');
   });
 
-  it(`if toExecutor('ls --all')`, () => {
-    const executor = 'ls --all';
+  it(`if toExecutor('pwsh -c echo Hello World!')`, () => {
+    const executor = 'pwsh -c echo Hello World!';
     const actual = toExecutor(executor);
 
-    assertEquals(actual, 'ls --all');
+    assertEquals(actual, 'pwsh -c echo Hello World!');
   });
 
-  it(`if toExecutor(['ls', '--all'])`, () => {
-    const executor = ['ls', '--all'];
+  it(`if toExecutor(['pwsh', '-c echo Hello World!'])`, () => {
+    const executor = ['pwsh', '-c echo Hello World!'];
     const actual = toExecutor(executor);
 
-    assertEquals(actual, ['ls', '--all']);
+    assertEquals(actual, ['pwsh', '-c echo Hello World!']);
   });
 
   it(`toExecutor([''])`, () => {
@@ -373,25 +373,25 @@ describe(toCommand.name, () => {
     assertEquals(actual, '');
   });
 
-  it(`if toCommand('ls')`, () => {
-    const executor = 'ls';
+  it(`if toCommand('pwsh -c ls')`, () => {
+    const executor = 'pwsh -c ls';
     const actual = toCommand(executor);
 
-    assertEquals(actual, 'ls');
+    assertEquals(actual, 'pwsh -c ls');
   });
 
-  it(`if toCommand('ls --all')`, () => {
-    const executor = 'ls --all';
+  it(`if toCommand('pwsh -c echo Hello World!')`, () => {
+    const executor = 'pwsh -c echo Hello World!';
     const actual = toCommand(executor);
 
-    assertEquals(actual, 'ls --all');
+    assertEquals(actual, 'pwsh -c echo Hello World!');
   });
 
-  it(`if toCommand(['ls', '--all'])`, () => {
-    const executor = ['ls', '--all'];
+  it(`if toCommand(['pwsh', '-c echo Hello World!'])`, () => {
+    const executor = ['pwsh', '-c echo Hello World!'];
     const actual = toCommand(executor);
 
-    assertEquals(actual, ['ls', '--all']);
+    assertEquals(actual, ['pwsh', '-c echo Hello World!']);
   });
 
   it(`if toCommand(() => {})`, () => {

@@ -72,8 +72,20 @@ describe(runCommand.name, () => {
     assertEquals(actual, false);
   });
 
-  it(`if runCommand('ls')`, async () => {
-    const command = 'ls';
+  it(`if runCommand('pwsh -c ls')`, async () => {
+    const command = 'pwsh -c ls';
+    const actual = await runCommand(command as unknown as Command)
+      .then(() => true)
+      .catch((err) => {
+        console.log('ERROR', err);
+        return false;
+      });
+
+    assertEquals(actual, true);
+  });
+
+  it(`if runCommand('pwsh -c echo Hello World!')`, async () => {
+    const command = 'pwsh -c echo Hello World!';
     const actual = await runCommand(command as unknown as Command)
       .then(() => true)
       .catch(() => false);
@@ -81,17 +93,8 @@ describe(runCommand.name, () => {
     assertEquals(actual, true);
   });
 
-  it(`if runCommand('ls --all')`, async () => {
-    const command = 'ls --all';
-    const actual = await runCommand(command as unknown as Command)
-      .then(() => true)
-      .catch(() => false);
-
-    assertEquals(actual, true);
-  });
-
-  it(`if runCommand(['ls', '--all'])`, async () => {
-    const command = ['ls', '--all'];
+  it(`if runCommand(['pwsh', '-c', 'echo Hello World!'])`, async () => {
+    const command = ['pwsh', '-c', 'echo Hello World!'];
     const actual = await runCommand(command as unknown as Command)
       .then(() => true)
       .catch(() => false);

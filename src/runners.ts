@@ -1,3 +1,5 @@
+import { mergeReadableStreams } from 'std/streams/merge_readable_streams.ts';
+
 import { Logger, logger } from './logger.ts';
 
 import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
@@ -79,21 +81,21 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
     }
   }
 
-  for await (const line of process.stdout) {
+  const joined = mergeReadableStreams(
+    process.stdout,
+    process.stderr,
+  );
+
+  // TODO(thu): How to know what's an error?
+  for await (const line of joined) {
     if (!quiet) {
       await Deno.stdout.write(line);
     }
 
     if (options?.output) {
-      options?.output(undefined, textDecoder.decode(line));
-    }
-  }
+      const text: string = textDecoder.decode(line);
 
-  for await (const line of process.stderr) {
-    await Deno.stderr.write(line);
-
-    if (options?.output) {
-      options?.output(textDecoder.decode(line), undefined);
+      options?.output(undefined, text);
     }
   }
 

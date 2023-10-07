@@ -16,14 +16,14 @@ describe(Handler.name, () => {
   });
 
   it(`Should have one task.`, () => {
-    task('myTask', `echo 'First Task'`);
+    task('myTask', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
   });
 
   it(`Should have two task.`, () => {
-    task('default', needs('pre-task'), `echo 'Second Task'`);
+    task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
     task('pre-task', `echo 'First Task'`);
 
     assertEquals(handler.count, 2);
@@ -31,7 +31,7 @@ describe(Handler.name, () => {
   });
 
   it(`Should run no task (because no default-task and no task set.).`, async () => {
-    task('myTask', `echo 'First Task'`);
+    task('myTask', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
@@ -42,7 +42,7 @@ describe(Handler.name, () => {
   });
 
   it(`Should run one task.`, async () => {
-    task('myTask', `echo 'First Task'`);
+    task('myTask', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
@@ -53,8 +53,8 @@ describe(Handler.name, () => {
   });
 
   it(`Should throws an error if trying to runs two times.`, async () => {
-    task('default', needs('pre-task'), `echo 'Second Task'`);
-    task('pre-task', `echo 'First Task'`);
+    task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
+    task('pre-task', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 2);
     assertEquals(handler.executed, 0);
@@ -72,8 +72,8 @@ describe(Handler.name, () => {
   });
 
   it(`Should runs two times.`, async () => {
-    task('default', needs('pre-task'), `echo 'Second Task'`);
-    task('pre-task', `echo 'First Task'`);
+    task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
+    task('pre-task', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 2);
     assertEquals(handler.executed, 0);
@@ -97,8 +97,8 @@ describe(Handler.name, () => {
       task('pre-task-one', () => {
         throw new Error('ERROR! ERROR! ERROR!');
       });
-      task('pre-task-two', `echo 'if you see the second pre-task, something went wrong'`);
-      task('default', needs('pre-task-one', 'pre-task-two'), `echo 'if you see me, something went wrong'`);
+      task('pre-task-two', `pwsh -c echo 'if you see the second pre-task, something went wrong'`);
+      task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c echo 'if you see me, something went wrong'`);
 
       await handler.run();
     } catch (err: unknown) {
@@ -110,8 +110,8 @@ describe(Handler.name, () => {
     task('pre-task-one', () => {
       throw new Error('ERROR! ERROR! ERROR!');
     });
-    task('pre-task-two', `echo 'if you see the second pre-task, something went wrong'`);
-    task('default', needs('pre-task-one', 'pre-task-two'), `echo 'if you see me, something went wrong'`);
+    task('pre-task-two', `pwsh -c echo 'if you see the second pre-task, something went wrong'`);
+    task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c echo 'if you see me, something went wrong'`);
 
     await handler.run('default', false);
 

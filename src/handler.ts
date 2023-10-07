@@ -119,7 +119,7 @@ export class Handler {
         });
     }
 
-    this.#postRun();
+    this.#postRun(!taskNames || taskNames.length === 0 || abort);
   }
 
   /**
@@ -134,6 +134,14 @@ export class Handler {
    */
   clear(): void {
     this.#cache.clear();
+  }
+
+  /**
+   * Disposes the handler.
+   */
+  dispose(): void {
+    this.#changes?.dispose();
+    this.#changes = null;
   }
 
   async #preRun(taskName: string): Promise<void> {
@@ -159,7 +167,7 @@ export class Handler {
     });
   }
 
-  #postRun(): void {
+  #postRun(dispose: boolean): void {
     const dateNow = new Date();
 
     this.#finished = performance.mark('finished_run', {
@@ -171,6 +179,10 @@ export class Handler {
     this.#log.info(bold(green(`Finished after {duration}`)), {
       duration: `${format(this.#measure.duration, { ignoreZero: true })}`,
     });
+
+    if (dispose) {
+      this.dispose();
+    }
   }
 
   #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {

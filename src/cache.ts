@@ -88,15 +88,10 @@ export class TanoCache {
     for (const promise of sequential(Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value)))) {
       await promise;
     }
-
-    db.close();
-    this.#db = null;
   }
 
-  async dispose(): Promise<void> {
-    const db: Deno.Kv = await this.#openKy();
-
-    db.close();
+  dispose(): void {
+    this.#db?.close();
     this.#db = null;
   }
 

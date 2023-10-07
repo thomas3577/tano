@@ -222,6 +222,8 @@ export class Task implements TaskParams {
     });
 
     await this.#handler.changes?.update(this.#name, new Date(), this.#status, options?.source);
+
+    this.#handler.changes?.dispose();
   }
 
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {

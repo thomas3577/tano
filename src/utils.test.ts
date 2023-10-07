@@ -312,7 +312,7 @@ describe(toExecutor.name, () => {
     const executor = 'pwsh -c ls';
     const actual = toExecutor(executor);
 
-    assertEquals(actual, 'bash -c ls');
+    assertEquals(actual, 'pwsh -c ls');
   });
 
   it(`if toExecutor('pwsh -c echo Hello World!')`, () => {

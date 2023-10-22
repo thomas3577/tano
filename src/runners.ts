@@ -86,7 +86,6 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
     process.stderr,
   );
 
-  // TODO(thu): How to know what's an error?
   for await (const line of joined) {
     if (!quiet) {
       await Deno.stdout.write(line);

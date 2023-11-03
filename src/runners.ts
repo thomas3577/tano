@@ -71,13 +71,14 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   const textDecoder = new TextDecoder();
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
   const processOrError: Deno.ChildProcess | ProcessError = getProcess(command, options);
+  const processError: ProcessError = processOrError as ProcessError;
   const process: Deno.ChildProcess = processOrError as Deno.ChildProcess;
 
-  if ('error' in processOrError) {
-    console.error(processOrError.error);
+  if (processError.error) {
+    await Promise.reject(processError.error);
 
     if (options?.output) {
-      options?.output(processOrError.error, undefined);
+      options?.output(processError.error, undefined);
     }
   }
 

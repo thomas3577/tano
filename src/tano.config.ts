@@ -1,4 +1,4 @@
-import { parse } from 'std/flags/mod.ts';
+import { parseArgs } from '$std/cli/mod.ts';
 
 import { getCwd, getImportUrl } from './tano.factory.ts';
 
@@ -10,7 +10,7 @@ import type { TanoCliAction, TanoConfig } from './types.ts';
  * @returns {Promise<TanoConfig>} The tano configuration.
  */
 export const setup = async (): Promise<TanoConfig> => {
-  const flags = parse(Deno.args, {
+  const flags = parseArgs(Deno.args, {
     alias: {
       f: 'file',
       t: 'task',

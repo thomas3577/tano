@@ -1,5 +1,5 @@
-import { assertEquals } from 'std/assert/mod.ts';
-import { describe, it } from 'std/testing/bdd.ts';
+import { assertEquals } from '$std/assert/mod.ts';
+import { describe, it } from '$std/testing/bdd.ts';
 
 import { executeCodeFunction, executeCondition, runCode, runCommand } from './runners.ts';
 

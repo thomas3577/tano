@@ -1,4 +1,4 @@
-import { dirname, fromFileUrl, isAbsolute, join, toFileUrl } from 'std/path/mod.ts';
+import { dirname, fromFileUrl, isAbsolute, join, toFileUrl } from '$std/path/mod.ts';
 
 /**
  * Gets a valid import url.

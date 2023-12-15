@@ -21,7 +21,7 @@ describe(Task.name, () => {
   it(`Should run the command line.`, async () => {
     const needs: any[] = [];
 
-    const actual: Task = new Task('task-test-02', needs, `echo 'Runs my task'`);
+    const actual: Task = new Task('task-test-02', needs, `pwsh -c echo 'Runs my task'`);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);

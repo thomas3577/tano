@@ -4,7 +4,7 @@ import { task07 } from './tanofile.task.ts';
 task(
   'default',
   needs(
-    task('My task 01', `echo 'Hello World from cmd.'`, { repl: true }),
+    task('My task 01', `pwsh -c echo 'Hello World from pwsh.'`),
     task('My task 02', () => console.log('Hello World from code at repl.'), { repl: true }),
     task('My task 03', { file: 'tanofile.code.ts' }),
     task('My task 04', async (): Promise<void> => {
@@ -30,7 +30,7 @@ task(
       args: ['--allow-write'],
     }),
   ),
-  `echo 'The END!'`,
+  `pwsh -c echo 'The END!'`,
 );
 
 task('unhappy-task-01', (done) => {
@@ -97,7 +97,7 @@ task(
   ),
 );
 
-task('output-01', `echo 'OUTPUT'`, {
+task('output-01', `pwsh -c echo 'OUTPUT'`, {
   output: (_, result) => {
     console.log('>>> result', result);
   },

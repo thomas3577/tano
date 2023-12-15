@@ -3,7 +3,6 @@ import { globToRegExp, GlobToRegExpOptions, normalizeGlob } from '$std/path/glob
 import { walk, WalkEntry, WalkOptions } from '$std/fs/walk.ts';
 
 import { GlobHashOptionsStrict, GlobHashSource } from './types.ts';
-import { sequential } from './utils.ts';
 
 /**
  * Gets a list files infos.
@@ -16,7 +15,7 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
   const promises: Promise<Deno.FileInfo>[] = paths.map((path: string) => Deno.stat(path));
   const fileInfos: Deno.FileInfo[] = [];
 
-  for (const promise of sequential<Deno.FileInfo>(promises)) {
+  for (const promise of promises) {
     await promise.then((fileInfo) => fileInfos.push(fileInfo));
   }
 

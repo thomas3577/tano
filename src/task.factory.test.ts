@@ -258,7 +258,7 @@ describe(task.name, () => {
     });
 
     it(`run one task with a command`, async () => {
-      const actual: Task = task('my-task-100', `echo 'First Task'`);
+      const actual: Task = task('my-task-100', `pwsh -c echo 'First Task'`);
 
       assertEquals(actual.status, 'ready');
       assertEquals(handler.executed, 0);
@@ -284,7 +284,7 @@ describe(task.name, () => {
     });
 
     it(`run two task with a command and a function`, async () => {
-      task('my-pretask-102-01', `echo 'My pre-task'`);
+      task('my-pretask-102-01', `pwsh -c echo 'My pre-task'`);
 
       const actual: Task = task('my-task-102', needs('my-pretask-102-01'), () => {
         console.log('>>> TEST');
@@ -300,7 +300,7 @@ describe(task.name, () => {
     });
 
     it(`Should gets an output`, async () => {
-      await task('my-task-103', `echo 'First Task'`, {
+      await task('my-task-103', `pwsh -c echo 'First Task'`, {
         output: (err: unknown, output: string): void => {
           assertEquals(err, undefined);
           assertEquals(output?.includes('First Task'), true);

@@ -24,7 +24,7 @@ describe(Handler.name, () => {
 
   it(`Should have two task.`, () => {
     task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
-    task('pre-task', `echo 'First Task'`);
+    task('pre-task', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 2);
     assertEquals(handler.executed, 0);

@@ -33,12 +33,12 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
 
       await executeCodeFunction(code)
         .then((output) => {
-          if (options?.output) {
+          if (typeof options?.output === 'function') {
             options?.output(undefined, output);
           }
         })
         .catch((err) => {
-          if (options?.output) {
+          if (typeof options?.output === 'function') {
             options?.output(err, undefined);
           }
 
@@ -77,7 +77,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   if (processError.error) {
     await Promise.reject(processError.error);
 
-    if (options?.output) {
+    if (typeof options?.output === 'function') {
       options?.output(processError.error, undefined);
     }
   }
@@ -92,10 +92,11 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
       await Deno.stdout.write(line);
     }
 
-    if (options?.output) {
-      const text: string = textDecoder.decode(line);
-
-      options?.output(undefined, text);
+    if (typeof options?.output === 'function') {
+      const text: string = textDecoder.decode(line).trim();
+      if (text?.length > 0) {
+        options?.output(undefined, text);
+      }
     }
   }
 

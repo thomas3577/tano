@@ -1,7 +1,6 @@
 import { format, join } from '$std/path/mod.ts';
 import { exists } from '$std/fs/exists.ts';
 
-import { sequential } from './utils.ts';
 import { TanoRunData, TaskRunData } from './types.ts';
 
 /**
@@ -85,7 +84,7 @@ export class TanoCache {
   async write(data?: TanoRunData): Promise<void> {
     const db: Deno.Kv = await this.#openKy();
 
-    for (const promise of sequential(Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value)))) {
+    for (const promise of Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value))) {
       await promise;
     }
   }

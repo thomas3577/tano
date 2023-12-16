@@ -1,7 +1,7 @@
 {
   "tasks": {
     "run": "cd ./examples && deno run --unstable --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
-    "cache": "deno cache --lock=deno.lock --lock-write ./src/deps.ts",
+    "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",
     "test": "deno test --unstable --allow-read --allow-run --allow-env --allow-write --trace-ops"
   },
   "compilerOptions": {

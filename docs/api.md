@@ -15,7 +15,7 @@ task(task: Task) => Task;
 **Example:**
 
 ```TypeScript
-import { Task, Task, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { Task, Task, task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 const myTask: Task = new Task('My Task');
 
@@ -35,7 +35,7 @@ task(taskParams: TaskParams) => Task;
 **Example:**
 
 ```TypeScript
-import { task, TaskParams } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task, TaskParams } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 const taskParams: TaskParams = {
   name: 'My Task',
@@ -59,7 +59,7 @@ task(taskName: string, needs: Needs) => Task;
 **Example:**
 
 ```TypeScript
-import { Needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { Needs, task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 const needs: Needs = {
   values: ['My Pre Task'],
@@ -74,7 +74,7 @@ You can also use the function `needs(...args)`.
 **Example with use of `needs()`:**
 
 ```TypeScript
-import { needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { needs, task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 task('My Task', needs('My Pre Task'));
 ```
@@ -82,7 +82,7 @@ task('My Task', needs('My Pre Task'));
 **Example with embedded, needed tasks (Var 1):**
 
 ```TypeScript
-import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 task('My Task', {
   values: [
@@ -94,7 +94,7 @@ task('My Task', {
 **Example with embedded, needed tasks (Var 2):**
 
 ```TypeScript
-import { , task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { , task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 task('My Task', needs(task('My Pre Task')));
 ```
@@ -114,7 +114,7 @@ task(taskName: string, command?: Command, options?: CommandOptions) => Task;
 **Example:**
 
 ```TypeScript
-import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 // Var 1
 task('My Task 1', 'ls -la', { cwd: 'C:\\temp' });
@@ -142,7 +142,7 @@ task(taskName: string, needs?: Needs, command?: Command, options?: CommandOption
 **Example:**
 
 ```TypeScript
-import { Needs, task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { Needs, task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 const needs: Needs = {
   values: ['My Task 2', 'My Task 3'],
@@ -168,7 +168,7 @@ task(taskName: string, code?: Code, options?: CommandOptions) => Task;
 **Example:**
 
 ```TypeScript
-import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 // Var 1
 task('default', () => {
@@ -205,7 +205,7 @@ Functions like in the examples above are executed in the main process. If you wa
 **Example:**
 
 ```TypeScript
-import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 // Var 5
 task('My Task 5', () => {
@@ -232,7 +232,7 @@ task(taskName: string, needs?: Needs, code?: Code, options?: CommandOptions) => 
 **Example:**
 
 ```TypeScript
-import { task } from 'https://deno.land/x/install@v0.0.1/mod.ts';
+import { task } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
 
 task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
 task('default', needs(), ('My Task 2') => {

@@ -1,7 +1,7 @@
 import { format, join } from '$std/path/mod.ts';
 import { exists } from '$std/fs/exists.ts';
 
-import { TanoRunData, TaskRunData } from './types.ts';
+import type { TanoRunData, TaskRunData } from './types.ts';
 
 /**
  * Creates the directory to the tano cache.

@@ -1,7 +1,8 @@
 import { TaskStatus } from '../mod.ts';
 import { TanoCache } from './cache.ts';
 import { computeHash } from './glob.ts';
-import { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
+
+import type { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
 
 /**
  * To determine if there are file changes in the glob area.

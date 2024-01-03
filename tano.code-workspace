@@ -19,10 +19,8 @@
     "deno.enable": true,
     "deno.unstable": true,
     "deno.config": "./deno.json",
-    "deno.testing.enable": true,
     "deno.codeLens.references": false,
     "deno.codeLens.referencesAllFunctions": false,
-    "deno.inlayHints.parameterNames.enabled": "none",
     "deno.internalDebug": true,
     "deno.testing.args": [
       "--allow-read",

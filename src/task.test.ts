@@ -3,7 +3,8 @@ import { afterEach, describe, it } from '$std/testing/bdd.ts';
 
 import { handler } from './handler.ts';
 import { Task } from './task.ts';
-import { Options } from './types.ts';
+
+import type { Options } from './types.ts';
 
 describe(Task.name, () => {
   afterEach(() => {

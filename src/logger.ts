@@ -1,6 +1,6 @@
 import { format } from '$std/datetime/format.ts';
-import { getLogger, handlers, Logger, LogRecord, setup } from '$std/log/mod.ts';
-import { ConsoleHandler } from '$std/log/handlers.ts';
+import { getLogger, Logger, LogRecord, setup } from '$std/log/mod.ts';
+import { ConsoleHandler } from '$std/log/console_handler.ts';
 import { gray, white } from '$std/fmt/colors.ts';
 
 import { consoleMock } from './console.ts';
@@ -9,7 +9,7 @@ type LogLevel = 'INFO' | 'NOTSET' | 'DEBUG' | 'WARNING' | 'ERROR' | 'CRITICAL' |
 
 const log = console.log;
 
-const consoleHandler: ConsoleHandler = new handlers.ConsoleHandler('DEBUG', {
+const consoleHandler: ConsoleHandler = new ConsoleHandler('DEBUG', {
   formatter: (logRecord: LogRecord) => {
     const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
     let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;

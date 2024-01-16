@@ -8,7 +8,7 @@ Yet another task runner cli with no dependencies, inspired by Gulp.
 ## Install
 
 ```bash
-deno install --allow-read --allow-run --allow-env --allow-write -f -n tano --config ./deno.json https://deno.land/x/tano@v0.1.8/tano.ts
+deno install --allow-read --allow-run --allow-env --allow-write -f -n tano --config ./deno.json https://deno.land/x/tano@v0.1.12/tano.ts
 ```
 
 **Note:**
@@ -20,7 +20,7 @@ Your tasks may need additional permissions.
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.
 
 ```TypeScript
-import { task, needs } from 'https://deno.land/x/tano@v0.1.8/mod.ts';
+import { task, needs } from 'https://deno.land/x/tano@v0.1.12/mod.ts';
 
 task('pre-task', `echo 'These were ...'`);
 task('default' needs('pre-task'), `echo '...two tasks.'`);

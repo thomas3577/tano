@@ -38,7 +38,7 @@ export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
  * @returns {String} The CWD.
  */
 export const getCwd = (importUrl: string): string => {
-  if (!importUrl.startsWith('file:')) {
+  if (!importUrl?.startsWith('file:')) {
     return Deno.cwd();
   }
 

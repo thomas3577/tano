@@ -8,7 +8,7 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "--unstable",
+        "--unstable-kv",
         "--allow-read",
         "--allow-run",
         "--allow-env",

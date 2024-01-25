@@ -1,14 +1,14 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --unstable --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
+    "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
     "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",
-    "test": "deno test --unstable --allow-read --allow-run --allow-env --allow-write --trace-ops"
+    "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write --trace-ops"
   },
   "compilerOptions": {
     "strict": true
   },
   "imports": {
-    "$std/": "https://deno.land/std@0.212.0/"
+    "$std/": "https://deno.land/std@0.213.0/"
   },
   "lint": {
     "rules": {
@@ -32,8 +32,8 @@
     "proseWrap": "preserve",
     "exclude": [
       ".vscode/**",
-      ".tano/cache.json",
-      "examples/.tano/cache.json",
+      ".tano/**",
+      "coverage/**",
       "cspell.json"
     ]
   }

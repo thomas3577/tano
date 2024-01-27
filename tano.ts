@@ -11,7 +11,7 @@ import type { TanoConfig } from './src/types.ts';
 const config: TanoConfig = await setup();
 const log: Logger = logger();
 
-log.debug(`FAIL-FAST: ${Deno.env.get('FAIL-FAST')}`);
+log.debug(`FAIL_FAST: ${Deno.env.get('FAIL_FAST')}`);
 log.debug(`LOG_LEVEL: ${Deno.env.get('LOG_LEVEL')}`);
 log.debug(`QUIET:     ${Deno.env.get('QUIET')}`);
 log.debug(`FORCE:     ${Deno.env.get('FORCE')}`);

@@ -37,7 +37,7 @@ export const setup = async (): Promise<TanoConfig> => {
   const force: boolean = flags.force;
   const cwd: string = getCwd(file);
 
-  Deno.env.set('FAIL-FAST', `${failFast}`);
+  Deno.env.set('FAIL_FAST', `${failFast}`);
   Deno.env.set('QUIET', `${flags.quiet}`);
   Deno.env.set('FORCE', `${force}`);
   Deno.env.set('LOG_LEVEL', logLevel);

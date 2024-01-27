@@ -1,8 +1,8 @@
 {
   "tasks": {
-    "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts",
     "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",
-    "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write --trace-ops"
+    "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",
+    "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"
   },
   "compilerOptions": {
     "strict": true

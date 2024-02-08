@@ -196,7 +196,7 @@ export class Handler {
 
       taskNames.push(taskName);
     } else {
-      this.#log.warning('A task with the name {name} does not exist.', {
+      this.#log.warn('A task with the name {name} does not exist.', {
         name: `'${taskName}'`,
       });
     }

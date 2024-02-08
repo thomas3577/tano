@@ -1,11 +1,9 @@
 import { format } from '$std/datetime/format.ts';
-import { getLogger, Logger, LogRecord, setup } from '$std/log/mod.ts';
+import { getLogger, LevelName, Logger, LogRecord, setup } from '$std/log/mod.ts';
 import { ConsoleHandler } from '$std/log/console_handler.ts';
 import { gray, white } from '$std/fmt/colors.ts';
 
 import { consoleMock } from './console.ts';
-
-type LogLevel = 'INFO' | 'NOTSET' | 'DEBUG' | 'WARNING' | 'ERROR' | 'CRITICAL' | undefined;
 
 const log = console.log;
 
@@ -33,7 +31,7 @@ export { Logger };
 
 export const logger = (): Logger => {
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const logLevel: LogLevel = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LogLevel || 'INFO';
+  const logLevel: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
 
   consoleHandler.log = log;
 

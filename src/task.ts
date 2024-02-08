@@ -150,8 +150,8 @@ export class Task implements TaskParams {
     const skippedBySource: boolean = force !== true && (await this.#handler.changes?.hasChanged(this.#name, this.#options?.source)) !== true;
     if (skippedBySource) {
       this.#status = 'skipped';
-      this.#log.warning('');
-      this.#log.warning(`Task {name} skipped by 'source'. No files have been changed since the last run.`, {
+      this.#log.warn('');
+      this.#log.warn(`Task {name} skipped by 'source'. No files have been changed since the last run.`, {
         name: `'${gray(this.#name)}'`,
       });
 
@@ -161,8 +161,8 @@ export class Task implements TaskParams {
     const skippedByCondition: boolean = !(await executeCondition(this.#options?.condition ?? ((): boolean => true)));
     if (skippedByCondition) {
       this.#status = 'skipped';
-      this.#log.warning('');
-      this.#log.warning(`Task {name} skipped by condition. The conditions of this task were not matched.`, {
+      this.#log.warn('');
+      this.#log.warn(`Task {name} skipped by condition. The conditions of this task were not matched.`, {
         name: `'${gray(this.#name)}'`,
       });
 

@@ -99,6 +99,6 @@ task(
 
 task('output-01', `pwsh -c echo 'OUTPUT'`, {
   output: (_, result) => {
-    console.log('>>> result', result);
+    console.log('Result', result);
   },
 });

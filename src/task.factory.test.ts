@@ -271,7 +271,7 @@ describe(task.name, () => {
 
     it(`run one task with a function`, async () => {
       const actual: Task = task('my-task-101', () => {
-        console.log('>>> TEST');
+        console.log('SUCCESS');
       });
 
       assertEquals(actual.status, 'ready');
@@ -287,7 +287,7 @@ describe(task.name, () => {
       task('my-pretask-102-01', `pwsh -c echo 'My pre-task'`);
 
       const actual: Task = task('my-task-102', needs('my-pretask-102-01'), () => {
-        console.log('>>> TEST');
+        console.log('SUCCESS');
       });
 
       assertEquals(actual.status, 'ready');

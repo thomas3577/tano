@@ -1,4 +1,4 @@
-import { mergeReadableStreams } from '$std/streams/merge_readable_streams.ts';
+import { mergeReadableStreams } from '@std/streams/merge_readable_streams.ts';
 
 import { Logger, logger } from './logger.ts';
 

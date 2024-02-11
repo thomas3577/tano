@@ -11,7 +11,7 @@
     "strict": true
   },
   "imports": {
-    "$std/": "https://deno.land/std@0.215.0/"
+    "@std/": "https://deno.land/std@0.215.0/"
   },
   "lint": {
     "rules": {

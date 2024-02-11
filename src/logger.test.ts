@@ -1,6 +1,6 @@
-import { assertEquals, assertInstanceOf } from '$std/assert/mod.ts';
-import { describe, it } from '$std/testing/bdd.ts';
-import { LogLevels } from '$std/log/levels.ts';
+import { assertEquals, assertInstanceOf } from '@std/assert/mod.ts';
+import { describe, it } from '@std/testing/bdd.ts';
+import { LogLevels } from '@std/log/levels.ts';
 
 import { Logger, logger } from './logger.ts';
 

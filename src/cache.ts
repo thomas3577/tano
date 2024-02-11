@@ -1,5 +1,5 @@
-import { format, join } from '$std/path/mod.ts';
-import { exists } from '$std/fs/exists.ts';
+import { format, join } from '@std/path/mod.ts';
+import { exists } from '@std/fs/exists.ts';
 
 import type { TanoRunData, TaskRunData } from './types.ts';
 

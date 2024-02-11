@@ -1,6 +1,6 @@
-import { assertEquals, assertInstanceOf } from '$std/assert/mod.ts';
-import { describe, it } from '$std/testing/bdd.ts';
-import { toFileUrl } from '$std/path/mod.ts';
+import { assertEquals, assertInstanceOf } from '@std/assert/mod.ts';
+import { describe, it } from '@std/testing/bdd.ts';
+import { toFileUrl } from '@std/path/mod.ts';
 
 import { getCwd, getImportUrl } from './tano.factory.ts';
 

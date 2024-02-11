@@ -1,5 +1,5 @@
-import { bold, gray, green, red } from '$std/fmt/colors.ts';
-import { format } from '$std/fmt/duration.ts';
+import { bold, gray, green, red } from '@std/fmt/colors.ts';
+import { format } from '@std/fmt/duration.ts';
 
 import { Logger, logger } from './logger.ts';
 import { Handler, handler } from './handler.ts';

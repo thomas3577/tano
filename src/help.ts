@@ -1,4 +1,4 @@
-import * as std from '$std/version.ts';
+import * as std from '@std/version.ts';
 
 import * as tano from './version.ts';
 

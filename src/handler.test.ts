@@ -1,6 +1,6 @@
-import { assertEquals, assertInstanceOf } from '$std/assert/mod.ts';
-import { afterEach, beforeAll, describe, it } from '$std/testing/bdd.ts';
-import { spy } from '$std/testing/mock.ts';
+import { assertEquals, assertInstanceOf } from '@std/assert/mod.ts';
+import { afterEach, beforeAll, describe, it } from '@std/testing/bdd.ts';
+import { spy } from '@std/testing/mock.ts';
 
 import { Handler, handler } from './handler.ts';
 import { needs } from './needs.ts';

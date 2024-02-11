@@ -1,7 +1,7 @@
-import { normalize, resolve } from '$std/path/mod.ts';
-import { globToRegExp, GlobToRegExpOptions } from '$std/path/glob_to_regexp.ts';
-import { normalizeGlob } from '$std/path/normalize_glob.ts';
-import { walk, WalkEntry, WalkOptions } from '$std/fs/walk.ts';
+import { normalize, resolve } from '@std/path/mod.ts';
+import { globToRegExp, GlobToRegExpOptions } from '@std/path/glob_to_regexp.ts';
+import { normalizeGlob } from '@std/path/normalize_glob.ts';
+import { walk, WalkEntry, WalkOptions } from '@std/fs/walk.ts';
 
 import type { GlobHashOptionsStrict, GlobHashSource } from './types.ts';
 

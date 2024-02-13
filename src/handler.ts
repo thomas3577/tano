@@ -204,4 +204,4 @@ export class Handler {
   }
 }
 
-export const handler = new Handler();
+export const handler: Handler = new Handler();

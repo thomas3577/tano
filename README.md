@@ -2,7 +2,10 @@
 
 [![ci](https://github.com/thomas3577/tano/actions/workflows/deno.yml/badge.svg)](https://github.com/thomas3577/tano/actions/workflows/deno.yml)
 
-Yet another task runner cli with no dependencies.
+Yet another task runner cli.
+
+> [!IMPORTANT]
+> tano is still under development and probably very buggy.
 
 ## Install
 

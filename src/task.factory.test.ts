@@ -1,5 +1,5 @@
-import { assertEquals, assertNotEquals } from '@std/assert/mod.ts';
-import { afterAll, afterEach, describe, it } from '@std/testing/bdd.ts';
+import { assertEquals, assertNotEquals } from '@std/assert';
+import { afterAll, afterEach, describe, it } from '@std/testing/bdd';
 
 import { task } from './task.factory.ts';
 import { handler } from './handler.ts';

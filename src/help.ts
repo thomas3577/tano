@@ -1,5 +1,3 @@
-import * as std from '@std/version.ts';
-
 import * as tano from './version.ts';
 
 export const help = () => {
@@ -9,7 +7,6 @@ export const help = () => {
 
     deno                  v${Deno.version.deno}
     typescript            v${Deno.version.typescript}
-    Deno standard library v${std.VERSION}
 
     To run the default task:
 
@@ -41,7 +38,7 @@ export const help = () => {
 
       -l, --log-level <LOG_LEVEL>
               To change the log level. Default is 'INFO'.
-              See https://deno.land/std@${std.VERSION}/log/levels.ts
+              See https://deno.land/std@log/levels.ts
 
       -V, --version
               Print version information

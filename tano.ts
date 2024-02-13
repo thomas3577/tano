@@ -1,4 +1,4 @@
-import { bold } from '@std/fmt/colors.ts';
+import { bold } from '@std/fmt/colors';
 
 import { Logger, logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';

@@ -1,5 +1,5 @@
-import { bold, green } from '@std/fmt/colors.ts';
-import { format } from '@std/fmt/duration.ts';
+import { bold, green } from '@std/fmt/colors';
+import { format } from '@std/fmt/duration';
 
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
@@ -151,7 +151,6 @@ export class Handler {
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);
     this.#log.info(`V8          v${Deno.version.v8}`);
-    this.#log.info(`std         v${(await import('@std/version.ts')).VERSION}`);
 
     if (data?.lastRun) {
       this.#log.info(`Last run at ${data?.lastRun}`);

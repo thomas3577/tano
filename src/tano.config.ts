@@ -1,4 +1,4 @@
-import { parseArgs } from '@std/cli/mod.ts';
+import { parseArgs } from '@std/cli';
 
 import { getCwd, getImportUrl } from './tano.factory.ts';
 

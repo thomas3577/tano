@@ -1,4 +1,4 @@
-import { GlobToRegExpOptions } from '@std/path/mod.ts';
+import { GlobToRegExpOptions } from '@std/path';
 
 import { Task } from './task.ts';
 

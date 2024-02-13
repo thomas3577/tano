@@ -1,7 +1,10 @@
 {
   "name": "@toea/tano",
-  "version": "0.2.0",
-  "exports": "./mod.ts",
+  "version": "0.2.1",
+  "exports": {
+    ".": "./mod.ts",
+    "./tano": "./tano.ts"
+  },
   "tasks": {
     "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",
     "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",

@@ -1,14 +1,13 @@
 # tano
 
 [![ci](https://github.com/thomas3577/tano/actions/workflows/deno.yml/badge.svg)](https://github.com/thomas3577/tano/actions/workflows/deno.yml)
-[![Built with the Deno Standard Library](https://raw.githubusercontent.com/denoland/deno_std/main/badge.svg)](https://deno.land/std)
 
-Yet another task runner cli with no dependencies, inspired by Gulp.
+Yet another task runner cli with no dependencies.
 
 ## Install
 
 ```bash
-deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -f -n tano --config ./deno.json https://cdn.jsdelivr.net/gh/thomas3577/tano/tano.ts
+deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -f -n tano jsr:@toea/tano/tano
 ```
 
 **Note:**
@@ -20,7 +19,7 @@ Your tasks may need additional permissions.
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.
 
 ```TypeScript
-import { task, needs } from 'https://cdn.jsdelivr.net/gh/thomas3577/tano/mod.ts';
+import { task, needs } from 'jsr:@toea/tano';
 
 task('pre-task', `echo 'These were ...'`);
 task('default' needs('pre-task'), `echo '...two tasks.'`);

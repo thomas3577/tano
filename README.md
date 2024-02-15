@@ -4,8 +4,8 @@
 
 Yet another task runner.
 
-> [!IMPORTANT]
-> tano is still under development and probably very buggy.
+**Important!**
+tano is still under development and probably very buggy.
 
 ## Install
 
@@ -22,10 +22,10 @@ Your tasks may need additional permissions.
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.
 
 ```TypeScript
-import { task, needs } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@toea/tano';
 
 task('pre-task', `echo 'These were ...'`);
-task('default' needs('pre-task'), `echo '...two tasks.'`);
+task('default', needs('pre-task'), `echo '...two tasks.'`);
 ```
 
 ## Using

@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/thomas3577/tano/actions/workflows/deno.yml/badge.svg)](https://github.com/thomas3577/tano/actions/workflows/deno.yml)
 
-Yet another task runner cli.
+Yet another task runner.
 
 > [!IMPORTANT]
 > tano is still under development and probably very buggy.
@@ -10,7 +10,7 @@ Yet another task runner cli.
 ## Install
 
 ```bash
-deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -f -n tano jsr:@toea/tano/tano
+deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -f -n tano https://jsr.io/@toea/tano
 ```
 
 **Note:**

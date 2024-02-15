@@ -27,6 +27,8 @@
           "jsr:@std/assert@^0.215.0"
         ]
       },
+      "@std/datetime@0.215.0": {},
+      "@std/fmt@0.215.0": {},
       "@std/fs@0.215.0": {
         "dependencies": [
           "jsr:@std/path@^0.215.0"
@@ -44,6 +46,7 @@
           "jsr:@std/assert@^0.215.0"
         ]
       },
+      "@std/streams@0.215.0": {},
       "@std/testing@0.215.0": {
         "dependencies": [
           "jsr:@std/assert@^0.215.0"

@@ -3,7 +3,7 @@ import * as tano from './version.ts';
 export const help = () => {
   console.log(`
     tano                  v${tano.VERSION}
-    Yet another task runner cli with no dependencies and inspired by Gulp.
+    Yet another task runner.
 
     deno                  v${Deno.version.deno}
     typescript            v${Deno.version.typescript}

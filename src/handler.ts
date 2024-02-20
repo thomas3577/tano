@@ -204,4 +204,7 @@ export class Handler {
   }
 }
 
+/**
+ * Instance of Handler.
+ */
 export const handler: Handler = new Handler();

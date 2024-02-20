@@ -1,6 +1,6 @@
 {
   "name": "@toea/tano",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "exports": {
     ".": "./mod.ts",
     "./tano": "./tano.ts"

@@ -19,7 +19,7 @@ export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root' | 'globToRe
  * @remarks
  * Internal type of The GlobHashOptions. The `root` property does have to be set.
  */
-export interface GlobHashOptionsStrict {
+export type GlobHashOptionsStrict = {
   /**
    * Array of glob rules.
    */
@@ -40,7 +40,7 @@ export interface GlobHashOptionsStrict {
    * (optional) Deno GlobToRegExpOptions
    */
   globToRegExpOptions?: GlobToRegExpOptions;
-}
+};
 
 /**
  * Defines the files that must be included in the hash.
@@ -73,7 +73,7 @@ export type TanoCliAction = 'run' | 'help' | 'version';
 /**
  * These are the tano options that you can specify either via environment variables or args.
  */
-export interface TanoConfig {
+export type TanoConfig = {
   /**
    * The path to the tanofile.
    */
@@ -99,7 +99,7 @@ export interface TanoConfig {
    * But if you now set `force` to true, this task will be executed anyway.
    */
   force: boolean;
-}
+};
 
 /**
  * This is the parameters that is stored when a task is completed.
@@ -107,7 +107,7 @@ export interface TanoConfig {
  * @remarks
  * The path where the data will be stored is `{cwd}/.tano/cache.json`.
  */
-export interface TaskRunData {
+export type TaskRunData = {
   /**
    * Timestamp of the last execution of the task.
    */
@@ -122,7 +122,7 @@ export interface TaskRunData {
    * Checksum of all files by GlobHashOptions.
    */
   hash?: string;
-}
+};
 
 /**
  * These are the parameters that are created in the working directory each time the tasks are executed.
@@ -130,14 +130,17 @@ export interface TaskRunData {
  * @remarks
  * The path where the data will be stored is `{cwd}/.tano/cache.json`.
  */
-export interface TanoRunData {
+export type TanoRunData = {
+  /**
+   * List of Tasks.
+   */
   tasks: Record<string, TaskRunData>;
-}
+};
 
 /**
  * These are the additional task run options (besides the `RunOptions`)
  */
-export interface TaskOptions extends Deno.CommandOptions {
+export interface ITaskOptions extends Deno.CommandOptions {
   /**
    * You can specify a function that returns a boolean. As a condition whether a task must be executed or skipped. If `true`, the task is executed.
    */
@@ -161,9 +164,14 @@ export interface TaskOptions extends Deno.CommandOptions {
 }
 
 /**
+ * These are the additional task run options (besides the `RunOptions`)
+ */
+export type TaskOptions = ITaskOptions;
+
+/**
  * These are the additional task run options for code tasks (besides the `TaskOptions`)
  */
-export interface CodeOptions extends TaskOptions {
+export interface ICodeOptions extends TaskOptions {
   /**
    * If you want, you can run your code with Deno repl.
    * This has the advantage that the code is executed in a separate process. But there are also some disadvantages :-)
@@ -177,9 +185,14 @@ export interface CodeOptions extends TaskOptions {
 }
 
 /**
+ * These are the additional task run options for code tasks (besides the `TaskOptions`)
+ */
+export type CodeOptions = ICodeOptions;
+
+/**
  * These are the additional task run options for command tasks (besides the `TaskOptions`)
  */
-export interface CommandOptions extends TaskOptions {
+export interface ICommandOptions extends TaskOptions {
   /**
    * Note! Currently there are no command specific properties.
    */
@@ -187,9 +200,14 @@ export interface CommandOptions extends TaskOptions {
 }
 
 /**
+ * These are the additional task run options for command tasks (besides the `TaskOptions`)
+ */
+export type CommandOptions = ICommandOptions;
+
+/**
  * The task parameters.
  */
-export interface TaskParams {
+export type TaskParams = {
   /**
    * The name of the task. This name have to be unique.
    */
@@ -209,21 +227,27 @@ export interface TaskParams {
    * There are two different types of tasks. Code tasks and command tasks.
    */
   executor?: Executor;
-}
+};
 
-export interface Needs {
+/**
+ * Defines a list of tasks that have to be executed before the parent task is executed.
+ */
+export type Needs = {
   /**
    * List of task names or task objects.
    */
   values: Array<string | TaskParams>;
-}
+};
 
-export interface CodeFile {
+/**
+ * Defines a file that can be executed with Deno.
+ */
+export type CodeFile = {
   /**
    * If the `code` is a TypeScript/JavaScript file.
    */
   file: string | URL;
-}
+};
 
 /**
  * A simple condition.
@@ -259,11 +283,27 @@ export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
 
 export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
 export type CodeFunctionWithoutDone = <T>() => void | T | Promise<void | T>;
+
+/**
+ * Defines a function for execution.
+ */
 export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
+
+/**
+ * Defines a function or a file for execution.
+ */
 export type Code = CodeFunction | CodeFile;
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+/**
+ * Defines the status of a task.
+ */
 export type TaskStatus = 'ready' | 'skipped' | 'running' | 'success' | 'failed';
+
+/**
+ * Defines a command for execution.
+ */
 export type Command = string | Array<string>;
 export type Options = CodeOptions | CommandOptions;
 export type Executor = Command | Code;

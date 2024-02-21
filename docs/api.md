@@ -4,7 +4,7 @@ There are some overloads. The return value is in any case `Task`.
 
 ## Overload 1
 
-```TypeScript
+```ts
 task(task: Task) => Task;
 ```
 
@@ -14,7 +14,7 @@ task(task: Task) => Task;
 
 **Example:**
 
-```TypeScript
+```ts
 import { Task, Task, task } from 'jsr:@toea/tano';
 
 const myTask: Task = new Task('My Task');
@@ -24,7 +24,7 @@ task(myTask);
 
 ## Overload 2
 
-```TypeScript
+```ts
 task(taskParams: TaskParams) => Task;
 ```
 
@@ -34,7 +34,7 @@ task(taskParams: TaskParams) => Task;
 
 **Example:**
 
-```TypeScript
+```ts
 import { task, TaskParams } from 'jsr:@toea/tano';
 
 const taskParams: TaskParams = {
@@ -46,7 +46,7 @@ task(taskParams);
 
 ## Overload 3
 
-```TypeScript
+```ts
 task(taskName: string, needs: Needs) => Task;
 ```
 
@@ -58,7 +58,7 @@ task(taskName: string, needs: Needs) => Task;
 
 **Example:**
 
-```TypeScript
+```ts
 import { Needs, task } from 'jsr:@toea/tano';
 
 const needs: Needs = {
@@ -73,7 +73,7 @@ You can also use the function `needs(...args)`.
 
 **Example with use of `needs()`:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('My Task', needs('My Pre Task'));
@@ -81,7 +81,7 @@ task('My Task', needs('My Pre Task'));
 
 **Example with embedded, needed tasks (Var 1):**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('My Task', {
@@ -93,7 +93,7 @@ task('My Task', {
 
 **Example with embedded, needed tasks (Var 2):**
 
-```TypeScript
+```ts
 import { , task } from 'jsr:@toea/tano';
 
 task('My Task', needs(task('My Pre Task')));
@@ -101,7 +101,7 @@ task('My Task', needs(task('My Pre Task')));
 
 ## Overload 4
 
-```TypeScript
+```ts
 task(taskName: string, command?: Command, options?: CommandOptions) => Task;
 ```
 
@@ -113,7 +113,7 @@ task(taskName: string, command?: Command, options?: CommandOptions) => Task;
 
 **Example:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 // Var 1
@@ -128,7 +128,7 @@ task('My Task 3', ['bash', '-c', 'ls -la'], { cwd: 'C:\\temp' });
 
 ## Overload 5
 
-```TypeScript
+```ts
 task(taskName: string, needs?: Needs, command?: Command, options?: CommandOptions) => Task;
 ```
 
@@ -141,7 +141,7 @@ task(taskName: string, needs?: Needs, command?: Command, options?: CommandOption
 
 **Example:**
 
-```TypeScript
+```ts
 import { Needs, task } from 'jsr:@toea/tano';
 
 const needs: Needs = {
@@ -155,7 +155,7 @@ task('default', needs 'ls -la', { cwd: 'C:\\temp' });
 
 ## Overload 6
 
-```TypeScript
+```ts
 task(taskName: string, code?: Code, options?: CommandOptions) => Task;
 ```
 
@@ -167,7 +167,7 @@ task(taskName: string, code?: Code, options?: CommandOptions) => Task;
 
 **Example:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 // Var 1
@@ -204,7 +204,7 @@ Functions like in the examples above are executed in the main process. If you wa
 
 **Example:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 // Var 5
@@ -218,7 +218,7 @@ task('My Task 6', 'my-task-6.ts');
 
 ## Overload 7
 
-```TypeScript
+```ts
 task(taskName: string, needs?: Needs, code?: Code, options?: CommandOptions) => Task;
 ```
 
@@ -231,7 +231,7 @@ task(taskName: string, needs?: Needs, code?: Code, options?: CommandOptions) => 
 
 **Example:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });

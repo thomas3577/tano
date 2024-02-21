@@ -10,7 +10,7 @@ tano
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('default', `ls`);
@@ -20,7 +20,7 @@ task('default', `ls`);
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('default', `ls`, { cwd: '/usr/bin' });
@@ -30,7 +30,7 @@ task('default', `ls`, { cwd: '/usr/bin' });
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 const myTask = task('default', () => {
@@ -45,7 +45,7 @@ const myTask = task('default', () => {
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('default', (): Promise<void> => {
@@ -61,7 +61,7 @@ task('default', (): Promise<void> => {
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('default', async (): Promise<void> => {
@@ -77,7 +77,7 @@ task('default', async (): Promise<void> => {
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { task } from 'jsr:@toea/tano';
 
 task('default', (done): void => {
@@ -95,7 +95,7 @@ task('default', (done): void => {
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('my-pre-task', () => console.log('Will be executed first'));
@@ -110,7 +110,7 @@ task('default', needs('my-pre-task'), () => console.log('Runs as second task'));
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('task01', `echo '1'`);
@@ -128,7 +128,7 @@ task('default', needs('task01', 'task02', 'task03'));
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('task01', `echo '1'`);
@@ -147,7 +147,7 @@ task('default', needs('task01', 'task02', 'task03'), `echo '4'`);
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task(
@@ -171,7 +171,7 @@ task(
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('default', () => console.log('Hello world'), { eval: true });
@@ -184,13 +184,13 @@ task('default', () => console.log('Hello world'), { eval: true });
 
 **func.ts:**
 
-```TypeScript
+```ts
 console.log('Hello world');
 ```
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('default', { file: 'func.ts' });
@@ -203,13 +203,13 @@ task('default', { file: 'func.ts' });
 
 **func.ts:**
 
-```TypeScript
+```ts
 console.log('Hello world');
 ```
 
 **tanofile.ts:**
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('default', { file: 'func.ts' }, { cwd: '/usr/bin' });

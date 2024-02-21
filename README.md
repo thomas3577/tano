@@ -21,7 +21,7 @@ Your tasks may need additional permissions.
 
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.
 
-```TypeScript
+```ts
 import { needs, task } from 'jsr:@toea/tano';
 
 task('pre-task', `echo 'These were ...'`);

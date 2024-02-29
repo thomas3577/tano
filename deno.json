@@ -1,9 +1,8 @@
 {
   "name": "@toea/tano",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "exports": {
-    ".": "./mod.ts",
-    "./tano": "./tano.ts"
+    ".": "./mod.ts"
   },
   "tasks": {
     "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",

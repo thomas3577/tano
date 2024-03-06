@@ -303,6 +303,13 @@ describe(task.name, () => {
       await task('my-task-103', `pwsh -c echo 'First Task'`, {
         output: (err: unknown, output: string): void => {
           assertEquals(err, undefined);
+
+          console.log(' ');
+          console.log('##################################################');
+          console.log('>>>', JSON.stringify(output));
+          console.log('##################################################');
+          console.log(' ');
+
           assertEquals(output?.includes('First Task'), true);
         },
       }).run();

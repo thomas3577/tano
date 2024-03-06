@@ -1,16 +1,15 @@
 # tano
 
+[![JSR Version](https://jsr.io/badges/@toea/tano)](https://jsr.io/@toea/tano)
+[![JSR Score](https://jsr.io/badges/@toea/tano/score)](https://jsr.io/@toea/tano/score)
 [![ci](https://github.com/thomas3577/tano/actions/workflows/deno.yml/badge.svg)](https://github.com/thomas3577/tano/actions/workflows/deno.yml)
 
 Yet another task runner.
 
-**Important!**
-tano is still under development and probably very buggy.
-
 ## Install
 
 ```bash
-deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -f -n tano https://jsr.io/@toea/tano
+deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -f -n tano jsr:@toea/tano
 ```
 
 **Note:**

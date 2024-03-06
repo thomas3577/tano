@@ -1,5 +1,3 @@
-import { mergeReadableStreams } from '@std/streams/merge_readable_streams';
-
 import { Logger, logger } from './logger.ts';
 
 import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
@@ -82,23 +80,39 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
     }
   }
 
-  const joined = mergeReadableStreams(
-    process.stdout,
-    process.stderr,
+  process.stdout.pipeTo(
+    new WritableStream({
+      write(chunk: Uint8Array): void {
+        if (!quiet) {
+          Deno.stdout.writeSync(chunk);
+        }
+
+        const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
+        for (const line of lines) {
+          if (line?.length > 0 && typeof options?.output === 'function') {
+            options?.output(undefined, line);
+          }
+        }
+      },
+    }),
   );
 
-  for await (const line of joined) {
-    if (!quiet) {
-      await Deno.stdout.write(line);
-    }
+  process.stderr.pipeTo(
+    new WritableStream({
+      write(chunk: Uint8Array): void {
+        if (!quiet) {
+          Deno.stderr.writeSync(chunk);
+        }
 
-    if (typeof options?.output === 'function') {
-      const text: string = textDecoder.decode(line).trim();
-      if (text?.length > 0) {
-        options?.output(undefined, text);
-      }
-    }
-  }
+        const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
+        for (const line of lines) {
+          if (line?.length > 0 && typeof options?.output === 'function') {
+            options?.output(line, undefined);
+          }
+        }
+      },
+    }),
+  );
 
   process.stdin.close();
 

@@ -1,9 +1,7 @@
 {
   "name": "@toea/tano",
-  "version": "0.3.7",
-  "exports": {
-    ".": "./mod.ts"
-  },
+  "version": "0.3.8",
+  "exports": "./mod.ts",
   "tasks": {
     "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",
     "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",
@@ -20,8 +18,19 @@
     "@std/testing": "jsr:@std/testing@0.218.0",
     "@std/datetime": "jsr:@std/datetime@0.218.0",
     "@std/log": "jsr:@std/log@0.218.0",
-    "@std/streams": "jsr:@std/streams@0.218.0",
     "@std/cli": "jsr:@std/cli@0.218.0"
+  },
+  "publish": {
+    "exclude": [
+      ".github",
+      "examples",
+      ".gitignore",
+      ".editorconfig",
+      "cspell.json",
+      "*.code-workspace",
+      "**/*.test.ts",
+      "tanofile.ts"
+    ]
   },
   "lint": {
     "rules": {

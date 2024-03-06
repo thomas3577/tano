@@ -29,7 +29,7 @@ jobs:
         run: deno lint
 
       - name: Run tests
-        run: deno run test
+        run: deno task test
 
       - name: Publish package
         run: deno publish

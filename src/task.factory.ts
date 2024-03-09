@@ -1,3 +1,14 @@
+/**
+ * This module contains the task function to create new tasks.
+ *
+ * ```ts
+ * import { needs, task } from 'jsr:@toea/tano';
+ *
+ * task('pre-task', `echo 'These were ...'`);
+ * task('default', needs('pre-task'), `echo '...two tasks.'`).run();
+ * ```
+ */
+
 import { Task } from './task.ts';
 import { isExecutor, isNeeds, toExecutor } from './utils.ts';
 

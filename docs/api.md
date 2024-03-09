@@ -15,7 +15,7 @@ task(task: Task) => Task;
 **Example:**
 
 ```ts
-import { Task, Task, task } from 'jsr:@toea/tano';
+import { Task, task } from 'jsr:@toea/tano';
 
 const myTask: Task = new Task('My Task');
 

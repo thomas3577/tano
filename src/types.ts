@@ -1,3 +1,7 @@
+/**
+ * This module contains types
+ */
+
 import { GlobToRegExpOptions } from '@std/path';
 
 import { Task } from './task.ts';

@@ -1,3 +1,15 @@
+/**
+ * This module only contains the Task class.
+ *
+ * ```ts
+ * import { Task } from '../src/task.ts';
+ *
+ * const task = new Task('my-task', null, () => console.log('Hello World!'));
+ *
+ * await task.runThis();
+ * ```
+ */
+
 import { bold, gray, green, red } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
 
@@ -9,7 +21,7 @@ import { executeCondition, runCode, runCommand } from './runners.ts';
 import type { Command, Executor, Options, TaskParams, TaskStatus, TaskType } from './types.ts';
 
 /**
- * Defines a Task.
+ * A class to create a Task.
  */
 export class Task implements TaskParams {
   readonly #log: Logger = logger();
@@ -33,7 +45,9 @@ export class Task implements TaskParams {
    * @param {Command | Code} executor - A command, function or JS/TS-file to execute.
    * @param {Options} options - Options, depending on whether the executor is of type Command or Code.
    */
-  constructor(nameOrTask: string | TaskParams, needs: Array<string> = [], executor?: Executor, options?: Options) {
+  constructor(nameOrTask: string | TaskParams, needs?: Array<string> | null, executor?: Executor, options?: Options) {
+    needs = needs == null ? [] : needs;
+
     const task: TaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as TaskParams : {
       name: nameOrTask,
       needs,

@@ -1,6 +1,6 @@
 import { parseArgs } from '@std/cli';
 
-import { getCwd, getImportUrl } from './tano.factory.ts';
+import { getCwd, getImportUrl } from './utils.ts';
 
 import type { TanoCliAction, TanoConfig } from './types.ts';
 

@@ -1,3 +1,7 @@
-import deno from '../deno.json' with { type: 'json' };
+/**
+ * This Module is used to get the version of the tano app.
+ */
 
-export const VERSION = deno.version;
+import { version } from '../deno.json' with { type: 'json' };
+
+export const VERSION = version;

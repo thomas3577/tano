@@ -1,9 +1,32 @@
+/**
+ * This module contains runners for code and commands.
+ */
+
 import { Logger, logger } from './logger.ts';
 
 import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
 
 const log: Logger = logger();
 
+const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
+  try {
+    const args: string[] = Array.isArray(command) ? command : command.split(' ');
+    const cmd: Deno.Command = new Deno.Command(args.shift() as string | URL, {
+      args,
+      cwd: options?.cwd || Deno.cwd(),
+      env: options?.env,
+      stdout: options?.stdout || 'piped',
+      stderr: options?.stderr || 'piped',
+      stdin: options?.stdin || 'piped',
+    });
+
+    return cmd.spawn();
+  } catch (err: unknown) {
+    const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown error';
+
+    return { error };
+  }
+};
 /**
  * Runs code.
  *
@@ -186,24 +209,4 @@ export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void |
   log.debug('Execute code function completed.');
 
   return output;
-};
-
-const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
-  try {
-    const args: string[] = Array.isArray(command) ? command : command.split(' ');
-    const cmd: Deno.Command = new Deno.Command(args.shift() as string | URL, {
-      args,
-      cwd: options?.cwd || Deno.cwd(),
-      env: options?.env,
-      stdout: options?.stdout || 'piped',
-      stderr: options?.stderr || 'piped',
-      stdin: options?.stdin || 'piped',
-    });
-
-    return cmd.spawn();
-  } catch (err: unknown) {
-    const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown error';
-
-    return { error };
-  }
 };

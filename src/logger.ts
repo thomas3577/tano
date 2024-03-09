@@ -1,3 +1,7 @@
+/**
+ * This module contains the logger function to create a new logger.
+ */
+
 import { format } from '@std/datetime/format';
 import { getLogger, LevelName, Logger, LogRecord, setup } from '@std/log';
 import { ConsoleHandler } from '@std/log/console_handler';

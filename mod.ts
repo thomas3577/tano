@@ -1,3 +1,7 @@
+/**
+ * The main module
+ */
+
 export { task } from './src/task.factory.ts';
 export { needs } from './src/needs.ts';
 export { handler } from './src/handler.ts';

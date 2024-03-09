@@ -1,3 +1,7 @@
+/**
+ * This module provides the help message for the CLI.
+ */
+
 import * as tano from './version.ts';
 
 export const help = () => {

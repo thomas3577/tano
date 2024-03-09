@@ -1,5 +1,5 @@
 /**
- * This module only contains the Task class.
+ * This module contains the Task class.
  *
  * ```ts
  * import { Task } from '../src/task.ts';

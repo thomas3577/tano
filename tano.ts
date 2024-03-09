@@ -1,3 +1,7 @@
+/**
+ * This is the initial module to start the Tano CLI.
+ */
+
 import { bold } from '@std/fmt/colors';
 
 import { Logger, logger } from './src/logger.ts';

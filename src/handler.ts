@@ -1,3 +1,7 @@
+/**
+ * This module provides the task handler class and an initial instance.
+ */
+
 import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
 

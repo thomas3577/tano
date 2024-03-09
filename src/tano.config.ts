@@ -1,3 +1,7 @@
+/**
+ * This module contains the setup function for the CLI.
+ */
+
 import { parseArgs } from '@std/cli';
 
 import { getCwd, getImportUrl } from './utils.ts';

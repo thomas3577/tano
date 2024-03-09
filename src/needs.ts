@@ -5,7 +5,7 @@
 import type { Needs, TaskParams } from './types.ts';
 
 /**
- * Just a wrapper to hold the `needs`.
+ * Just a wrapper to hold the `needs`. A function to define an ordered series of tasks that must be listed before the current task.
  *
  * @param {...Array<string | TaskParams>} values - Task names and Tasks.
  *

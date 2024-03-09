@@ -1,3 +1,8 @@
+/**
+ * Just a mock for the console object.
+ * @module
+ */
+
 // deno-lint-ignore-file no-unused-vars
 export const consoleMock: Console = {
   assert(condition?: boolean | undefined, ...data: any[]): void {},

@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "exports": {
     ".": "./mod.ts",
     "./tano": "./tano.ts"

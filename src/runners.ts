@@ -1,5 +1,6 @@
 /**
  * This module contains runners for code and commands.
+ * @module
  */
 
 import { Logger, logger } from './logger.ts';

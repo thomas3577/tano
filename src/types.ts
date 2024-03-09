@@ -1,5 +1,6 @@
 /**
- * This module contains types
+ * This module contains types.
+ * @module
  */
 
 import { GlobToRegExpOptions } from '@std/path';

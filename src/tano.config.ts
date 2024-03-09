@@ -1,5 +1,6 @@
 /**
  * This module contains the setup function for the CLI.
+ * @module
  */
 
 import { parseArgs } from '@std/cli';

@@ -1,4 +1,6 @@
 /**
+ * @module
+ *
  * This module contains the task function to create new tasks.
  *
  * ```ts

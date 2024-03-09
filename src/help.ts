@@ -1,5 +1,6 @@
 /**
  * This module provides the help message for the CLI.
+ * @module
  */
 
 import * as tano from './version.ts';

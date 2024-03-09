@@ -1,3 +1,8 @@
+/**
+ * This module contains a function to compute a hash by glob.
+ * @module
+ */
+
 import { normalize, resolve } from '@std/path';
 import { globToRegExp, GlobToRegExpOptions } from '@std/path/glob_to_regexp';
 import { normalizeGlob } from '@std/path/normalize_glob';
@@ -28,7 +33,7 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
  *
  * @param {Array<String>} globs - An array of globs.
  * @param {String} root - The root path.
- * @param {GlobToRegExpOptions} - Options for the GlobToRegExp
+ * @param {GlobToRegExpOptions} globToRegExpOptions - Options for the GlobToRegExp
  *
  * @returns {Promise<Array<string>>} A promise to resolve the globs.
  */

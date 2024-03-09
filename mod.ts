@@ -1,5 +1,6 @@
 /**
- * The main module
+ * The main module for programmatic use.
+ * @module
  */
 
 /**

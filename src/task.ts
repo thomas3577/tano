@@ -1,4 +1,6 @@
 /**
+ * @module
+ *
  * This module contains the Task class.
  *
  * ```ts

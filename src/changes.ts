@@ -1,3 +1,8 @@
+/**
+ * This module provides a class to determine if there are file changes in the glob area.
+ * @module
+ */
+
 import { TaskStatus } from '../mod.ts';
 import { TanoCache } from './cache.ts';
 import { computeHash } from './glob.ts';

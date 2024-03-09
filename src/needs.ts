@@ -1,5 +1,6 @@
 /**
  * The Module container only the needs helper function.
+ * @module
  */
 
 import type { Needs, TaskParams } from './types.ts';

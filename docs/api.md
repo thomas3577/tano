@@ -15,7 +15,7 @@ task(task: Task) => Task;
 **Example:**
 
 ```ts
-import { Task, task } from 'jsr:@toea/tano';
+import { Task, task } from 'jsr:@dx/tano';
 
 const myTask: Task = new Task('My Task');
 
@@ -35,7 +35,7 @@ task(taskParams: TaskParams) => Task;
 **Example:**
 
 ```ts
-import { task, TaskParams } from 'jsr:@toea/tano';
+import { task, TaskParams } from 'jsr:@dx/tano';
 
 const taskParams: TaskParams = {
   name: 'My Task',
@@ -59,7 +59,7 @@ task(taskName: string, needs: Needs) => Task;
 **Example:**
 
 ```ts
-import { Needs, task } from 'jsr:@toea/tano';
+import { Needs, task } from 'jsr:@dx/tano';
 
 const needs: Needs = {
   values: ['My Pre Task'],
@@ -74,7 +74,7 @@ You can also use the function `needs(...args)`.
 **Example with use of `needs()`:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('My Task', needs('My Pre Task'));
 ```
@@ -82,7 +82,7 @@ task('My Task', needs('My Pre Task'));
 **Example with embedded, needed tasks (Var 1):**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('My Task', {
   values: [
@@ -94,7 +94,7 @@ task('My Task', {
 **Example with embedded, needed tasks (Var 2):**
 
 ```ts
-import { , task } from 'jsr:@toea/tano';
+import { , task } from 'jsr:@dx/tano';
 
 task('My Task', needs(task('My Pre Task')));
 ```
@@ -114,7 +114,7 @@ task(taskName: string, command?: Command, options?: CommandOptions) => Task;
 **Example:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 // Var 1
 task('My Task 1', 'ls -la', { cwd: 'C:\\temp' });
@@ -142,7 +142,7 @@ task(taskName: string, needs?: Needs, command?: Command, options?: CommandOption
 **Example:**
 
 ```ts
-import { Needs, task } from 'jsr:@toea/tano';
+import { Needs, task } from 'jsr:@dx/tano';
 
 const needs: Needs = {
   values: ['My Task 2', 'My Task 3'],
@@ -168,7 +168,7 @@ task(taskName: string, code?: Code, options?: CommandOptions) => Task;
 **Example:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 // Var 1
 task('default', () => {
@@ -205,7 +205,7 @@ Functions like in the examples above are executed in the main process. If you wa
 **Example:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 // Var 5
 task('My Task 5', () => {
@@ -232,7 +232,7 @@ task(taskName: string, needs?: Needs, code?: Code, options?: CommandOptions) => 
 **Example:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
 task('default', needs(), ('My Task 2') => {

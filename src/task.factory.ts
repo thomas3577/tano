@@ -2,7 +2,7 @@
  * This module contains the task function to create new tasks.
  *
  * ```ts
- * import { needs, task } from 'jsr:@toea/tano';
+ * import { needs, task } from 'jsr:@dx/tano';
  *
  * task('pre-task', `echo 'These were ...'`);
  * task('default', needs('pre-task'), `echo '...two tasks.'`).run();

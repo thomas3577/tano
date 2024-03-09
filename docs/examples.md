@@ -11,7 +11,7 @@ tano
 **tanofile.ts:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', `ls`);
 ```
@@ -21,7 +21,7 @@ task('default', `ls`);
 **tanofile.ts:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', `ls`, { cwd: '/usr/bin' });
 ```
@@ -31,7 +31,7 @@ task('default', `ls`, { cwd: '/usr/bin' });
 **tanofile.ts:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 const myTask = task('default', () => {
   console.log('Hello world');
@@ -46,7 +46,7 @@ const myTask = task('default', () => {
 **tanofile.ts:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', (): Promise<void> => {
   console.log('Hello world');
@@ -62,7 +62,7 @@ task('default', (): Promise<void> => {
 **tanofile.ts:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', async (): Promise<void> => {
   console.log('Hello world');
@@ -78,7 +78,7 @@ task('default', async (): Promise<void> => {
 **tanofile.ts:**
 
 ```ts
-import { task } from 'jsr:@toea/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', (done): void => {
   setTimeout(() => {
@@ -96,7 +96,7 @@ task('default', (done): void => {
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('my-pre-task', () => console.log('Will be executed first'));
 task('default', needs('my-pre-task'), () => console.log('Runs as second task'));
@@ -111,7 +111,7 @@ task('default', needs('my-pre-task'), () => console.log('Runs as second task'));
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('task01', `echo '1'`);
 task('task02', `echo '2'`);
@@ -129,7 +129,7 @@ task('default', needs('task01', 'task02', 'task03'));
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('task01', `echo '1'`);
 task('task02', `echo '2'`);
@@ -148,7 +148,7 @@ task('default', needs('task01', 'task02', 'task03'), `echo '4'`);
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task(
   'default',
@@ -172,7 +172,7 @@ task(
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('default', () => console.log('Hello world'), { eval: true });
 
@@ -191,7 +191,7 @@ console.log('Hello world');
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('default', { file: 'func.ts' });
 
@@ -210,7 +210,7 @@ console.log('Hello world');
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@toea/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('default', { file: 'func.ts' }, { cwd: '/usr/bin' });
 

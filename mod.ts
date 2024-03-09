@@ -6,7 +6,7 @@
  * The task function to create new tasks.
  *
  * ```ts
- * import { needs, task } from 'jsr:@toea/tano';
+ * import { needs, task } from 'jsr:@dx/tano';
  *
  * task('pre-task', `echo 'These were ...'`);
  * task('default', needs('pre-task'), `echo '...two tasks.'`).run();
@@ -23,7 +23,7 @@ export { needs } from './src/needs.ts';
  * An initial instance of the handler to run the tasks.
  *
  * ```ts
- * import { handler } from 'jsr:@toea/tano';
+ * import { handler } from 'jsr:@dx/tano';
  *
  * handler();
  * ```

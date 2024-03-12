@@ -1,9 +1,4 @@
 /**
- * The main module for programmatic use.
- * @module
- */
-
-/**
  * The task function to create new tasks.
  *
  * ```ts

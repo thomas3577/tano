@@ -6,7 +6,7 @@
     "./tano": "./tano.ts"
   },
   "tasks": {
-    "install": "deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -n tano jsr:@dx/tano/tano",
+    "install": "deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -n tano -c ./deno.json jsr:@dx/tano/tano",
     "cache": "deno cache --lock=deno.lock --lock-write ./mod.ts",
     "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",
     "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --file ./tanofile.ts"

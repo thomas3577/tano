@@ -3,6 +3,6 @@
  * @module
  */
 
-import { version } from '../deno.json' with { type: 'json' };
+import deno from '../deno.json' with { type: 'json' };
 
-export const VERSION = version;
+export const VERSION = deno.version;

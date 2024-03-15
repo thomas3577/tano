@@ -9,6 +9,7 @@ import { format } from '@std/fmt/duration';
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
 import { Changes } from './changes.ts';
+import { VERSION } from './version.ts';
 
 import type { TaskRunData } from './types.ts';
 
@@ -156,6 +157,7 @@ export class Handler {
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);
     this.#log.info(`V8          v${Deno.version.v8}`);
+    this.#log.info(`Tano        v${VERSION}`);
 
     if (data?.lastRun) {
       this.#log.info(`Last run at ${data?.lastRun}`);

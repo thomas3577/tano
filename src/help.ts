@@ -53,5 +53,8 @@ export const help = () => {
 
           --force
               Also executes the tasks that have not been changed since the last run.
+
+          --no-cache
+              Disables the cache mechanism.
   `);
 };

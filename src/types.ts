@@ -8,6 +8,16 @@ import { GlobToRegExpOptions } from '@std/path';
 import { Task } from './task.ts';
 
 /**
+ * The changes interface to determine if there are file changes in the glob area.
+ */
+export interface IChanges {
+  hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean>;
+  update(taskName: string, timestamp: Date, status: TaskStatus, source?: GlobHashSource): Promise<void>;
+  get(taskName: string): Promise<undefined | TaskRunData>;
+  dispose(): void;
+}
+
+/**
  * Great idea from Peter Kröner <peter@peterkroener.de> to make Properties optional.
  */
 export type Optional<Source, Keys extends keyof Source> =
@@ -104,6 +114,11 @@ export type TanoConfig = {
    * But if you now set `force` to true, this task will be executed anyway.
    */
   force: boolean;
+
+  /**
+   * If false, the cache mechanism is disabled.
+   */
+  noCache: boolean;
 };
 
 /**

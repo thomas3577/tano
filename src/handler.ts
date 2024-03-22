@@ -8,10 +8,10 @@ import { format } from '@std/fmt/duration';
 
 import { Logger, logger } from './logger.ts';
 import { Task } from './task.ts';
-import { Changes } from './changes.ts';
+import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
 
-import type { TaskRunData } from './types.ts';
+import type { IChanges, TaskRunData } from './types.ts';
 
 /**
  * The task handler.
@@ -23,7 +23,7 @@ export class Handler {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
-  #changes: null | Changes = null;
+  #changes: null | IChanges = null;
 
   /**
    * Gets the timestamp when the handler was created.
@@ -70,11 +70,13 @@ export class Handler {
   /**
    * Managed the tano data.
    */
-  get changes(): null | Changes {
+  get changes(): null | IChanges {
     if (!this.#changes) {
-      const cwd: undefined | string = Deno.env.get('TANO_CWD');
-
-      this.#changes = new Changes(cwd);
+      if (Deno.env.get('NO_CACHE') === 'true') {
+        this.#changes = new ChangesMock();
+      } else {
+        this.#changes = new Changes(Deno.env.get('TANO_CWD'));
+      }
     }
 
     return this.#changes;

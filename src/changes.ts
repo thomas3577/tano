@@ -7,12 +7,37 @@ import { TaskStatus } from '../mod.ts';
 import { TanoCache } from './cache.ts';
 import { computeHash } from './glob.ts';
 
-import type { GlobHashSource, TanoRunData, TaskRunData } from './types.ts';
+import type { GlobHashSource, IChanges, TanoRunData, TaskRunData } from './types.ts';
+
+/**
+ * Dummy implementation of the changes interface.
+ * Used instead of Changes if no-cache is true.
+ */
+export class ChangesMock implements IChanges {
+  // deno-lint-ignore no-unused-vars
+  async hasChanged(taskName: string): Promise<boolean> {
+    return await Promise.resolve(true);
+  }
+
+  // deno-lint-ignore no-unused-vars
+  async update(taskName: string, timestamp: Date, status: TaskStatus): Promise<void> {
+    return await Promise.resolve();
+  }
+
+  // deno-lint-ignore no-unused-vars
+  async get(taskName: string): Promise<TaskRunData | undefined> {
+    return await Promise.resolve(undefined);
+  }
+
+  dispose(): void {
+    return;
+  }
+}
 
 /**
  * To determine if there are file changes in the glob area.
  */
-export class Changes {
+export class Changes implements IChanges {
   readonly #cache: TanoCache;
   #data: undefined | TanoRunData;
 

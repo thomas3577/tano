@@ -25,13 +25,14 @@ export const setup = async (): Promise<TanoConfig> => {
       V: 'version',
     },
     string: ['file', 'task', 'log-level'],
-    boolean: ['help', 'quiet', 'fail-fast', 'version', 'force'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version', 'force', 'no-cache'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
       force: false,
       'fail-fast': false,
       'log-level': 'INFO',
+      'no-cache': false,
     },
   });
 
@@ -40,12 +41,14 @@ export const setup = async (): Promise<TanoConfig> => {
   const logLevel: string = flags['log-level'].toUpperCase();
   const failFast: boolean = flags['fail-fast'];
   const force: boolean = flags.force;
+  const noCache: boolean = flags['no-cache'];
   const cwd: string = getCwd(file);
 
   Deno.env.set('FAIL_FAST', `${failFast}`);
   Deno.env.set('QUIET', `${flags.quiet}`);
   Deno.env.set('FORCE', `${force}`);
   Deno.env.set('LOG_LEVEL', logLevel);
+  Deno.env.set('NO_CACHE', `${noCache}`);
   Deno.env.set('TANO_CWD', cwd);
 
   let action: TanoCliAction = 'run';
@@ -61,6 +64,7 @@ export const setup = async (): Promise<TanoConfig> => {
     failFast,
     action,
     force,
+    noCache,
   };
 
   return config;

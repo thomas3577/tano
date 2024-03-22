@@ -114,9 +114,9 @@ export class Handler {
    */
   async run(taskName: string = 'default', options?: TaskRunOptions): Promise<void> {
     this.#options = {
-      failFast: options?.failFast || this.#options.failFast,
-      force: options?.force || this.#options.force,
-      noCache: options?.noCache || this.#options.noCache,
+      failFast: options?.failFast !== undefined ? options?.failFast : this.#options.failFast,
+      force: options?.force !== undefined ? options?.force : this.#options.force,
+      noCache: options?.noCache !== undefined ? options?.noCache : this.#options.noCache,
     };
 
     await this.#preRun(taskName);

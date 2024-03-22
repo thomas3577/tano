@@ -121,6 +121,24 @@ export type TanoConfig = {
   noCache: boolean;
 };
 
+export type TaskRunOptions = {
+  /**
+   * If `true`, it will be aborted at the first error.
+   */
+  failFast?: boolean;
+
+  /**
+   * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
+   * But if you now set `force` to true, this task will be executed anyway.
+   */
+  force?: boolean;
+
+  /**
+   * If false, the cache mechanism is disabled.
+   */
+  noCache?: boolean;
+};
+
 /**
  * This is the parameters that is stored when a task is completed.
  *

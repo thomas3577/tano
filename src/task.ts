@@ -20,7 +20,7 @@ import { Handler, handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
 
-import type { Command, Executor, Options, TaskParams, TaskStatus, TaskType } from './types.ts';
+import type { Command, Executor, Options, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
 
 /**
  * A class to create a Task.
@@ -136,13 +136,12 @@ export class Task implements TaskParams {
   /**
    * Executes all dependent tasks and its own.
    *
-   * @param {Boolean} failFast - [optionalParam=true] If `true`, then it will be aborted after the first error.
-   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
+   * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(failFast: boolean = true, force: boolean = false): Promise<void> {
-    await this.#handler.run(this.#name, failFast, force);
+  async run(options?: TaskRunOptions): Promise<void> {
+    await this.#handler.run(this.#name, options);
   }
 
   /**

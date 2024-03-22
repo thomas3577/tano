@@ -113,7 +113,7 @@ describe(Handler.name, () => {
     task('pre-task-two', `pwsh -c echo 'if you see the second pre-task, something went wrong'`);
     task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c echo 'if you see me, something went wrong'`);
 
-    await handler.run('default', false);
+    await handler.run('default', { failFast: false });
 
     assertEquals(handler.executed, 3);
   });

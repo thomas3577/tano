@@ -11,7 +11,7 @@ import { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
 
-import type { IChanges, TaskRunData } from './types.ts';
+import type { IChanges, TaskRunData, TaskRunOptions } from './types.ts';
 
 /**
  * The task handler.
@@ -20,10 +20,16 @@ export class Handler {
   readonly #log: Logger = logger();
   readonly #created: Date = new Date();
   readonly #cache: Map<string, Task> = new Map();
+
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
   #changes: null | IChanges = null;
+  #options: TaskRunOptions = {
+    failFast: true,
+    force: false,
+    noCache: false,
+  };
 
   /**
    * Gets the timestamp when the handler was created.
@@ -72,7 +78,7 @@ export class Handler {
    */
   get changes(): null | IChanges {
     if (!this.#changes) {
-      if (Deno.env.get('NO_CACHE') === 'true') {
+      if (this.#options.noCache === true) {
         this.#changes = new ChangesMock();
       } else {
         this.#changes = new Changes(Deno.env.get('TANO_CWD'));
@@ -102,12 +108,17 @@ export class Handler {
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
    * @param {String} taskName - [optionalParam='default'] Name of the task.
-   * @param {Boolean} failFast - [optionalParam=true] If `true`, then it will be aborted after the first error.
-   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
+   * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', failFast: boolean = true, force: boolean = false): Promise<void> {
+  async run(taskName: string = 'default', options?: TaskRunOptions): Promise<void> {
+    this.#options = {
+      failFast: options?.failFast || this.#options.failFast,
+      force: options?.force || this.#options.force,
+      noCache: options?.noCache || this.#options.noCache,
+    };
+
     await this.#preRun(taskName);
 
     const taskNames: Array<string> = this.#createPlan(taskName);
@@ -119,9 +130,9 @@ export class Handler {
         break;
       }
 
-      await this.#cache.get(tn)?.runThis(force)
+      await this.#cache.get(tn)?.runThis(this.#options.force)
         .catch((err) => {
-          if (failFast) {
+          if (this.#options.failFast) {
             abort = true;
             throw err;
           }

@@ -4,8 +4,8 @@
  */
 
 import { normalize, resolve } from '@std/path';
-import { globToRegExp, GlobToRegExpOptions } from '@std/path/glob_to_regexp';
-import { normalizeGlob } from '@std/path/normalize_glob';
+import { globToRegExp, GlobToRegExpOptions } from '@std/path/glob-to-regexp';
+import { normalizeGlob } from '@std/path/normalize-glob';
 import { walk, WalkEntry, WalkOptions } from '@std/fs/walk';
 
 import type { GlobHashOptionsStrict, GlobHashSource } from './types.ts';

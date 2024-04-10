@@ -115,9 +115,9 @@ export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
     const importPath: string = isAbsolute(importFile) ? importFile : join(Deno.cwd(), importFile);
 
     try {
-      const stat: Deno.FileInfo = await Deno.stat(importPath);
-      if (!stat.isFile) {
-        throw new Error(`The path ${importPath} is not a file.`);
+      const stat: null | Deno.FileInfo = await Deno.stat(importPath).catch(() => (null));
+      if (!stat?.isFile) {
+        throw new Error(`The path '${importPath}' is not a file.`);
       }
     } catch (err: unknown) {
       throw err;
@@ -136,7 +136,7 @@ export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
  *
  * @returns {String} The CWD.
  */
-export const getCwd = (importUrl: string): string => {
+export const getCwd = (importUrl?: string): string => {
   if (!importUrl?.startsWith('file:')) {
     return Deno.cwd();
   }

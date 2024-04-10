@@ -29,7 +29,10 @@ const cli = async (): Promise<void> => {
     log.info(`Using       ${config.file}`);
     log.info(`Tano        v${VERSION}`);
 
-    await import(config.file);
+    if (config.file) {
+      await import(config.file);
+    }
+
     await handler.run(config.task, {
       failFast: config.failFast,
       force: config.force,

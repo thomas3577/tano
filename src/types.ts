@@ -92,7 +92,7 @@ export type TanoConfig = {
   /**
    * The path to the tanofile.
    */
-  file: string;
+  file?: string;
 
   /**
    * Name of the task to be executed.

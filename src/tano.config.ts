@@ -36,13 +36,20 @@ export const setup = async (): Promise<TanoConfig> => {
     },
   });
 
-  const file: string = await getImportUrl(flags.file);
+  let action: TanoCliAction = 'run';
+  if (flags.version) {
+    action = 'version';
+  } else if (flags.help) {
+    action = 'help';
+  }
+
+  const file: undefined | string = action === 'run' ? await getImportUrl(flags.file) : undefined;
+  const cwd: null | string = getCwd(file);
   const task: string = flags.task || flags._[0] as string;
   const logLevel: string = flags['log-level'].toUpperCase();
   const failFast: boolean = flags['fail-fast'];
   const force: boolean = flags.force;
   const noCache: boolean = flags['no-cache'];
-  const cwd: string = getCwd(file);
 
   Deno.env.set('FAIL_FAST', `${failFast}`);
   Deno.env.set('QUIET', `${flags.quiet}`);
@@ -50,13 +57,6 @@ export const setup = async (): Promise<TanoConfig> => {
   Deno.env.set('LOG_LEVEL', logLevel);
   Deno.env.set('NO_CACHE', `${noCache}`);
   Deno.env.set('TANO_CWD', cwd);
-
-  let action: TanoCliAction = 'run';
-  if (flags.version) {
-    action = 'version';
-  } else if (flags.help) {
-    action = 'help';
-  }
 
   const config: TanoConfig = {
     file,

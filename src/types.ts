@@ -83,7 +83,7 @@ export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 /**
  * These are the tano actions that you can run through the CLI.
  */
-export type TanoCliAction = 'run' | 'help' | 'version';
+export type TanoCliAction = 'run' | 'help' | 'version' | 'update';
 
 /**
  * These are the tano options that you can specify either via environment variables or args.

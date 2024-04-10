@@ -23,9 +23,10 @@ export const setup = async (): Promise<TanoConfig> => {
       q: 'quiet',
       l: 'log-level',
       V: 'version',
+      U: 'update',
     },
     string: ['file', 'task', 'log-level'],
-    boolean: ['help', 'quiet', 'fail-fast', 'version', 'force', 'no-cache'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version', 'update', 'force', 'no-cache'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
@@ -41,6 +42,8 @@ export const setup = async (): Promise<TanoConfig> => {
     action = 'version';
   } else if (flags.help) {
     action = 'help';
+  } else if (flags.update) {
+    action = 'update';
   }
 
   const file: undefined | string = action === 'run' ? await getImportUrl(flags.file) : undefined;

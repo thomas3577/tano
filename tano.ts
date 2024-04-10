@@ -10,6 +10,7 @@ import { handler } from './src/handler.ts';
 import { setup } from './src/tano.config.ts';
 import { help } from './src/help.ts';
 import { VERSION } from './src/version.ts';
+import { task } from './src/task.factory.ts';
 
 import type { TanoConfig } from './src/types.ts';
 
@@ -51,6 +52,9 @@ if (import.meta.main) {
       break;
     case 'version':
       console.log(`v${VERSION}`);
+      break;
+    case 'update':
+      await task('update', 'deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -g -f -n tano jsr:@dx/tano/tano').run();
       break;
     default:
       await cli();

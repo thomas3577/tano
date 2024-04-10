@@ -9,7 +9,7 @@ Yet another task runner.
 ## Install
 
 ```bash
-deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -n tano jsr:@dx/tano/tano
+deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -g -n tano jsr:@dx/tano/tano
 ```
 
 **Note:**

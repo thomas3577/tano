@@ -6,6 +6,9 @@
 
 Yet another task runner.
 
+There is a very good article on the Deno blog with the title [You Don't Need a Build Step](https://deno.com/blog/you-dont-need-a-build-step).
+Yes, you don't need this task runner either, but it works (maybe) and it was fun to implement it.
+
 ## Install
 
 ```bash

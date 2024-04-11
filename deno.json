@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.3.19",
+  "version": "0.3.20",
   "exports": {
     ".": "./mod.ts",
     "./tano": "./tano.ts"
@@ -26,10 +26,12 @@
   "publish": {
     "exclude": [
       ".github",
+      ".vscode",
       "examples",
       ".gitignore",
       ".editorconfig",
       "cspell.json",
+      "deno.lock",
       "*.code-workspace",
       "**/*.test.ts",
       "tanofile.ts"

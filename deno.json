@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.3.24",
+  "version": "0.3.25",
   "exports": {
     ".": "./mod.ts",
     "./tano": "./tano.ts"
@@ -15,7 +15,7 @@
   },
   "imports": {
     "@std/path": "jsr:@std/path@0.225",
-    "@std/fs": "jsr:@std/fs@0.224",
+    "@std/fs": "jsr:@std/fs@0.229",
     "@std/fmt": "jsr:@std/fmt@0.225",
     "@std/assert": "jsr:@std/assert@0.225",
     "@std/testing": "jsr:@std/testing@0.224",

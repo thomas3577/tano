@@ -34,6 +34,11 @@ const consoleHandler: ConsoleHandler = new ConsoleHandler('DEBUG', {
 
 export { Logger };
 
+/**
+ * Creates an instance of a task logger.
+ *
+ * @returns {Logger}
+ */
 export const logger = (): Logger => {
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
   const logLevel: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';

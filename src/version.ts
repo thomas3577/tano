@@ -5,4 +5,7 @@
 
 import deno from '../deno.json' with { type: 'json' };
 
-export const VERSION = deno.version;
+/**
+ * Version of tano
+ */
+export const VERSION: string = deno.version;

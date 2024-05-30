@@ -5,7 +5,10 @@
 
 import * as tano from './version.ts';
 
-export const help = () => {
+/**
+ * Generates the help output for the CLI
+ */
+export const help = (): void => {
   console.log(`
     tano                  v${tano.VERSION}
     Yet another task runner.

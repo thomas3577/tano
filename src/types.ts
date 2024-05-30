@@ -3,17 +3,42 @@
  * @module
  */
 
-import { GlobToRegExpOptions } from '@std/path';
+import type { GlobToRegExpOptions } from '@std/path';
 
-import { Task } from './task.ts';
+import type { Task } from './task.ts';
 
 /**
  * The changes interface to determine if there are file changes in the glob area.
  */
 export interface IChanges {
+  /**
+   * Indicates whether something has changed at the source or not.
+   *
+   * @param {string} taskName - Name of the desired task.
+   * @param {GlobHashSource} source - Global hash source of the files to be checked for changes.
+   */
   hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean>;
+
+  /**
+   * Writes the information of the executed task to the database.
+   *
+   * @param {string} taskName - Name of the desired task.
+   * @param {Date} timestamp - execution date.
+   * @param {TaskStatus} status - Execution status of the task.
+   * @param {GlobHashSource} source - Global hash source of the files.
+   */
   update(taskName: string, timestamp: Date, status: TaskStatus, source?: GlobHashSource): Promise<void>;
+
+  /**
+   * Gets information about the last run.
+   *
+   * @param {string} taskName - Name of the desired task.
+   */
   get(taskName: string): Promise<undefined | TaskRunData>;
+
+  /**
+   * Disposes of resources held by the object.
+   */
   dispose(): void;
 }
 
@@ -26,6 +51,9 @@ export type Optional<Source, Keys extends keyof Source> =
   }
   & Pick<Source, Exclude<keyof Source, Keys>>;
 
+/**
+ * Same like {@linkcode GlobHashOptionsStrict} but `root` and `globToRegExpOptions` are optional.
+ */
 export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root' | 'globToRegExpOptions'>;
 
 /**
@@ -52,9 +80,9 @@ export type GlobHashOptionsStrict = {
   root: string;
 
   /**
-   * (optional) Deno GlobToRegExpOptions
+   * Deno GlobToRegExpOptions
    */
-  globToRegExpOptions?: GlobToRegExpOptions;
+  globToRegExpOptions: GlobToRegExpOptions;
 };
 
 /**
@@ -70,6 +98,9 @@ export type GlobHashSource = boolean | string | string[] | GlobHashOptions;
  */
 export type TaskType = 'command' | 'code' | undefined;
 
+/**
+ * Defines a process error.
+ */
 export type ProcessError = {
   error?: string;
 };
@@ -121,6 +152,9 @@ export type TanoConfig = {
   noCache: boolean;
 };
 
+/**
+ * Options for a task run.
+ */
 export type TaskRunOptions = {
   /**
    * If `true`, it will be aborted at the first error.
@@ -319,7 +353,14 @@ export type ConditionType3 = (done: (result: boolean) => void) => void;
  */
 export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
 
+/**
+ * Defines a function which has a done-callback function.
+ */
 export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
+
+/**
+ * Defines a function that does not have a done callback function.
+ */
 export type CodeFunctionWithoutDone = <T>() => void | T | Promise<void | T>;
 
 /**
@@ -332,6 +373,9 @@ export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
  */
 export type Code = CodeFunction | CodeFile;
 
+/**
+ * Excludes selected properties.
+ */
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 /**
@@ -343,11 +387,30 @@ export type TaskStatus = 'ready' | 'skipped' | 'running' | 'success' | 'failed';
  * Defines a command for execution.
  */
 export type Command = string | Array<string>;
+
+/**
+ * Defines the options for code or command.
+ */
 export type Options = CodeOptions | CommandOptions;
+
+/**
+ * Defines the executor.
+ */
 export type Executor = Command | Code;
+
+/**
+ * Defines a parameter, which can be an option object or an executor object.
+ */
 export type ExecutorOrOptions = Executor | Options;
+
+/**
+ * Defines a parameter, which can be an needs object or an executor object.
+ */
 export type NeedsOrExecutor = Needs | Executor;
 
+/**
+ * Variants of possible sets of parameters.
+ */
 export type TaskDefinition = {
   (task: Task): Task;
   (task: TaskParams): Task;

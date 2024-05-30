@@ -79,6 +79,9 @@ export class Changes implements IChanges {
     return data?.tasks[taskName];
   }
 
+  /**
+   * Disposes of resources held by the object.
+   */
   dispose(): void {
     this.#cache.dispose();
   }

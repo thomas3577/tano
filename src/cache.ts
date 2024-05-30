@@ -36,6 +36,11 @@ export class TanoCache {
   readonly #path: string;
   #db: Deno.Kv | null = null;
 
+  /**
+   * Constructor of tano cache.
+   *
+   * @param {string} cwd - Current working directory
+   */
   constructor(cwd: string) {
     this.#dir = join(cwd, '.tano');
     this.#path = format({
@@ -96,6 +101,9 @@ export class TanoCache {
     }
   }
 
+  /**
+   * Disposes of resources held by the object.
+   */
   dispose(): void {
     this.#db?.close();
     this.#db = null;

@@ -14,21 +14,30 @@ import type { GlobHashSource, IChanges, TanoRunData, TaskRunData } from './types
  * Used instead of Changes if no-cache is true.
  */
 export class ChangesMock implements IChanges {
-  // deno-lint-ignore no-unused-vars
-  async hasChanged(taskName: string): Promise<boolean> {
+  /**
+   * Only a mock implementation.
+   */
+  async hasChanged(_: string): Promise<boolean> {
     return await Promise.resolve(true);
   }
 
-  // deno-lint-ignore no-unused-vars
-  async update(taskName: string, timestamp: Date, status: TaskStatus): Promise<void> {
+  /**
+   * Only a mock implementation.
+   */
+  async update(_1: string, _2: Date, _3: TaskStatus): Promise<void> {
     return await Promise.resolve();
   }
 
-  // deno-lint-ignore no-unused-vars
-  async get(taskName: string): Promise<TaskRunData | undefined> {
+  /**
+   * Only a mock implementation.
+   */
+  async get(_: string): Promise<TaskRunData | undefined> {
     return await Promise.resolve(undefined);
   }
 
+  /**
+   * Only a mock implementation.
+   */
   dispose(): void {
     return;
   }
@@ -41,10 +50,21 @@ export class Changes implements IChanges {
   readonly #cache: TanoCache;
   #data: undefined | TanoRunData;
 
+  /**
+   * Constructor of changes.
+   *
+   * @param {string} cwd - Current working directory.
+   */
   constructor(cwd?: string) {
     this.#cache = new TanoCache(cwd || Deno.cwd());
   }
 
+  /**
+   * Indicates whether something has changed at the source or not.
+   *
+   * @param {string} taskName - Name of the desired task.
+   * @param {GlobHashSource} source - Global hash source of the files to be checked for changes.
+   */
   async hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean> {
     if (!source) {
       return true;
@@ -56,6 +76,14 @@ export class Changes implements IChanges {
     return lastHash === undefined || lastHash !== hash;
   }
 
+  /**
+   * Writes the information of the executed task to the database.
+   *
+   * @param {string} taskName - Name of the desired task.
+   * @param {Date} timestamp - execution date.
+   * @param {TaskStatus} status - Execution status of the task.
+   * @param {GlobHashSource} source - Global hash source of the files.
+   */
   async update(taskName: string, timestamp: Date, status: TaskStatus, source?: GlobHashSource): Promise<void> {
     if (!this.#data) {
       return;
@@ -73,6 +101,11 @@ export class Changes implements IChanges {
     await this.#cache.write(this.#data);
   }
 
+  /**
+   * Gets information about the last run.
+   *
+   * @param {string} taskName - Name of the desired task.
+   */
   async get(taskName: string): Promise<undefined | TaskRunData> {
     const data = await this.#getAll();
 

@@ -3,6 +3,7 @@
 [![JSR Version](https://jsr.io/badges/@dx/tano)](https://jsr.io/@dx/tano)
 [![JSR Score](https://jsr.io/badges/@dx/tano/score)](https://jsr.io/@dx/tano/score)
 [![ci](https://github.com/thomas3577/tano/actions/workflows/deno.yml/badge.svg)](https://github.com/thomas3577/tano/actions/workflows/deno.yml)
+[![Built with the Deno Standard Library](https://raw.githubusercontent.com/denoland/deno_std/main/badge.svg)](https://deno.land/std)
 
 Yet another task runner.
 

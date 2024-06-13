@@ -10,6 +10,29 @@ import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, Needs
 /**
  * Checks if a parameter is of type `Needs`.
  *
+ * @example Returns `true` if the parameter is of type `Needs` with a list of Task-Names.
+ * ```ts
+ * const value: Needs = {
+ *   values: ['myTask01', 'myTask02']
+ * };
+ *
+ * const result = isNeeds(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is of type `Needs` with a list of Tasks.
+ * ```ts
+ * const task: TaskParams = {
+ *   name: 'myTask01',
+ *   needs: ['myTask03']
+ * };
+ *
+ * const value: Needs = {
+ *   values: [TaskParams]
+ * };
+ *
+ * const result = isNeeds(value); // true
+ * ```
+ *
  * @param {Object} param - A object to check.
  *
  * @returns {Boolean} if `true` the object is of type `Needs`.
@@ -20,6 +43,46 @@ export const isNeeds = (param?: NeedsOrExecutor): boolean => {
 
 /**
  * Checks if a parameter is of type `Executor`.
+ *
+ * @example Returns `true` if the parameter is command executer (using a string array).
+ * ```ts
+ * const value: Command = ['bash', '-c', 'ls -la'];
+ *
+ * const result = isExecutor(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is command executer (using a string).
+ * ```ts
+ * const value: Command = 'bash -c ls -la';
+ *
+ * const result = isExecutor(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is code executer (using a JavaScript).
+ * ```ts
+ * const value: Code = () => console.log('Hello World!');
+ *
+ * const result = isExecutor(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is code executer (using a JavaScript).
+ * ```ts
+ * const value: Code = done => {
+ *   setTimeout(() => {
+ *     console.log('Hello World!');
+ *     done();
+ *   }, 1000);
+ * };
+ *
+ * const result = isExecutor(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is code executer (using a JavaScript File).
+ * ```ts
+ * const value: Code = './myTask.js';
+ *
+ * const result = isExecutor(value); // true
+ * ```
  *
  * @param {Object} param - A object to check.
  *

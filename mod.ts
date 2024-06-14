@@ -1,6 +1,7 @@
 /**
  * The task function to create new tasks.
  *
+ * @example Creates a default task which requires another task.
  * ```ts
  * import { needs, task } from 'jsr:@dx/tano';
  *
@@ -18,6 +19,7 @@ export { needs } from './src/needs.ts';
 /**
  * An initial instance of the handler to run the tasks.
  *
+ * @example Runs the task handler.
  * ```ts
  * import { handler } from 'jsr:@dx/tano';
  *
@@ -29,6 +31,7 @@ export { handler } from './src/handler.ts';
 /**
  * The Task class.
  *
+ * @example Creates a new task and runs it.
  * ```ts
  * import { Task } from '../src/task.ts';
  *

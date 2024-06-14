@@ -12,7 +12,7 @@ import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, Needs
  *
  * @example Returns `true` if the parameter is of type `Needs` with a list of Task-Names.
  * ```ts
- * const value: Needs = {
+ * const value = {
  *   values: ['myTask01', 'myTask02']
  * };
  *
@@ -21,13 +21,13 @@ import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, Needs
  *
  * @example Returns `true` if the parameter is of type `Needs` with a list of Tasks.
  * ```ts
- * const task: TaskParams = {
+ * const task = {
  *   name: 'myTask01',
  *   needs: ['myTask03']
  * };
  *
- * const value: Needs = {
- *   values: [TaskParams]
+ * const value = {
+ *   values: [task]
  * };
  *
  * const result = isNeeds(value); // true
@@ -44,30 +44,30 @@ export const isNeeds = (param?: NeedsOrExecutor): boolean => {
 /**
  * Checks if a parameter is of type `Executor`.
  *
- * @example Returns `true` if the parameter is command executer (using a string array).
+ * @example Returns `true` if the parameter is a command executer (using a string array).
  * ```ts
- * const value: Command = ['bash', '-c', 'ls -la'];
+ * const value = ['bash', '-c', 'ls -la'];
  *
  * const result = isExecutor(value); // true
  * ```
  *
- * @example Returns `true` if the parameter is command executer (using a string).
+ * @example Returns `true` if the parameter is a command executer (using a string).
  * ```ts
- * const value: Command = 'bash -c ls -la';
+ * const value = 'bash -c ls -la';
  *
  * const result = isExecutor(value); // true
  * ```
  *
- * @example Returns `true` if the parameter is code executer (using a JavaScript).
+ * @example Returns `true` if the parameter is a code executer (using a JavaScript).
  * ```ts
- * const value: Code = () => console.log('Hello World!');
+ * const value = () => console.log('Hello World!');
  *
  * const result = isExecutor(value); // true
  * ```
  *
- * @example Returns `true` if the parameter is code executer (using a JavaScript).
+ * @example Returns `true` if the parameter is a code executer (using a JavaScript).
  * ```ts
- * const value: Code = done => {
+ * const value = done => {
  *   setTimeout(() => {
  *     console.log('Hello World!');
  *     done();
@@ -77,9 +77,16 @@ export const isNeeds = (param?: NeedsOrExecutor): boolean => {
  * const result = isExecutor(value); // true
  * ```
  *
- * @example Returns `true` if the parameter is code executer (using a JavaScript File).
+ * @example Returns `true` if the parameter is a code executer (using a JavaScript File).
  * ```ts
- * const value: Code = './myTask.js';
+ * const value = './myTask.js';
+ *
+ * const result = isExecutor(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is a code executer (using a TypeScript File).
+ * ```ts
+ * const value = './myTask.ts';
  *
  * const result = isExecutor(value); // true
  * ```
@@ -95,6 +102,20 @@ export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean
 /**
  * Checks if a parameter is of type `Command`.
  *
+ * @example Returns `true` if the parameter is a command.
+ * ```ts
+ * const value = 'bash -c ls -la';
+ *
+ * const result = isCommand(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is a command.
+ * ```ts
+ * const value = ['bash', '-c', 'ls -la'];;
+ *
+ * const result = isCommand(value); // true
+ * ```
+ *
  * @param {Object} param - A object to check.
  *
  * @returns {Boolean} if `true` the object is of type `Command`.
@@ -106,6 +127,39 @@ export const isCommand = (param?: Executor): boolean => {
 /**
  * Checks if a parameter is of type `Code`.
  *
+ * @example Returns `true` if the parameter is a code executer (using a JavaScript).
+ * ```ts
+ * const value = () => console.log('Hello World!');
+ *
+ * const result = isCode(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is a code executer (using a JavaScript).
+ * ```ts
+ * const value = done => {
+ *   setTimeout(() => {
+ *     console.log('Hello World!');
+ *     done();
+ *   }, 1000);
+ * };
+ *
+ * const result = isCode(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is a code executer (using a JavaScript File).
+ * ```ts
+ * const value = './myTask.js';
+ *
+ * const result = isCode(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is a code executer (using a TypeScript File).
+ * ```ts
+ * const value = './myTask.ts';
+ *
+ * const result = isCode(value); // true
+ * ```
+ *
  * @param {Object} param - A object to check.
  *
  * @returns {Boolean} if `true` the object is of type `Code`.
@@ -116,6 +170,20 @@ export const isCode = (param?: Executor): boolean => {
 
 /**
  * Checks if a parameter is of type `CodeFile`.
+ *
+ * @example Returns `true` if the parameter is a JavaScript File.
+ * ```ts
+ * const value = './myTask.js';
+ *
+ * const result = isCodeFile(value); // true
+ * ```
+ *
+ * @example Returns `true` if the parameter is a code executer (using a TypeScript File).
+ * ```ts
+ * const value = './myTask.ts';
+ *
+ * const result = isCodeFile(value); // true
+ * ```
  *
  * @param {Object} param - A object to check.
  *

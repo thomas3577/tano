@@ -20,6 +20,7 @@ export class Handler {
   readonly #log: Logger = logger();
   readonly #created: Date = new Date();
   readonly #cache: Map<string, Task> = new Map();
+  readonly #eventTarget = new EventTarget();
 
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
@@ -121,7 +122,7 @@ export class Handler {
 
     await this.#preRun(taskName);
 
-    const taskNames: Array<string> = this.#createPlan(taskName);
+    const taskNames: Array<string> = this.#getPlan(taskName);
 
     let abort = false;
 
@@ -130,8 +131,13 @@ export class Handler {
         break;
       }
 
+      this.#emitChanges(tn, 'running');
+
       await this.#cache.get(tn)?.runThis(this.#options.force)
+        .then(() => this.#emitChanges(tn, 'finished'))
         .catch((err) => {
+          this.#emitChanges(tn, 'error', err);
+
           if (this.#options.failFast) {
             abort = true;
             throw err;
@@ -157,11 +163,42 @@ export class Handler {
   }
 
   /**
+   * Gets a list of all tasks to be executed in the correct order.
+   *
+   * @param {string} taskName - Name of the entry task.
+   * @param taskNames
+   * @returns {Array<string>} - List of the names of all executed tasks
+   */
+  getPlan(taskName: string): Array<string> {
+    return this.#getPlan(taskName);
+  }
+
+  /**
    * Disposes the handler.
    */
   dispose(): void {
     this.#changes?.dispose();
     this.#changes = null;
+  }
+
+  /**
+   * Adds an event listener for the `changed` event.
+   * The event is triggered when a task changes its state.
+   * The event detail contains the task name and the new state.
+   *
+   * @param fn - The event listener to add.
+   */
+  onChanged(fn: EventListenerOrEventListenerObject): void {
+    this.#eventTarget.addEventListener('changed', fn);
+  }
+
+  /**
+   * Removes an event listener for the `changed` event.
+   *
+   * @param fn - The event listener to remove.
+   */
+  offChanged(fn: EventListenerOrEventListenerObject): void {
+    this.#eventTarget.removeEventListener('changed', fn);
   }
 
   async #preRun(taskName: string): Promise<void> {
@@ -205,12 +242,12 @@ export class Handler {
     }
   }
 
-  #createPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
+  #getPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
     if (this.#cache.has(taskName)) {
       const task: Task = this.#cache.get(taskName) as Task;
 
       if (task?.needs?.length > 0) {
-        task.needs.forEach((tn) => this.#createPlan(tn, taskNames));
+        task.needs.forEach((tn) => this.#getPlan(tn, taskNames));
       }
 
       taskNames.push(taskName);
@@ -221,6 +258,18 @@ export class Handler {
     }
 
     return taskNames;
+  }
+
+  #emitChanges(taskName: string, state: string, error?: Error): void {
+    this.#eventTarget.dispatchEvent(
+      new CustomEvent('changed', {
+        detail: {
+          taskName,
+          state,
+          error,
+        },
+      }),
+    );
   }
 }
 

@@ -131,18 +131,17 @@ export class Handler {
         break;
       }
 
-      this.#emitChanges(tn, 'running');
+      const task: Task | undefined = this.#cache.get(tn);
+      task?.onChanged(this.#emitChanges.bind(this));
 
-      await this.#cache.get(tn)?.runThis(this.#options.force)
-        .then(() => this.#emitChanges(tn, 'finished'))
+      await task?.runThis(this.#options.force)
         .catch((err) => {
-          this.#emitChanges(tn, 'error', err);
-
           if (this.#options.failFast) {
             abort = true;
             throw err;
           }
-        });
+        })
+        .finally(() => task?.offChanged(this.#emitChanges.bind(this)));
     }
 
     this.#postRun(!taskNames || taskNames.length === 0 || abort);
@@ -260,13 +259,13 @@ export class Handler {
     return taskNames;
   }
 
-  #emitChanges(taskName: string, state: string, error?: Error): void {
+  #emitChanges(e: CustomEventInit): void {
     this.#eventTarget.dispatchEvent(
       new CustomEvent('changed', {
         detail: {
-          taskName,
-          state,
-          error,
+          taskName: e.detail.taskName,
+          status: e.detail.status,
+          error: e.detail.error,
         },
       }),
     );

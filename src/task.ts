@@ -34,6 +34,8 @@ export class Task implements TaskParams {
   readonly #executor: Executor;
   readonly #options: Options;
   readonly #type: TaskType = undefined;
+  readonly #eventTarget = new EventTarget();
+
   #status: TaskStatus = 'ready';
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
@@ -134,6 +136,26 @@ export class Task implements TaskParams {
   }
 
   /**
+   * Adds an event listener for the `changed` event.
+   * The event is triggered when a task changes its state.
+   * The event detail contains the task name and the new state.
+   *
+   * @param fn - The event listener to add.
+   */
+  onChanged(fn: EventListenerOrEventListenerObject): void {
+    this.#eventTarget.addEventListener('changed', fn);
+  }
+
+  /**
+   * Removes an event listener for the `changed` event.
+   *
+   * @param fn - The event listener to remove.
+   */
+  offChanged(fn: EventListenerOrEventListenerObject): void {
+    this.#eventTarget.removeEventListener('changed', fn);
+  }
+
+  /**
    * Executes all dependent tasks and its own.
    *
    * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
@@ -164,7 +186,7 @@ export class Task implements TaskParams {
 
     const skippedBySource: boolean = force !== true && (await this.#handler.changes?.hasChanged(this.#name, this.#options?.source)) !== true;
     if (skippedBySource) {
-      this.#status = 'skipped';
+      this.#updateStatus('skipped');
       this.#log.warn('');
       this.#log.warn(`Task {name} skipped by 'source'. No files have been changed since the last run.`, {
         name: `'${gray(this.#name)}'`,
@@ -175,7 +197,7 @@ export class Task implements TaskParams {
 
     const skippedByCondition: boolean = !(await executeCondition(this.#options?.condition ?? ((): boolean => true)));
     if (skippedByCondition) {
-      this.#status = 'skipped';
+      this.#updateStatus('skipped');
       this.#log.warn('');
       this.#log.warn(`Task {name} skipped by condition. The conditions of this task were not matched.`, {
         name: `'${gray(this.#name)}'`,
@@ -188,7 +210,7 @@ export class Task implements TaskParams {
 
     await this.#run(this.#type, this.#executor, this.#options)
       .catch((err) => {
-        this.#status = 'failed';
+        this.#updateStatus('failed', err);
 
         this.#log.error(`${bold(red('Error'))} {name}: ${err}`, {
           name: `'${gray(this.#name)}'`,
@@ -206,7 +228,7 @@ export class Task implements TaskParams {
   reset(): void {
     this.#starting = null;
     this.#finished = null;
-    this.#status = 'ready';
+    this.#updateStatus('ready');
   }
 
   #preRun(): void {
@@ -219,11 +241,11 @@ export class Task implements TaskParams {
       startTime: Date.now(),
     });
 
-    this.#status = 'running';
+    this.#updateStatus('running');
   }
 
   async #postRun(options: Options): Promise<void> {
-    this.#status = 'success';
+    this.#updateStatus('success');
 
     this.#finished = performance.mark(`finished_${this.#name}`, {
       startTime: Date.now(),
@@ -250,5 +272,22 @@ export class Task implements TaskParams {
         await runCode(toCode(executor), options);
         break;
     }
+  }
+
+  #updateStatus(status: TaskStatus, error?: Error): void {
+    this.#status = status;
+    this.#emitChanges(status, error);
+  }
+
+  #emitChanges(status: TaskStatus, error?: Error): void {
+    this.#eventTarget.dispatchEvent(
+      new CustomEvent('changed', {
+        detail: {
+          taskName: this.#name,
+          status,
+          error,
+        },
+      }),
+    );
   }
 }

@@ -137,11 +137,13 @@ export class Handler {
       await task?.runThis(this.#options.force)
         .catch((err) => {
           if (this.#options.failFast) {
+            task?.offChanged(this.#emitChanges.bind(this));
             abort = true;
             throw err;
           }
-        })
-        .finally(() => task?.offChanged(this.#emitChanges.bind(this)));
+        });
+
+      task?.offChanged(this.#emitChanges.bind(this));
     }
 
     this.#postRun(!taskNames || taskNames.length === 0 || abort);

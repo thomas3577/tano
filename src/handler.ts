@@ -100,6 +100,7 @@ export class Handler {
     }
 
     this.#cache.set(task.name, task);
+    task.onChanged(this.#emitChanges.bind(this));
 
     this.#log.debug(`Added task ${task.name}`);
   }
@@ -131,19 +132,13 @@ export class Handler {
         break;
       }
 
-      const task: Task | undefined = this.#cache.get(tn);
-      task?.onChanged(this.#emitChanges.bind(this));
-
-      await task?.runThis(this.#options.force)
+      await this.#cache.get(tn)?.runThis(this.#options.force)
         .catch((err) => {
           if (this.#options.failFast) {
-            task?.offChanged(this.#emitChanges.bind(this));
             abort = true;
             throw err;
           }
         });
-
-      task?.offChanged(this.#emitChanges.bind(this));
     }
 
     this.#postRun(!taskNames || taskNames.length === 0 || abort);
@@ -160,6 +155,7 @@ export class Handler {
    * Clears the cache. The handler will then have no more tasks to execute.
    */
   clear(): void {
+    this.#cache.forEach((task: Task) => task.offChanged(this.#emitChanges.bind(this)));
     this.#cache.clear();
   }
 

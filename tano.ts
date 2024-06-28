@@ -7,37 +7,39 @@ import { bold } from '@std/fmt/colors';
 
 import { Logger, logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';
-import { setup } from './src/tano.config.ts';
+import { parseTanoArgs } from './src/tano.config.ts';
 import { help } from './src/help.ts';
 import { VERSION } from './src/version.ts';
 import { task } from './src/task.factory.ts';
 
-import type { TanoConfig } from './src/types.ts';
+import type { TanoArgs } from './src/types.ts';
 
-const config: TanoConfig = await setup();
+const args: TanoArgs = await parseTanoArgs();
 const log: Logger = logger();
 
-log.debug(`MO_CACHE:  ${Deno.env.get('NO_CACHE')}`);
-log.debug(`FAIL_FAST: ${Deno.env.get('FAIL_FAST')}`);
-log.debug(`LOG_LEVEL: ${Deno.env.get('LOG_LEVEL')}`);
-log.debug(`QUIET:     ${Deno.env.get('QUIET')}`);
-log.debug(`FORCE:     ${Deno.env.get('FORCE')}`);
-log.debug(`TANO_CWD:  ${Deno.env.get('TANO_CWD')}`);
+log.debug(`MO_CACHE:   ${Deno.env.get('NO_CACHE')}`);
+log.debug(`FAIL_FAST:  ${Deno.env.get('FAIL_FAST')}`);
+log.debug(`LOG_LEVEL:  ${Deno.env.get('LOG_LEVEL')}`);
+log.debug(`LOG_OUTPUT: ${Deno.env.get('LOG_OUTPUT')}`);
+log.debug(`LOG_FILE:   ${Deno.env.get('LOG_FILE')}`);
+log.debug(`QUIET:      ${Deno.env.get('QUIET')}`);
+log.debug(`FORCE:      ${Deno.env.get('FORCE')}`);
+log.debug(`TANO_CWD:   ${Deno.env.get('TANO_CWD')}`);
 log.debug('');
 
 const cli = async (): Promise<void> => {
   try {
-    log.info(`Using       ${config.file}`);
+    log.info(`Using       ${args.file}`);
     log.info(`Tano        v${VERSION}`);
 
-    if (config.file) {
-      await import(config.file);
+    if (args.file) {
+      await import(args.file);
     }
 
-    await handler.run(config.task, {
-      failFast: config.failFast,
-      force: config.force,
-      noCache: config.noCache,
+    await handler.run(args.task, {
+      failFast: args.failFast,
+      force: args.force,
+      noCache: args.noCache,
     });
   } catch (err: unknown) {
     log.error(bold('Aborted with errors.'));
@@ -46,7 +48,7 @@ const cli = async (): Promise<void> => {
 };
 
 if (import.meta.main) {
-  switch (config.action) {
+  switch (args.action) {
     case 'help':
       help();
       break;

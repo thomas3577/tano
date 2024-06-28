@@ -106,6 +106,21 @@ export type ProcessError = {
 };
 
 /**
+ * Defines the possible log handler.
+ */
+export type LogHandler = 'console' | 'stream' | 'file';
+
+/**
+ * The log stream.
+ */
+export type LogStream = {
+  /**
+   * The readable stream of the log.
+   */
+  readable: ReadableStream<string>;
+};
+
+/**
  * RunOptions are almost the same as the Deno.RunOptions with the difference that we exclude the attribute "cmd"
  * because we handle this outside of these options.
  */
@@ -119,7 +134,7 @@ export type TanoCliAction = 'run' | 'help' | 'version' | 'update';
 /**
  * These are the tano options that you can specify either via environment variables or args.
  */
-export type TanoConfig = {
+export type TanoArgs = {
   /**
    * The path to the tanofile.
    */
@@ -150,6 +165,33 @@ export type TanoConfig = {
    * If false, the cache mechanism is disabled.
    */
   noCache: boolean;
+};
+
+export type TanoConfig = TanoArgs & {
+  /**
+   * The working directory of the tanofile.
+   */
+  cwd: string;
+
+  /**
+   * The log level.
+   */
+  logLevel: string;
+
+  /**
+   * The log output.
+   */
+  logOutput: string[];
+
+  /**
+   * The log file path.
+   */
+  logFile: string;
+
+  /**
+   * If `true`, the console output is quiet.
+   */
+  quiet: boolean;
 };
 
 /**

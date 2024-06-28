@@ -48,6 +48,13 @@ export const help = (): void => {
               To change the log level. Default is 'INFO'.
               See https://deno.land/std@log/levels.ts
 
+          --log-file <LOG_FILE>
+              Path to the log file. Default is <CWD>/tano.log
+
+          --log-output <LOG_OUTPUT>
+              Where to output the logs. Default is 'console'.
+              Possible values are 'console', 'stream', 'file'.
+
       -V, --version
               Print version information
 

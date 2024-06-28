@@ -9,7 +9,7 @@ describe(`logger`, () => {
     const actual: Logger = logger();
 
     assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 2);
+    assertEquals(actual.handlers.length, 1);
     assertEquals(actual.level, LogLevels.INFO);
   });
 
@@ -20,7 +20,7 @@ describe(`logger`, () => {
     const actual: Logger = logger();
 
     assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 2);
+    assertEquals(actual.handlers.length, 1);
     assertEquals(actual.level, LogLevels.ERROR);
   });
 
@@ -31,7 +31,7 @@ describe(`logger`, () => {
     const actual: Logger = logger();
 
     assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 2);
+    assertEquals(actual.handlers.length, 1);
     assertEquals(actual.level, LogLevels.ERROR);
   });
 });
@@ -40,11 +40,14 @@ describe(`logStream`, () => {
   it('Should stream the log output', async () => {
     Deno.env.set('QUIET', 'false');
     Deno.env.set('LOG_LEVEL', 'debug');
+    Deno.env.set('LOG_OUTPUT', 'console, stream');
 
     const actual: Logger = logger();
     const reader = logStream.readable.getReader();
 
     let message = null;
+
+    assertEquals(actual.handlers.length, 2);
 
     (async () => {
       while (true) {
@@ -59,7 +62,7 @@ describe(`logStream`, () => {
 
     actual.info('Hello, world!');
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 250));
 
     assertEquals(message, 'INFO Hello, world!');
 

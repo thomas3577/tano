@@ -43,6 +43,18 @@ export { handler } from './src/handler.ts';
 export { Task } from './src/task.ts';
 
 /**
+ * An instance of a LogStream.
+ */
+export { logStream } from './src/logger.ts';
+
+/**
+ * Possibility to setup the tano configuration.
+ *
+ * Just add to your tanofile.ts
+ */
+export { tanoSetup } from './src/tano.config.ts';
+
+/**
  * Types
  */
-export type { Code, CodeFile, CodeFunction, CodeOptions, Command, CommandOptions, Condition, GlobHashSource, Needs, TaskParams, TaskStatus } from './src/types.ts';
+export type { Code, CodeFile, CodeFunction, CodeOptions, Command, CommandOptions, Condition, GlobHashSource, LogHandler, LogStream, Needs, TanoConfig, TaskParams, TaskStatus } from './src/types.ts';

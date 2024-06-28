@@ -2,14 +2,14 @@ import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { LogLevels } from '@std/log/levels';
 
-import { Logger, logger } from './logger.ts';
+import { Logger, logger, logStream } from './logger.ts';
 
 describe(`logger`, () => {
   it(`Should create a instance of Logger`, () => {
     const actual: Logger = logger();
 
     assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 1);
+    assertEquals(actual.handlers.length, 2);
     assertEquals(actual.level, LogLevels.INFO);
   });
 
@@ -20,7 +20,7 @@ describe(`logger`, () => {
     const actual: Logger = logger();
 
     assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 1);
+    assertEquals(actual.handlers.length, 2);
     assertEquals(actual.level, LogLevels.ERROR);
   });
 
@@ -31,7 +31,38 @@ describe(`logger`, () => {
     const actual: Logger = logger();
 
     assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 1);
+    assertEquals(actual.handlers.length, 2);
     assertEquals(actual.level, LogLevels.ERROR);
+  });
+});
+
+describe(`logStream`, () => {
+  it('Should stream the log output', async () => {
+    Deno.env.set('QUIET', 'false');
+    Deno.env.set('LOG_LEVEL', 'debug');
+
+    const actual: Logger = logger();
+    const reader = logStream.readable.getReader();
+
+    let message = null;
+
+    (async () => {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+
+        message = value;
+      }
+    })();
+
+    actual.info('Hello, world!');
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    assertEquals(message, 'INFO Hello, world!');
+
+    await reader.cancel();
   });
 });

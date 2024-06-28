@@ -20,6 +20,44 @@
       ],
       "cwd": "${workspaceFolder}/examples",
       "attachSimplePort": 9229
-    }
+    },
+    {
+      "name": "Test",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--unstable-kv",
+        "--allow-read",
+        "--allow-run",
+        "--allow-env",
+        "--allow-write",
+        "--inspect-brk",
+        "./src/**/*.test.ts"
+      ],
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "Test {file}",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--unstable-kv",
+        "--allow-read",
+        "--allow-run",
+        "--allow-env",
+        "--allow-write",
+        "--inspect-brk",
+        "${file}"
+      ],
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "attachSimplePort": 9229
+    },
   ]
 }

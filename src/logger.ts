@@ -4,13 +4,37 @@
  */
 
 import { format } from '@std/datetime/format';
-import { getLogger, LevelName, Logger, LogRecord, setup } from '@std/log';
+import { BaseHandler, getLogger, LevelName, Logger, LogRecord, setup } from '@std/log';
 import { ConsoleHandler } from '@std/log/console-handler';
 import { gray, white } from '@std/fmt/colors';
 
 import { consoleMock } from './console.ts';
 
 const log = console.log;
+const stream = new TextEncoderStream();
+
+class LogStream {
+  #readable = stream.readable.pipeThrough(new TextDecoderStream());
+
+  get readable(): ReadableStream<string> {
+    return this.#readable;
+  }
+}
+
+const logStream = new LogStream();
+
+class StreamHandler extends BaseHandler {
+  #writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
+
+  async handle(logRecord: LogRecord): Promise<void> {
+    const chunk = this.format(logRecord);
+
+    await this.#writer.ready;
+    await this.#writer.write(chunk);
+  }
+}
+
+const streamHandler: StreamHandler = new StreamHandler('DEBUG', {});
 
 const consoleHandler: ConsoleHandler = new ConsoleHandler('DEBUG', {
   formatter: (logRecord: LogRecord) => {
@@ -32,7 +56,7 @@ const consoleHandler: ConsoleHandler = new ConsoleHandler('DEBUG', {
   },
 });
 
-export { Logger };
+export { Logger, logStream };
 
 /**
  * Creates an instance of a task logger.
@@ -51,11 +75,12 @@ export const logger = (): Logger => {
   setup({
     handlers: {
       console: consoleHandler,
+      stream: streamHandler,
     },
     loggers: {
       default: {
         level: logLevel,
-        handlers: ['console'],
+        handlers: ['console', 'stream'],
       },
     },
   });

@@ -38,7 +38,21 @@ class StreamHandler extends BaseHandler {
   }
 }
 
-const streamHandler: StreamHandler = new StreamHandler('DEBUG', {});
+const streamHandler: StreamHandler = new StreamHandler('DEBUG', {
+  formatter: (logRecord: LogRecord) => {
+    const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
+    let msg: string = !logRecord.msg ? '' : `[${timestamp}] [${logRecord.levelName}] ${logRecord.msg}`;
+
+    const params = logRecord.args?.at(0);
+    if (params && typeof params === 'object') {
+      for (const [key, value] of Object.entries(params)) {
+        msg = msg.replace(`{${key}}`, `${value}`);
+      }
+    }
+
+    return msg;
+  },
+});
 
 const fileHandler = new FileHandler('DEBUG', {
   filename: Deno.env.get('LOG_FILE') as string, // deno-lint-ignore no-undef

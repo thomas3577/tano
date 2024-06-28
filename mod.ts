@@ -52,7 +52,7 @@ export { logStream } from './src/logger.ts';
  *
  * Just add to your tanofile.ts
  */
-export { tanoSetup } from './src/tano.config.ts';
+export { setup } from './src/tano.config.ts';
 
 /**
  * Types

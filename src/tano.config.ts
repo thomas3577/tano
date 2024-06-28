@@ -15,7 +15,7 @@ import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
  *
  * @param {TanoConfig} config The tano configuration.
  */
-export const tanoSetup = (config: TanoConfig): void => {
+export const setup = (config: TanoConfig): void => {
   Deno.env.set('FAIL_FAST', `${config.failFast}`);
   Deno.env.set('QUIET', `${config.quiet}`);
   Deno.env.set('FORCE', `${config.force}`);
@@ -82,7 +82,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
     action,
   };
 
-  tanoSetup(config);
+  setup(config);
 
   const args: TanoArgs = {
     file: config.file,

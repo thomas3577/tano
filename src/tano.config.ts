@@ -16,14 +16,14 @@ import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
  * @param {TanoConfig} config The tano configuration.
  */
 export const setup = (config: TanoConfig): void => {
+  Deno.env.set('TANO_CWD', config.cwd);
   Deno.env.set('FAIL_FAST', `${config.failFast}`);
-  Deno.env.set('QUIET', `${config.quiet}`);
   Deno.env.set('FORCE', `${config.force}`);
+  Deno.env.set('LOG_FILE', config.logFile);
   Deno.env.set('LOG_LEVEL', config.logLevel);
   Deno.env.set('LOG_OUTPUT', config.logOutput.join(','));
-  Deno.env.set('LOG_FILE', config.logFile);
   Deno.env.set('NO_CACHE', `${config.noCache}`);
-  Deno.env.set('TANO_CWD', config.cwd);
+  Deno.env.set('QUIET', `${config.quiet}`);
 };
 
 /**
@@ -67,30 +67,28 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
 
   const file: string | undefined = action === 'run' ? await getImportUrl(flags.file) : undefined;
   const cwd: string = getCwd(file);
+  const task: string = flags.task || flags._[0] as string;
   const logFile: string = flags['log-file'] ? flags['log-file'] : join(cwd, './tano.log');
   const config: TanoConfig = {
-    file,
     cwd,
-    task: flags.task || flags._[0] as string,
-    logLevel: flags['log-level'].toUpperCase(),
-    logOutput: flags['log-output'] as string[],
     failFast: flags['fail-fast'],
     force: flags.force,
+    logFile,
+    logLevel: flags['log-level'].toUpperCase(),
+    logOutput: flags['log-output'] as string[],
     noCache: flags['no-cache'],
     quiet: flags.quiet,
-    logFile,
-    action,
   };
 
   setup(config);
 
   const args: TanoArgs = {
-    file: config.file,
-    task: config.task,
+    action,
     failFast: config.failFast,
-    action: config.action,
-    force: config.force,
+    file,
     noCache: config.noCache,
+    force: config.force,
+    task,
   };
 
   return args;

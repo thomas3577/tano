@@ -136,14 +136,9 @@ export type TanoCliAction = 'run' | 'help' | 'version' | 'update';
  */
 export type TanoArgs = {
   /**
-   * The path to the tanofile.
+   * The CLI action.
    */
-  file?: string;
-
-  /**
-   * Name of the task to be executed.
-   */
-  task: string;
+  action: TanoCliAction;
 
   /**
    * If `true`, it will be aborted at the first error.
@@ -151,9 +146,9 @@ export type TanoArgs = {
   failFast: boolean;
 
   /**
-   * The CLI action.
+   * The path to the tanofile.
    */
-  action: TanoCliAction;
+  file?: string;
 
   /**
    * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
@@ -165,13 +160,37 @@ export type TanoArgs = {
    * If false, the cache mechanism is disabled.
    */
   noCache: boolean;
+
+  /**
+   * Name of the task to be executed.
+   */
+  task: string;
 };
 
-export type TanoConfig = TanoArgs & {
+/**
+ * These are the tano options that you can specify either via environment variables or args.
+ */
+export type TanoConfig = {
   /**
    * The working directory of the tanofile.
    */
   cwd: string;
+
+  /**
+   * If `true`, it will be aborted at the first error.
+   */
+  failFast: boolean;
+
+  /**
+   * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
+   * But if you now set `force` to true, this task will be executed anyway.
+   */
+  force: boolean;
+
+  /**
+   * The log file path.
+   */
+  logFile: string;
 
   /**
    * The log level.
@@ -184,9 +203,9 @@ export type TanoConfig = TanoArgs & {
   logOutput: string[];
 
   /**
-   * The log file path.
+   * If false, the cache mechanism is disabled.
    */
-  logFile: string;
+  noCache: boolean;
 
   /**
    * If `true`, the console output is quiet.

@@ -45,7 +45,7 @@ describe(`logStream`, () => {
     const actual: Logger = logger();
     const reader = logStream.readable.getReader();
 
-    let message: string = '';
+    let log: any = null;
 
     assertEquals(actual.handlers.length, 2);
 
@@ -56,7 +56,8 @@ describe(`logStream`, () => {
           break;
         }
 
-        message = value;
+        console.log(value);
+        log = JSON.parse(value);
       }
     })();
 
@@ -64,7 +65,9 @@ describe(`logStream`, () => {
 
     await new Promise((resolve) => setTimeout(resolve, 250));
 
-    assertEquals(message.endsWith('[INFO] Hello, world!'), true);
+    assertEquals(log.msg, 'Hello, world!');
+    assertEquals(log.levelName, 'INFO');
+    assertEquals(log.loggerName, 'default');
 
     await reader.cancel();
   });

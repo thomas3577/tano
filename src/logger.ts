@@ -14,6 +14,7 @@ import type { LogHandler, LogStream } from './types.ts';
 const log = console.log;
 const stream = new TextEncoderStream();
 const readable = stream.readable.pipeThrough(new TextDecoderStream());
+const ansiEscapeCodePattern = new RegExp('/\x1b\[[0-9;]*m/g');
 
 /**
  * A readable stream of the log.
@@ -41,16 +42,8 @@ class StreamHandler extends BaseHandler {
 const streamHandler: StreamHandler = new StreamHandler('DEBUG', {
   formatter: (logRecord: LogRecord) => {
     const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
-    let msg: string = !logRecord.msg ? '' : `[${timestamp}] [${logRecord.levelName}] ${logRecord.msg}`;
 
-    const params = logRecord.args?.at(0);
-    if (params && typeof params === 'object') {
-      for (const [key, value] of Object.entries(params)) {
-        msg = msg.replace(`{${key}}`, `${value}`);
-      }
-    }
-
-    return msg;
+    return JSON.stringify({ ...logRecord, timestamp }).replace(ansiEscapeCodePattern, '');
   },
 });
 

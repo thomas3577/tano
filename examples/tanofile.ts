@@ -1,6 +1,7 @@
-import { needs, task } from '../mod.ts';
+import { Logger, logger, needs, task } from '../mod.ts';
 import { task07 } from './tanofile.task.ts';
 
+const log: Logger = logger();
 task(
   'default',
   needs(
@@ -28,6 +29,10 @@ task(
       console.dir(deno);
     }, {
       args: ['--allow-write'],
+      output: (_, result) => {
+        log.info(_);
+        log.info(result);
+      },
     }),
   ),
   `pwsh -c echo 'The END!'`,
@@ -100,5 +105,6 @@ task(
 task('output-01', `pwsh -c echo 'OUTPUT'`, {
   output: (_, result) => {
     console.log('Result', result);
+    log.info('Output 01');
   },
 });

@@ -288,12 +288,17 @@ export interface ITaskOptions extends Deno.CommandOptions {
   source?: GlobHashSource;
 
   /**
-   * Callback function to get to output from the task.
+   * Callback function to get output from the task.
    *
    * @remarks
    * Unstable! The output property will probably change again.
    */
   output?: (err: unknown, output: any) => void;
+
+  /**
+   * If `true`, the output of the task will be logged.
+   */
+  logThis?: boolean;
 }
 
 /**

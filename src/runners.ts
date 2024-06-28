@@ -55,11 +55,19 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
 
       await executeCodeFunction(code)
         .then((output) => {
+          if (options?.logThis) {
+            log.info(output);
+          }
+
           if (typeof options?.output === 'function') {
             options?.output(undefined, output);
           }
         })
         .catch((err) => {
+          if (options?.logThis) {
+            log.error(err);
+          }
+
           if (typeof options?.output === 'function') {
             options?.output(err, undefined);
           }
@@ -99,6 +107,10 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   if (processError.error) {
     await Promise.reject(processError.error);
 
+    if (options?.logThis) {
+      log.error(processError.error);
+    }
+
     if (typeof options?.output === 'function') {
       options?.output(processError.error, undefined);
     }
@@ -113,6 +125,10 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 
         const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
         for (const line of lines) {
+          if (options?.logThis) {
+            log.info(line);
+          }
+
           if (line?.length > 0 && typeof options?.output === 'function') {
             options?.output(undefined, line);
           }
@@ -130,6 +146,10 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 
         const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
         for (const line of lines) {
+          if (options?.logThis) {
+            log.info(line);
+          }
+
           if (line?.length > 0 && typeof options?.output === 'function') {
             options?.output(line, undefined);
           }

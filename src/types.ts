@@ -174,43 +174,43 @@ export type TanoConfig = {
   /**
    * The working directory of the tanofile.
    */
-  cwd: string;
+  cwd?: string;
 
   /**
    * If `true`, it will be aborted at the first error.
    */
-  failFast: boolean;
+  failFast?: boolean;
 
   /**
    * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
    * But if you now set `force` to true, this task will be executed anyway.
    */
-  force: boolean;
+  force?: boolean;
 
   /**
    * The log file path.
    */
-  logFile: string;
+  logFile?: string;
 
   /**
    * The log level.
    */
-  logLevel: string;
+  logLevel?: string;
 
   /**
    * The log output.
    */
-  logOutput: string[];
+  logOutput?: string[];
 
   /**
    * If false, the cache mechanism is disabled.
    */
-  noCache: boolean;
+  noCache?: boolean;
 
   /**
    * If `true`, the console output is quiet.
    */
-  quiet: boolean;
+  quiet?: boolean;
 };
 
 /**

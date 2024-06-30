@@ -3,11 +3,10 @@
  * @module
  */
 
-import { TaskStatus } from '../mod.ts';
 import { TanoCache } from './cache.ts';
 import { computeHash } from './glob.ts';
 
-import type { GlobHashSource, IChanges, TanoRunData, TaskRunData } from './types.ts';
+import type { GlobHashSource, IChanges, TanoRunData, TaskRunData, TaskStatus } from './types.ts';
 
 /**
  * Dummy implementation of the changes interface.

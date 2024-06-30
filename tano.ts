@@ -15,22 +15,12 @@ import { task } from './src/task.factory.ts';
 import type { TanoArgs } from './src/types.ts';
 
 const args: TanoArgs = await parseTanoArgs();
-const log: Logger = logger();
-
-log.debug(`MO_CACHE:   ${Deno.env.get('NO_CACHE')}`);
-log.debug(`FAIL_FAST:  ${Deno.env.get('FAIL_FAST')}`);
-log.debug(`LOG_LEVEL:  ${Deno.env.get('LOG_LEVEL')}`);
-log.debug(`LOG_OUTPUT: ${Deno.env.get('LOG_OUTPUT')}`);
-log.debug(`LOG_FILE:   ${Deno.env.get('LOG_FILE')}`);
-log.debug(`QUIET:      ${Deno.env.get('QUIET')}`);
-log.debug(`FORCE:      ${Deno.env.get('FORCE')}`);
-log.debug(`TANO_CWD:   ${Deno.env.get('TANO_CWD')}`);
-log.debug('');
 
 const cli = async (): Promise<void> => {
+  const log: Logger = logger();
+
   try {
     log.info(`Using       ${args.file}`);
-    log.info(`Tano        v${VERSION}`);
 
     if (args.file) {
       await import(args.file);

@@ -4,11 +4,12 @@
  */
 
 import { format } from '@std/datetime/format';
-import { BaseHandler, FileHandler, getLogger, LevelName, Logger, LogRecord, setup } from '@std/log';
+import { BaseHandler, FileHandler, getLogger, LevelName, LogConfig, Logger, LogRecord, setup } from '@std/log';
 import { ConsoleHandler } from '@std/log/console-handler';
 import { gray, white } from '@std/fmt/colors';
 
 import { consoleMock } from './console.ts';
+
 import type { LogHandler, LogStream } from './types.ts';
 
 const log = console.log;
@@ -16,6 +17,8 @@ const stream = new TextEncoderStream();
 const readable = stream.readable.pipeThrough(new TextDecoderStream());
 const ansiEscapeCodePattern = new RegExp('/\x1b\[[0-9;]*m/g');
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
+
+const loggers: Map<string, Logger> = new Map();
 
 /**
  * A readable stream of the log.
@@ -38,77 +41,76 @@ class StreamHandler extends BaseHandler {
   }
 }
 
+const consoleHandler = new ConsoleHandler('DEBUG', {
+  formatter: (logRecord: LogRecord) => {
+    const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
+    let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
+
+    const params = logRecord.args?.at(0);
+    if (params && typeof params === 'object') {
+      for (const [key, value] of Object.entries(params)) {
+        msg = msg.replace(`{${key}}`, `${value}`);
+      }
+    }
+
+    if (logRecord.levelName === 'DEBUG') {
+      msg = gray(msg);
+    }
+
+    return msg;
+  },
+});
+
+const streamHandler: StreamHandler = new StreamHandler('DEBUG', {
+  formatter: (logRecord: LogRecord) => {
+    return JSON.stringify({ ...logRecord }).replace(ansiEscapeCodePattern, '');
+  },
+});
+
+const fileHandler = new FileHandler('DEBUG', {
+  filename: Deno.env.get('LOG_FILE') as string,
+});
+
 /**
  * Creates an instance of a task logger.
  *
  * @returns {Logger}
  */
-const logger = (loggerName: string = 'default'): Logger => {
+const logger = (): Logger => {
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const logLevel: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
-  const logHandlers: LogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as LogHandler[] || ['console'] as LogHandler[];
+  const level: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
+  const handlers: LogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as LogHandler[] || ['console'] as LogHandler[];
 
   // deno-lint-ignore no-global-assign
   console = quiet ? consoleMock : console;
 
-  const handlers: any = {};
-
-  if (logHandlers.includes('console')) {
-    const consoleHandler = new ConsoleHandler('DEBUG', {
-      formatter: (logRecord: LogRecord) => {
-        const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
-        const name = loggerName !== 'default' ? ` ${white('[')}${gray(loggerName)}${white(']')}` : '';
-        let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')}${name} ${logRecord.msg}`;
-
-        const params = logRecord.args?.at(0);
-        if (params && typeof params === 'object') {
-          for (const [key, value] of Object.entries(params)) {
-            msg = msg.replace(`{${key}}`, `${value}`);
-          }
-        }
-
-        if (logRecord.levelName === 'DEBUG') {
-          msg = gray(msg);
-        }
-
-        return msg;
-      },
-    });
-
-    consoleHandler.log = log;
-
-    handlers['console'] = consoleHandler;
-  }
-
-  if (logHandlers.includes('file')) {
-    const fileHandler = new FileHandler('DEBUG', {
-      filename: Deno.env.get('LOG_FILE') as string, // deno-lint-ignore no-undef
-    });
-
-    handlers['file'] = fileHandler;
-  }
-
-  if (logHandlers.includes('stream')) {
-    const streamHandler: StreamHandler = new StreamHandler('DEBUG', {
-      formatter: (logRecord: LogRecord) => {
-        const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
-
-        return JSON.stringify({ ...logRecord, timestamp, loggerName }).replace(ansiEscapeCodePattern, '');
-      },
-    });
-
-    handlers['stream'] = streamHandler;
-  }
-
-  setup({
-    handlers,
+  const config: LogConfig = {
+    handlers: {},
     loggers: {
       default: {
-        level: logLevel,
-        handlers: logHandlers,
+        level,
+        handlers,
       },
     },
-  });
+  };
+
+  if (handlers.includes('console')) {
+    consoleHandler.log = log;
+    config.handlers = config.handlers ?? {};
+    config.handlers['console'] = consoleHandler;
+  }
+
+  if (handlers.includes('stream')) {
+    config.handlers = config.handlers ?? {};
+    config.handlers['stream'] = streamHandler;
+  }
+
+  if (handlers.includes('file')) {
+    config.handlers = config.handlers ?? {};
+    config.handlers['file'] = fileHandler;
+  }
+
+  setup(config);
 
   return getLogger();
 };

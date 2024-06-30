@@ -16,7 +16,8 @@
         "--inspect-brk",
         "../tano.ts",
         "--file",
-        "./tanofile.ts"
+        "./tanofile.ts",
+        "--log-level=debug",
       ],
       "cwd": "${workspaceFolder}/examples",
       "attachSimplePort": 9229

@@ -55,6 +55,10 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
 
       await executeCodeFunction(code)
         .then((output) => {
+          if (!output) {
+            return;
+          }
+
           if (options?.logThis) {
             log.info(output);
           }
@@ -119,17 +123,17 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   process.stdout.pipeTo(
     new WritableStream({
       write(chunk: Uint8Array): void {
-        if (!quiet) {
+        if (!quiet && !options?.logThis) {
           Deno.stdout.writeSync(chunk);
         }
 
         const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
         for (const line of lines) {
-          if (options?.logThis) {
-            log.info(line);
-          }
-
           if (line?.length > 0 && typeof options?.output === 'function') {
+            if (options?.logThis) {
+              log.info(line);
+            }
+
             options?.output(undefined, line);
           }
         }

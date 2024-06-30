@@ -7,6 +7,7 @@ import { parseArgs } from '@std/cli';
 import { join } from '@std/path';
 
 import { getCwd, getImportUrl } from './utils.ts';
+import { Logger, logger } from './logger.ts';
 
 import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
 
@@ -47,6 +48,19 @@ export const setup = (config: TanoConfig): void => {
   if (config.quiet !== undefined) {
     Deno.env.set('QUIET', `${config.quiet}`);
   }
+
+  console.log('>>> CONFIG!!!'); // TODO(thu): remove
+  const log: Logger = logger();
+
+  log.debug(`MO_CACHE:   ${Deno.env.get('NO_CACHE')}`);
+  log.debug(`FAIL_FAST:  ${Deno.env.get('FAIL_FAST')}`);
+  log.debug(`LOG_LEVEL:  ${Deno.env.get('LOG_LEVEL')}`);
+  log.debug(`LOG_OUTPUT: ${Deno.env.get('LOG_OUTPUT')}`);
+  log.debug(`LOG_FILE:   ${Deno.env.get('LOG_FILE')}`);
+  log.debug(`QUIET:      ${Deno.env.get('QUIET')}`);
+  log.debug(`FORCE:      ${Deno.env.get('FORCE')}`);
+  log.debug(`TANO_CWD:   ${Deno.env.get('TANO_CWD')}`);
+  log.debug('');
 };
 
 /**

@@ -16,10 +16,10 @@ import { bold, gray, green, red } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
 import { Logger } from '@std/log';
 import { logger } from './logger.ts';
-import { Handler, handler } from './handler.ts';
+import { handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
-import type { Command, Executor, Options, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
+import type { Command, Executor, Options, TanoHandler, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
 
 /**
  * A class to create a Task.
@@ -27,7 +27,7 @@ import type { Command, Executor, Options, TaskParams, TaskRunOptions, TaskStatus
 export class Task implements TaskParams {
   readonly #log: Logger = logger();
   readonly #created: Date = new Date();
-  readonly #handler: Handler = handler;
+  readonly #handler: TanoHandler = handler;
   readonly #name: string;
   readonly #needs: Array<string>;
   readonly #executor: Executor;

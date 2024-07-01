@@ -1,11 +1,11 @@
 import { assertEquals, assertInstanceOf } from '@std/assert';
 import { afterEach, beforeAll, describe, it } from '@std/testing/bdd';
 import { spy } from '@std/testing/mock';
-import { Handler, handler } from './handler.ts';
+import { handler } from './handler.ts';
 import { needs } from './needs.ts';
 import { task } from './task.factory.ts';
 
-describe(Handler.name, () => {
+describe('handler', () => {
   beforeAll(() => {
     spy(Deno.writeTextFile);
   });
@@ -35,7 +35,7 @@ describe(Handler.name, () => {
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
 
-    await handler.run();
+    await handler.run(undefined);
 
     assertEquals(handler.executed, 0);
   });

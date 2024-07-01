@@ -10,12 +10,12 @@ import { logger } from './logger.ts';
 import { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
-import type { IChanges, TaskRunData, TaskRunOptions } from './types.ts';
+import type { IChanges, TanoHandler, TaskRunData, TaskRunOptions } from './types.ts';
 
 /**
  * The task handler.
  */
-export class Handler {
+class Handler implements TanoHandler {
   readonly #created: Date = new Date();
   readonly #cache: Map<string, Task> = new Map();
   readonly #eventTarget = new EventTarget();
@@ -279,4 +279,4 @@ export class Handler {
 /**
  * Instance of Handler.
  */
-export const handler: Handler = new Handler();
+export const handler: TanoHandler = new Handler();

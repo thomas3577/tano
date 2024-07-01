@@ -11,8 +11,8 @@ import { consoleMock } from './console.ts';
 import type { LogHandler, LogStream } from './types.ts';
 
 const log = console.log;
-const ansiEscapeCodePattern = new RegExp('/\x1b\[[0-9;]*m/g');
-const stream = new TextEncoderStream();
+const ansiEscapeCodePattern: RegExp = new RegExp('/\x1b\[[0-9;]*m/g');
+const stream: TextEncoderStream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
 const levelName: LevelName = 'DEBUG';
@@ -77,7 +77,7 @@ const fileHandlerOptions: FileHandlerOptions = {
 const fileHandler = new FileHandler(levelName, fileHandlerOptions);
 
 /**
- * Creates an instance of a task logger.
+ * Creates an instance of a logger.
  *
  * @returns {Logger}
  */

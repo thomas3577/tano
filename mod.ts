@@ -57,4 +57,4 @@ export { setup } from './src/tano.config.ts';
 /**
  * Types
  */
-export type { Code, CodeFile, CodeFunction, CodeOptions, Command, CommandOptions, Condition, GlobHashSource, LogHandler, LogStream, Needs, TanoConfig, TaskParams, TaskStatus } from './src/types.ts';
+export type { Code, CodeFile, CodeFunction, CodeOptions, Command, CommandOptions, Condition, GlobHashSource, LogHandler, LogStream, Needs, TanoConfig, TanoHandler, TaskParams, TaskStatus } from './src/types.ts';

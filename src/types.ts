@@ -485,3 +485,103 @@ export type TaskDefinition = {
   (name: string, code?: Code, options?: CodeOptions): Task;
   (name: string, needs?: Needs, code?: Code, options?: CodeOptions): Task;
 };
+
+export interface TanoHandler {
+  /**
+   * Gets the timestamp when the handler was created.
+   */
+  created: Date;
+
+  /**
+   * Gets the performance mark when the last run starts.
+   */
+  starting: null | PerformanceMark;
+
+  /**
+   * Gets the performance mark when the last run ends.
+   */
+  finished: null | PerformanceMark;
+
+  /**
+   * Gets the performance measure of the last run.
+   */
+  measure: null | PerformanceMeasure;
+
+  /**
+   * Gets the number of tasks that are in the cache.
+   */
+  count: number;
+
+  /**
+   * Gets the number of executed tasks.
+   */
+  executed: number;
+
+  /**
+   * Managed the tano data.
+   */
+  changes: null | IChanges;
+
+  /**
+   * Adds a task to the cache.
+   *
+   * @param {Task} task - A task to add.
+   */
+  add(task: Task): void;
+
+  /**
+   * Runs the Task.
+   * In the process, all dependent tasks `needs` are executed beforehand.
+   *
+   * @param {String} taskName - [optionalParam='default'] Name of the task.
+   * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
+   *
+   * @returns {Promise<void>} A promise that resolves to void.
+   */
+  run(taskName?: string, options?: TaskRunOptions): Promise<void>;
+
+  /**
+   * Resets all tasks so that you can run them again.
+   */
+  reset(): void;
+
+  /**
+   * Clears the cache. The handler will then have no more tasks to execute.
+   */
+  clear(): void;
+
+  /**
+   * Gets a list of all tasks to be executed in the correct order.
+   *
+   * @param {string} taskName - Name of the entry task.
+   * @param taskNames
+   * @returns {Array<string>} - List of the names of all executed tasks
+   */
+  getPlan(taskName: string): Array<string>;
+
+  /**
+   * Disposes the handler.
+   */
+  dispose(): void;
+
+  /**
+   * Adds an event listener for the `changed` event.
+   * The event is triggered when a task changes its state.
+   * The event detail contains the task name and the new state.
+   *
+   * @param fn - The event listener to add.
+   */
+  onChanged(fn: EventListenerOrEventListenerObject): void;
+
+  /**
+   * Removes an event listener for the `changed` event.
+   *
+   * @param fn - The event listener to remove.
+   */
+  offChanged(fn: EventListenerOrEventListenerObject): void;
+
+  /**
+   * Hack: Updates the logger of this handler.
+   */
+  updateLogger(): void;
+}

@@ -13,12 +13,10 @@ import { consoleMock } from './console.ts';
 import type { LogHandler, LogStream } from './types.ts';
 
 const log = console.log;
-const stream = new TextEncoderStream();
-const readable = stream.readable.pipeThrough(new TextDecoderStream());
 const ansiEscapeCodePattern = new RegExp('/\x1b\[[0-9;]*m/g');
+const stream = new TextEncoderStream();
+const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
-
-const loggers: Map<string, Logger> = new Map();
 
 /**
  * A readable stream of the log.

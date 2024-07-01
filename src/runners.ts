@@ -7,8 +7,6 @@ import { Logger, logger } from './logger.ts';
 
 import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
 
-const log: Logger = logger();
-
 const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
   try {
     const args: string[] = Array.isArray(command) ? command : command.split(' ');
@@ -40,6 +38,8 @@ const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProce
  * @returns {Promise<void>}
  */
 export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
+  const log: Logger = logger();
+
   log.debug('Run code...');
 
   if (typeof code === 'function') {
@@ -100,6 +100,8 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
  * @returns {Promise<number>}
  */
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
+  const log: Logger = logger();
+
   log.debug('Run command...');
 
   const textDecoder = new TextDecoder();
@@ -180,6 +182,8 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
  * @returns {Promise<Boolean>} If `true`, the task will be executed. Otherwise it will be skipped.
  */
 export const executeCondition = async (condition: Condition): Promise<boolean> => {
+  const log: Logger = logger();
+
   log.debug('Execute condition...');
 
   const result: boolean = await new Promise<boolean>((resolve, reject) => {
@@ -211,6 +215,8 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
  * @returns {Promise<void | T>}
  */
 export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void | T> => {
+  const log: Logger = logger();
+
   log.debug('Execute code function...');
 
   const output = await new Promise<void | T>((resolve, reject) => {

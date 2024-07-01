@@ -13,11 +13,12 @@ import { VERSION } from './version.ts';
 
 import type { IChanges, TaskRunData, TaskRunOptions } from './types.ts';
 
+let log: Logger;
+
 /**
  * The task handler.
  */
 export class Handler {
-  readonly #log: Logger = logger();
   readonly #created: Date = new Date();
   readonly #cache: Map<string, Task> = new Map();
   readonly #eventTarget = new EventTarget();
@@ -31,6 +32,14 @@ export class Handler {
     force: false,
     noCache: false,
   };
+
+  get #log(): Logger {
+    if (!log) {
+      log = logger();
+    }
+
+    return log;
+  }
 
   /**
    * Gets the timestamp when the handler was created.

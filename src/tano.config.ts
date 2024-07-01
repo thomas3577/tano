@@ -49,7 +49,6 @@ export const setup = (config: TanoConfig): void => {
     Deno.env.set('QUIET', `${config.quiet}`);
   }
 
-  console.log('>>> CONFIG!!!'); // TODO(thu): remove
   const log: Logger = logger();
 
   log.debug(`MO_CACHE:   ${Deno.env.get('NO_CACHE')}`);

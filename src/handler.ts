@@ -12,8 +12,6 @@ import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
 import type { IChanges, TaskRunData, TaskRunOptions } from './types.ts';
 
-let log: Logger;
-
 /**
  * The task handler.
  */
@@ -22,6 +20,7 @@ export class Handler {
   readonly #cache: Map<string, Task> = new Map();
   readonly #eventTarget = new EventTarget();
 
+  #log: Logger = logger();
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
@@ -31,15 +30,6 @@ export class Handler {
     force: false,
     noCache: false,
   };
-
-  // TODO(thu): Possibly a slow type
-  get #log(): Logger {
-    if (!log) {
-      log = logger();
-    }
-
-    return log;
-  }
 
   /**
    * Gets the timestamp when the handler was created.
@@ -205,6 +195,13 @@ export class Handler {
    */
   offChanged(fn: EventListenerOrEventListenerObject): void {
     this.#eventTarget.removeEventListener('changed', fn);
+  }
+
+  /**
+   * Hack: Updates the logger of this handler.
+   */
+  updateLogger(): void {
+    this.#log = logger();
   }
 
   async #preRun(taskName: string): Promise<void> {

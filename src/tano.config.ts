@@ -8,6 +8,7 @@ import { join } from '@std/path';
 import { Logger } from '@std/log';
 import { getCwd, getImportUrl } from './utils.ts';
 import { logger } from './logger.ts';
+import { handler } from './handler.ts';
 import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
 
 /**
@@ -49,6 +50,8 @@ export const setup = (config: TanoConfig): void => {
   }
 
   const log: Logger = logger();
+
+  handler.updateLogger();
 
   log.debug(`MO_CACHE:   ${Deno.env.get('NO_CACHE')}`);
   log.debug(`FAIL_FAST:  ${Deno.env.get('FAIL_FAST')}`);

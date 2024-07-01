@@ -1,8 +1,11 @@
-import { Logger, logger, needs, task } from '../mod.ts';
+import { Logger, logger, needs, setup, task } from '../mod.ts';
 
 import { task07 } from './tanofile.task.ts';
 
-const log: Logger = logger();
+setup({
+  logLevel: 'DEBUG',
+  logOutput: ['console'],
+});
 
 task(
   'default',
@@ -32,20 +35,25 @@ task(
     }, {
       args: ['--allow-write'],
       output: (_, result) => {
+        const log: Logger = logger();
         log.info(_);
         log.info(result);
       },
     }),
     task('My task 09', async () => {
+      const log: Logger = logger();
       const deno = await Deno.readTextFile('../deno.json');
 
-      console.dir(deno);
+      log.info(deno);
     }, {
       args: ['--allow-write'],
       logThis: true,
     }),
   ),
   `pwsh -c echo 'The END!'`,
+  {
+    logThis: true,
+  },
 );
 
 task('unhappy-task-01', (done) => {
@@ -114,8 +122,8 @@ task(
 
 task('output-01', `pwsh -c echo 'OUTPUT'`, {
   output: (_, result) => {
-    console.log('Result', result);
-    log.info('Output 01');
+    const log: Logger = logger();
+    log.info('Output 01', result);
   },
 });
 

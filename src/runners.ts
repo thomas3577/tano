@@ -122,6 +122,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
     }
   }
 
+  // Output pipe
   process.stdout.pipeTo(
     new WritableStream({
       write(chunk: Uint8Array): void {
@@ -131,11 +132,15 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 
         const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
         for (const line of lines) {
-          if (line?.length > 0 && typeof options?.output === 'function') {
-            if (options?.logThis) {
-              log.info(line);
-            }
+          if (line?.length < 1) {
+            continue;
+          }
 
+          if (options?.logThis) {
+            log.info(line);
+          }
+
+          if (typeof options?.output === 'function') {
             options?.output(undefined, line);
           }
         }
@@ -143,6 +148,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
     }),
   );
 
+  // Error pipe
   process.stderr.pipeTo(
     new WritableStream({
       write(chunk: Uint8Array): void {
@@ -152,11 +158,15 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 
         const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
         for (const line of lines) {
-          if (options?.logThis) {
-            log.info(line);
+          if (line?.length < 1) {
+            continue;
           }
 
-          if (line?.length > 0 && typeof options?.output === 'function') {
+          if (options?.logThis) {
+            log.error(line);
+          }
+
+          if (typeof options?.output === 'function') {
             options?.output(line, undefined);
           }
         }

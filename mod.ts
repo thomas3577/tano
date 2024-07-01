@@ -45,7 +45,7 @@ export { Task } from './src/task.ts';
 /**
  * An instance of a LogStream.
  */
-export { Logger, logger, logStream } from './src/logger.ts';
+export { logger, logStream } from './src/logger.ts';
 
 /**
  * Possibility to setup the tano configuration.

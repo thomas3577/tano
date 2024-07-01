@@ -1,8 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
-
 import { executeCodeFunction, executeCondition, runCode, runCommand } from './runners.ts';
-
 import type { Code, CodeFunction, Command, Condition } from './types.ts';
 
 describe(runCode.name, () => {

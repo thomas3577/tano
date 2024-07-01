@@ -1,9 +1,7 @@
 import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { toFileUrl } from '@std/path';
-
 import { getCwd, getImportUrl, isCode, isCommand, isExecutor, isNeeds, toCode, toCommand, toExecutor } from './utils.ts';
-
 import type { Executor, NeedsOrExecutor } from './types.ts';
 
 describe(isNeeds.name, () => {

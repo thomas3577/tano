@@ -1,4 +1,6 @@
-import { Logger, logger, needs, setup, task } from '../mod.ts';
+import { Logger } from '@std/log';
+
+import { logger, needs, setup, task } from '../mod.ts';
 
 import { task07 } from './tanofile.task.ts';
 

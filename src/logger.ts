@@ -4,12 +4,10 @@
  */
 
 import { format } from '@std/datetime/format';
-import { BaseHandler, FileHandler, getLogger, LevelName, LogConfig, Logger, LogRecord, setup } from '@std/log';
-import { ConsoleHandler } from '@std/log/console-handler';
 import { gray, white } from '@std/fmt/colors';
-
+import { BaseHandler, ConsoleHandler, FileHandler, getLogger, LevelName, LogConfig, Logger, LogRecord, setup } from '@std/log';
+import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions } from '@std/log';
 import { consoleMock } from './console.ts';
-
 import type { LogHandler, LogStream } from './types.ts';
 
 const log = console.log;
@@ -17,6 +15,7 @@ const ansiEscapeCodePattern = new RegExp('/\x1b\[[0-9;]*m/g');
 const stream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
+const levelName: LevelName = 'DEBUG';
 
 /**
  * A readable stream of the log.
@@ -39,8 +38,8 @@ class StreamHandler extends BaseHandler {
   }
 }
 
-const consoleHandler = new ConsoleHandler('DEBUG', {
-  formatter: (logRecord: LogRecord) => {
+const consoleHandlerOptions: ConsoleHandlerOptions = {
+  formatter: (logRecord: LogRecord): string => {
     const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
     let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
 
@@ -57,17 +56,25 @@ const consoleHandler = new ConsoleHandler('DEBUG', {
 
     return msg;
   },
-});
+};
 
-const streamHandler: StreamHandler = new StreamHandler('DEBUG', {
-  formatter: (logRecord: LogRecord) => {
-    return JSON.stringify({ ...logRecord }).replace(ansiEscapeCodePattern, '');
+const consoleHandler: ConsoleHandler = new ConsoleHandler(levelName, consoleHandlerOptions);
+
+const streamHandlerOptions: BaseHandlerOptions = {
+  formatter: (logRecord: LogRecord): string => {
+    const msg: string = JSON.stringify({ ...logRecord }).replace(ansiEscapeCodePattern, '');
+
+    return msg;
   },
-});
+};
 
-const fileHandler = new FileHandler('DEBUG', {
+const streamHandler: StreamHandler = new StreamHandler(levelName, streamHandlerOptions);
+
+const fileHandlerOptions: FileHandlerOptions = {
   filename: Deno.env.get('LOG_FILE') as string,
-});
+};
+
+const fileHandler = new FileHandler(levelName, fileHandlerOptions);
 
 /**
  * Creates an instance of a task logger.
@@ -115,4 +122,4 @@ const logger = (): Logger => {
 
 export type { LogHandler, LogStream };
 
-export { Logger, logger, logStream };
+export { logger, logStream };

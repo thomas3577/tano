@@ -3,8 +3,8 @@
  * @module
  */
 
-import { Logger, logger } from './logger.ts';
-
+import { Logger } from '@std/log';
+import { logger } from './logger.ts';
 import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
 
 const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {

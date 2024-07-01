@@ -6,8 +6,7 @@
  */
 
 import { format, join } from '@std/path';
-import { exists } from '@std/fs/exists';
-
+import { exists } from '@std/fs';
 import type { TanoRunData, TaskRunData } from './types.ts';
 
 /**

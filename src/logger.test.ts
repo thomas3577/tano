@@ -1,8 +1,7 @@
 import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
-import { LogLevels } from '@std/log/levels';
-
-import { Logger, logger, logStream } from './logger.ts';
+import { Logger, LogLevels } from '@std/log';
+import { logger, logStream } from './logger.ts';
 
 describe(`logger`, () => {
   it(`Should create a instance of Logger`, () => {

@@ -4,7 +4,6 @@
  */
 
 import type { GlobToRegExpOptions } from '@std/path';
-
 import type { Task } from './task.ts';
 
 /**

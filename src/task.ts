@@ -14,12 +14,11 @@
 
 import { bold, gray, green, red } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
-
-import { Logger, logger } from './logger.ts';
+import { Logger } from '@std/log';
+import { logger } from './logger.ts';
 import { Handler, handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
-
 import type { Command, Executor, Options, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
 
 /**

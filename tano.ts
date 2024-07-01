@@ -4,14 +4,13 @@
  */
 
 import { bold } from '@std/fmt/colors';
-
-import { Logger, logger } from './src/logger.ts';
+import { Logger } from '@std/log';
+import { logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';
 import { parseTanoArgs } from './src/tano.config.ts';
 import { help } from './src/help.ts';
 import { VERSION } from './src/version.ts';
 import { task } from './src/task.factory.ts';
-
 import type { TanoArgs } from './src/types.ts';
 
 const args: TanoArgs = await parseTanoArgs();

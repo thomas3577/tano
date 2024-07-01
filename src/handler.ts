@@ -5,12 +5,11 @@
 
 import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
-
-import { Logger, logger } from './logger.ts';
+import { Logger } from '@std/log';
+import { logger } from './logger.ts';
 import { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
-
 import type { IChanges, TaskRunData, TaskRunOptions } from './types.ts';
 
 let log: Logger;
@@ -33,6 +32,7 @@ export class Handler {
     noCache: false,
   };
 
+  // TODO(thu): Possibly a slow type
   get #log(): Logger {
     if (!log) {
       log = logger();

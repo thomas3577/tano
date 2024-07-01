@@ -5,10 +5,9 @@
 
 import { parseArgs } from '@std/cli';
 import { join } from '@std/path';
-
+import { Logger } from '@std/log';
 import { getCwd, getImportUrl } from './utils.ts';
-import { Logger, logger } from './logger.ts';
-
+import { logger } from './logger.ts';
 import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
 
 /**

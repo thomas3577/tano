@@ -13,7 +13,6 @@
 
 import { Task } from './task.ts';
 import { isExecutor, isNeeds, toExecutor } from './utils.ts';
-
 import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, TaskDefinition, TaskParams } from './types.ts';
 
 /**

@@ -38,6 +38,7 @@ const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProce
  * @returns {Promise<void>}
  */
 export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
+  const logThis = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
   const log: Logger = logger();
 
   log.debug('Run code...');
@@ -59,7 +60,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
             return;
           }
 
-          if (options?.logThis) {
+          if (logThis) {
             log.info(output);
           }
 
@@ -68,7 +69,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
           }
         })
         .catch((err) => {
-          if (options?.logThis) {
+          if (logThis) {
             log.error(err);
           }
 
@@ -100,6 +101,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
  * @returns {Promise<number>}
  */
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
+  const logThis = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
   const log: Logger = logger();
 
   log.debug('Run command...');
@@ -113,7 +115,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   if (processError.error) {
     await Promise.reject(processError.error);
 
-    if (options?.logThis) {
+    if (logThis) {
       log.error(processError.error);
     }
 
@@ -126,7 +128,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
   process.stdout.pipeTo(
     new WritableStream({
       write(chunk: Uint8Array): void {
-        if (!quiet && !options?.logThis) {
+        if (!quiet && !logThis) {
           Deno.stdout.writeSync(chunk);
         }
 
@@ -136,7 +138,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
             continue;
           }
 
-          if (options?.logThis) {
+          if (logThis) {
             log.info(line);
           }
 
@@ -162,7 +164,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
             continue;
           }
 
-          if (options?.logThis) {
+          if (logThis) {
             log.error(line);
           }
 

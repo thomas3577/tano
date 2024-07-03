@@ -37,6 +37,10 @@ export const setup = (config: TanoConfig): void => {
     Deno.env.set('LOG_LEVEL', config.logLevel);
   }
 
+  if (config.logEverything !== undefined) {
+    Deno.env.set('LOG_EVERYTHING', `${config.logEverything}`);
+  }
+
   if (config.logOutput !== undefined) {
     Deno.env.set('LOG_OUTPUT', config.logOutput.join(','));
   }
@@ -53,14 +57,15 @@ export const setup = (config: TanoConfig): void => {
 
   handler.updateLogger();
 
-  log.debug(`MO_CACHE:   ${Deno.env.get('NO_CACHE')}`);
-  log.debug(`FAIL_FAST:  ${Deno.env.get('FAIL_FAST')}`);
-  log.debug(`LOG_LEVEL:  ${Deno.env.get('LOG_LEVEL')}`);
-  log.debug(`LOG_OUTPUT: ${Deno.env.get('LOG_OUTPUT')}`);
-  log.debug(`LOG_FILE:   ${Deno.env.get('LOG_FILE')}`);
-  log.debug(`QUIET:      ${Deno.env.get('QUIET')}`);
-  log.debug(`FORCE:      ${Deno.env.get('FORCE')}`);
-  log.debug(`TANO_CWD:   ${Deno.env.get('TANO_CWD')}`);
+  log.debug(`MO_CACHE:       ${Deno.env.get('NO_CACHE')}`);
+  log.debug(`FAIL_FAST:      ${Deno.env.get('FAIL_FAST')}`);
+  log.debug(`LOG_LEVEL:      ${Deno.env.get('LOG_LEVEL')}`);
+  log.debug(`LOG_OUTPUT:     ${Deno.env.get('LOG_OUTPUT')}`);
+  log.debug(`LOG_FILE:       ${Deno.env.get('LOG_FILE')}`);
+  log.debug(`LOG_EVERYTHING: ${Deno.env.get('LOG_EVERYTHING')}`);
+  log.debug(`QUIET:          ${Deno.env.get('QUIET')}`);
+  log.debug(`FORCE:          ${Deno.env.get('FORCE')}`);
+  log.debug(`TANO_CWD:       ${Deno.env.get('TANO_CWD')}`);
   log.debug('');
 };
 
@@ -82,7 +87,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
     },
     string: ['file', 'task', 'log-level', 'log-file'],
     collect: ['log-output'],
-    boolean: ['help', 'quiet', 'fail-fast', 'version', 'update', 'force', 'no-cache'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version', 'update', 'force', 'no-cache', 'log-everything'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
@@ -91,6 +96,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
       'log-level': 'INFO',
       'log-output': ['console'],
       'no-cache': false,
+      'log-everything': false,
     },
   });
 
@@ -110,6 +116,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
   const task: string = flags.task || flags._[0] as string;
   const logFile: string = flags['log-file'] ? flags['log-file'] : join(cwd, './tano.log');
   const logLevel: string = flags['log-level'].toUpperCase();
+  const logEverything: boolean = flags['log-everything'];
   const logOutput: string[] = flags['log-output'] as string[];
   const quiet: boolean = flags.quiet;
   const noCache: boolean = flags['no-cache'];
@@ -121,6 +128,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
     logFile,
     logLevel,
     logOutput,
+    logEverything,
     noCache,
     quiet,
   };

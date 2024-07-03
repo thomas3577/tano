@@ -202,6 +202,11 @@ export type TanoConfig = {
   logOutput?: string[];
 
   /**
+   * If true, you don't need to set `logThis` on every task.
+   */
+  logEverything?: boolean;
+
+  /**
    * If false, the cache mechanism is disabled.
    */
   noCache?: boolean;

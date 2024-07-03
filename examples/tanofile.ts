@@ -6,7 +6,7 @@ import { task07 } from './tanofile.task.ts';
 
 setup({
   logLevel: 'DEBUG',
-  logOutput: ['console'],
+  logOutput: ['console', 'stream'],
 });
 
 task(
@@ -111,7 +111,7 @@ task('conditions-06', () => {}, {
 task(
   'few',
   needs(
-    ...Array.from(Array(100).keys()).map((key) =>
+    ...Array.from(Array(1).keys()).map((key) =>
       task(`${key}`, (done) => {
         setTimeout(() => {
           console.log(`Task ${key}`);

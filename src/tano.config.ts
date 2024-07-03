@@ -11,15 +11,14 @@ import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
 
-/**
- * Sets up the environment variables for the CLI.
- *
- * @param {TanoConfig} config The tano configuration.
- */
-export const setup = (config: TanoConfig): void => {
+type EnvSetBy = 'setup';
+
+const setEnv = (config: TanoConfig, setBy?: EnvSetBy): void => {
+  const overwrittenBy = setBy ? ` (overwritten by ${setBy})` : '';
+
   Object.entries(config).forEach(([key, value]) => {
     const envKey = toSnakeCase(key)?.toUpperCase();
-    if (envKey && !Deno.env.has(envKey) && value !== undefined) {
+    if (envKey && value !== undefined) {
       Deno.env.set(envKey, `${value}`);
     }
   });
@@ -28,16 +27,24 @@ export const setup = (config: TanoConfig): void => {
 
   handler.updateLogger();
 
-  log.debug(`NO_CACHE:       ${Deno.env.get('NO_CACHE')}`);
-  log.debug(`FAIL_FAST:      ${Deno.env.get('FAIL_FAST')}`);
-  log.debug(`LOG_LEVEL:      ${Deno.env.get('LOG_LEVEL')}`);
-  log.debug(`LOG_OUTPUT:     ${Deno.env.get('LOG_OUTPUT')}`);
-  log.debug(`LOG_FILE:       ${Deno.env.get('LOG_FILE')}`);
-  log.debug(`LOG_EVERYTHING: ${Deno.env.get('LOG_EVERYTHING')}`);
-  log.debug(`QUIET:          ${Deno.env.get('QUIET')}`);
-  log.debug(`FORCE:          ${Deno.env.get('FORCE')}`);
-  log.debug(`TANO_CWD:       ${Deno.env.get('TANO_CWD')}`);
+  Object.keys(config).forEach((key) => {
+    const envKey = toSnakeCase(key)?.toUpperCase();
+    if (envKey) {
+      log.debug(`${(envKey + ':').padEnd(16)}${Deno.env.get(envKey)}${overwrittenBy}`);
+    }
+  });
+
   log.debug('');
+};
+
+/**
+ * Sets up the environment variables for the CLI.
+ *
+ * @param {TanoConfig} config The tano configuration.
+ * @param {boolean} [override] Whether to override the existing environment variables.
+ */
+export const setup = (config: TanoConfig): void => {
+  setEnv(config, 'setup');
 };
 
 /**
@@ -104,7 +111,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
     quiet,
   };
 
-  setup(config);
+  setEnv(config);
 
   const args: TanoArgs = {
     action,

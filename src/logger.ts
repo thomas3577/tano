@@ -11,7 +11,6 @@ import { consoleMock } from './console.ts';
 import type { LogHandler, LogStream } from './types.ts';
 
 const log = console.log;
-const ansiEscapeCodePattern: RegExp = new RegExp('/\x1b\[[0-9;]*m/g');
 const stream: TextEncoderStream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
@@ -38,7 +37,7 @@ class StreamHandler extends BaseHandler {
   }
 }
 
-const replaceParams = (msg: string, params?: unknown): string => {
+const interpolate = (msg: string, params?: unknown): string => {
   if (params && typeof params === 'object') {
     for (const [key, value] of Object.entries(params)) {
       msg = msg.replace(`{${key}}`, `${value}`);
@@ -53,7 +52,7 @@ const consoleHandlerOptions: ConsoleHandlerOptions = {
     const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
     const params = logRecord.args?.at(0);
     let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
-    msg = replaceParams(msg, params);
+    msg = interpolate(msg, params);
 
     if (logRecord.levelName === 'DEBUG') {
       msg = gray(msg);
@@ -67,8 +66,8 @@ const consoleHandler: ConsoleHandler = new ConsoleHandler(levelName, consoleHand
 
 const streamHandlerOptions: BaseHandlerOptions = {
   formatter: (logRecord: LogRecord): string => {
-    const msg: string = replaceParams(logRecord.msg, logRecord.args?.at(0));
-    const result: string = JSON.stringify({ ...logRecord, msg }).replace(ansiEscapeCodePattern, '');
+    const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
+    const result: string = JSON.stringify({ ...logRecord, msg });
 
     return result;
   },

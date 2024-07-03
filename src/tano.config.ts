@@ -6,7 +6,7 @@
 import { parseArgs } from '@std/cli';
 import { join } from '@std/path';
 import { Logger } from '@std/log';
-import { getCwd, getImportUrl } from './utils.ts';
+import { getCwd, getImportUrl, toSnakeCase } from './utils.ts';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
@@ -17,41 +17,12 @@ import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
  * @param {TanoConfig} config The tano configuration.
  */
 export const setup = (config: TanoConfig): void => {
-  if (Deno.env.has('TANO_CWD') && config.cwd !== undefined) {
-    Deno.env.set('TANO_CWD', config.cwd);
-  }
-
-  if (Deno.env.has('FAIL_FAST') && config.failFast !== undefined) {
-    Deno.env.set('FAIL_FAST', `${config.failFast}`);
-  }
-
-  if (Deno.env.has('FORCE') && config.force !== undefined) {
-    Deno.env.set('FORCE', `${config.force}`);
-  }
-
-  if (Deno.env.has('LOG_FILE') && config.logFile !== undefined) {
-    Deno.env.set('LOG_FILE', config.logFile);
-  }
-
-  if (Deno.env.has('LOG_LEVEL') && config.logLevel !== undefined) {
-    Deno.env.set('LOG_LEVEL', config.logLevel);
-  }
-
-  if (Deno.env.has('LOG_OUTPUT') && config.logOutput !== undefined) {
-    Deno.env.set('LOG_OUTPUT', config.logOutput.join(','));
-  }
-
-  if (Deno.env.has('LOG_EVERYTHING') && config.logEverything !== undefined) {
-    Deno.env.set('LOG_EVERYTHING', `${config.logEverything}`);
-  }
-
-  if (Deno.env.has('NO_CACHE') && config.noCache !== undefined) {
-    Deno.env.set('NO_CACHE', `${config.noCache}`);
-  }
-
-  if (Deno.env.has('QUIET') && config.quiet !== undefined) {
-    Deno.env.set('QUIET', `${config.quiet}`);
-  }
+  Object.entries(config).forEach(([key, value]) => {
+    const envKey = toSnakeCase(key)?.toUpperCase();
+    if (envKey && !Deno.env.has(envKey)) {
+      Deno.env.set(envKey, `${value}`);
+    }
+  });
 
   const log: Logger = logger();
 
@@ -110,11 +81,11 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
   }
 
   const file: string | undefined = action === 'run' ? await getImportUrl(flags.file) : undefined;
-  const cwd: string = getCwd(file);
+  const tanoCwd: string = getCwd(file);
   const failFast: boolean = flags['fail-fast'];
   const force: boolean = flags.force;
   const task: string = flags.task || flags._[0] as string;
-  const logFile: string = flags['log-file'] ? flags['log-file'] : join(cwd, './tano.log');
+  const logFile: string = flags['log-file'] ? flags['log-file'] : join(tanoCwd, './tano.log');
   const logLevel: string = flags['log-level'].toUpperCase();
   const logEverything: boolean = flags['log-everything'];
   const logOutput: string[] = flags['log-output'] as string[];
@@ -122,7 +93,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
   const noCache: boolean = flags['no-cache'];
 
   const config: TanoConfig = {
-    cwd,
+    tanoCwd,
     failFast,
     force,
     logFile,

@@ -173,7 +173,7 @@ export type TanoConfig = {
   /**
    * The working directory of the tanofile.
    */
-  cwd?: string;
+  tanoCwd?: string;
 
   /**
    * If `true`, it will be aborted at the first error.

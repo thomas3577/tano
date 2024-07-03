@@ -19,7 +19,7 @@ import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
 export const setup = (config: TanoConfig): void => {
   Object.entries(config).forEach(([key, value]) => {
     const envKey = toSnakeCase(key)?.toUpperCase();
-    if (envKey && !Deno.env.has(envKey)) {
+    if (envKey && !Deno.env.has(envKey) && value !== undefined) {
       Deno.env.set(envKey, `${value}`);
     }
   });

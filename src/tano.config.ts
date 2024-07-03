@@ -17,39 +17,39 @@ import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
  * @param {TanoConfig} config The tano configuration.
  */
 export const setup = (config: TanoConfig): void => {
-  if (config.cwd !== undefined) {
+  if (Deno.env.has('TANO_CWD') && config.cwd !== undefined) {
     Deno.env.set('TANO_CWD', config.cwd);
   }
 
-  if (config.failFast !== undefined) {
+  if (Deno.env.has('FAIL_FAST') && config.failFast !== undefined) {
     Deno.env.set('FAIL_FAST', `${config.failFast}`);
   }
 
-  if (config.force !== undefined) {
+  if (Deno.env.has('FORCE') && config.force !== undefined) {
     Deno.env.set('FORCE', `${config.force}`);
   }
 
-  if (config.logFile !== undefined) {
+  if (Deno.env.has('LOG_FILE') && config.logFile !== undefined) {
     Deno.env.set('LOG_FILE', config.logFile);
   }
 
-  if (config.logLevel !== undefined) {
+  if (Deno.env.has('LOG_LEVEL') && config.logLevel !== undefined) {
     Deno.env.set('LOG_LEVEL', config.logLevel);
   }
 
-  if (config.logEverything !== undefined) {
-    Deno.env.set('LOG_EVERYTHING', `${config.logEverything}`);
-  }
-
-  if (config.logOutput !== undefined) {
+  if (Deno.env.has('LOG_OUTPUT') && config.logOutput !== undefined) {
     Deno.env.set('LOG_OUTPUT', config.logOutput.join(','));
   }
 
-  if (config.noCache !== undefined) {
+  if (Deno.env.has('LOG_EVERYTHING') && config.logEverything !== undefined) {
+    Deno.env.set('LOG_EVERYTHING', `${config.logEverything}`);
+  }
+
+  if (Deno.env.has('NO_CACHE') && config.noCache !== undefined) {
     Deno.env.set('NO_CACHE', `${config.noCache}`);
   }
 
-  if (config.quiet !== undefined) {
+  if (Deno.env.has('QUIET') && config.quiet !== undefined) {
     Deno.env.set('QUIET', `${config.quiet}`);
   }
 
@@ -57,7 +57,7 @@ export const setup = (config: TanoConfig): void => {
 
   handler.updateLogger();
 
-  log.debug(`MO_CACHE:       ${Deno.env.get('NO_CACHE')}`);
+  log.debug(`NO_CACHE:       ${Deno.env.get('NO_CACHE')}`);
   log.debug(`FAIL_FAST:      ${Deno.env.get('FAIL_FAST')}`);
   log.debug(`LOG_LEVEL:      ${Deno.env.get('LOG_LEVEL')}`);
   log.debug(`LOG_OUTPUT:     ${Deno.env.get('LOG_OUTPUT')}`);

@@ -38,17 +38,22 @@ class StreamHandler extends BaseHandler {
   }
 }
 
+const replaceParams = (msg: string, params?: unknown): string => {
+  if (params && typeof params === 'object') {
+    for (const [key, value] of Object.entries(params)) {
+      msg = msg.replace(`{${key}}`, `${value}`);
+    }
+  }
+
+  return msg;
+};
+
 const consoleHandlerOptions: ConsoleHandlerOptions = {
   formatter: (logRecord: LogRecord): string => {
     const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
-    let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
-
     const params = logRecord.args?.at(0);
-    if (params && typeof params === 'object') {
-      for (const [key, value] of Object.entries(params)) {
-        msg = msg.replace(`{${key}}`, `${value}`);
-      }
-    }
+    let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
+    msg = replaceParams(msg, params);
 
     if (logRecord.levelName === 'DEBUG') {
       msg = gray(msg);
@@ -62,9 +67,10 @@ const consoleHandler: ConsoleHandler = new ConsoleHandler(levelName, consoleHand
 
 const streamHandlerOptions: BaseHandlerOptions = {
   formatter: (logRecord: LogRecord): string => {
-    const msg: string = JSON.stringify({ ...logRecord }).replace(ansiEscapeCodePattern, '');
+    const msg: string = replaceParams(logRecord.msg, logRecord.args?.at(0));
+    const result: string = JSON.stringify({ ...logRecord, msg }).replace(ansiEscapeCodePattern, '');
 
-    return msg;
+    return result;
   },
 };
 

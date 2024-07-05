@@ -66,8 +66,9 @@ const consoleHandler: ConsoleHandler = new ConsoleHandler(levelName, consoleHand
 
 const streamHandlerOptions: BaseHandlerOptions = {
   formatter: (logRecord: LogRecord): string => {
+    const datetime: string = logRecord.datetime.toISOString();
     const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
-    const result: string = JSON.stringify({ ...logRecord, msg });
+    const result: string = JSON.stringify({ ...logRecord, datetime, msg });
 
     return result;
   },

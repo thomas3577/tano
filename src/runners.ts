@@ -180,7 +180,7 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 
   const status: Deno.CommandStatus = await process.status;
 
-  log.debug(`Run command completed with code '${status.code}'.`);
+  log.debug(`Run command completed with code '{code}'.`, status);
 };
 
 /**
@@ -214,7 +214,7 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
     }
   });
 
-  log.debug(`Execute condition completed with '${result}'.`);
+  log.debug(`Execute condition completed with '{result}'.`, { result });
 
   return result;
 };

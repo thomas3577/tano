@@ -187,8 +187,8 @@ export class Task implements TaskParams {
     if (skippedBySource) {
       this.#updateStatus('skipped');
       this.#log.warn('');
-      this.#log.warn(`Task {name} skipped by 'source'. No files have been changed since the last run.`, {
-        name: `'${gray(this.#name)}'`,
+      this.#log.warn(`Task '${gray('{name}')}' skipped by 'source'. No files have been changed since the last run.`, {
+        name: this.#name,
       });
 
       return;
@@ -198,8 +198,8 @@ export class Task implements TaskParams {
     if (skippedByCondition) {
       this.#updateStatus('skipped');
       this.#log.warn('');
-      this.#log.warn(`Task {name} skipped by condition. The conditions of this task were not matched.`, {
-        name: `'${gray(this.#name)}'`,
+      this.#log.warn(`Task '${gray('{name}')}' skipped by condition. The conditions of this task were not matched.`, {
+        name: this.#name,
       });
 
       return;
@@ -211,8 +211,8 @@ export class Task implements TaskParams {
       .catch((err) => {
         this.#updateStatus('failed', err);
 
-        this.#log.error(`${bold(red('Error'))} {name}: ${err}`, {
-          name: `'${gray(this.#name)}'`,
+        this.#log.error(`${bold(red('Error'))} '${gray('{name}')}': ${err}`, {
+          name: this.#name,
         });
 
         throw err;
@@ -231,8 +231,8 @@ export class Task implements TaskParams {
   }
 
   #preRun(): void {
-    this.#log.info(`Starting {name}...`, {
-      name: `'${gray(this.#name)}'`,
+    this.#log.info(`Starting '${gray('{name}')}'...`, {
+      name: this.#name,
     });
 
     this.#finished = null;
@@ -252,9 +252,9 @@ export class Task implements TaskParams {
 
     this.#measure = performance.measure(this.#name, `starting_${this.#name}`, `finished_${this.#name}`);
 
-    this.#log.info(`Finished {name} after {duration}`, {
-      name: `'${gray(this.#name)}'`,
-      duration: `${bold(green(format(this.#measure.duration, { ignoreZero: true })))}`,
+    this.#log.info(`Finished '${gray('{name}')}' after ${bold(green('{duration}'))} `, {
+      name: this.#name,
+      duration: format(this.#measure.duration, { ignoreZero: true }),
     });
 
     await this.#handler.changes?.update(this.#name, new Date(), this.#status, options?.source);

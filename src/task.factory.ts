@@ -70,8 +70,8 @@ export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?
 export const xtask: TaskDefinition = (param1: string | Task | TaskParams, _2?: NeedsOrExecutor, _3?: ExecutorOrOptions, _4?: Options): Task => {
   const log = logger();
   if (typeof param1 === 'object') {
-    return new Task(param1.name, null, () => log.warn(`The task '${param1.name}' is not executed because it is an 'xtask'.`));
+    return new Task(param1.name, null, () => log.warn(`The task '{name}' is not executed because it is an 'xtask'.`, { name: param1.name }));
   }
 
-  return new Task(param1, null, () => log.warn(`The task '${param1}' is not executed because it is an 'xtask'.`));
+  return new Task(param1, null, () => log.warn(`The task '{name}' is not executed because it is an 'xtask'.`, { name: param1 }));
 };

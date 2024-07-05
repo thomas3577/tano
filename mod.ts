@@ -9,7 +9,7 @@
  * task('default', needs('pre-task'), `echo '...two tasks.'`).run();
  * ```
  */
-export { task } from './src/task.factory.ts';
+export { task, xtask } from './src/task.factory.ts';
 
 /**
  * Just a wrapper to hold the `needs`. A function to define an ordered series of tasks that must be listed before the current task.

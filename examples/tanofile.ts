@@ -1,6 +1,6 @@
 import { Logger } from '@std/log';
 
-import { logger, needs, setup, task } from '../mod.ts';
+import { logger, needs, setup, task, xtask } from '../mod.ts';
 
 import { task07 } from './tanofile.task.ts';
 
@@ -51,6 +51,7 @@ task(
       args: ['--allow-write'],
       logThis: true,
     }),
+    xtask('My task 10', `pwsh -c echo 'Hello World from pwsh.'`),
   ),
   `pwsh -c echo 'The END!'`,
   {

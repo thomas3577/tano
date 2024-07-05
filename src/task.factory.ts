@@ -14,6 +14,7 @@
 import { Task } from './task.ts';
 import { isExecutor, isNeeds, toExecutor } from './utils.ts';
 import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, TaskDefinition, TaskParams } from './types.ts';
+import { logger } from './logger.ts';
 
 /**
  * Creates a new task.
@@ -54,4 +55,23 @@ export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?
   }
 
   return new Task(param1, needs, executor, options);
+};
+
+/**
+ * Creates a dummy task.
+ *
+ * @param {String | Task | TaskParams} param1
+ * @param {Needs | Command | Code} _2
+ * @param {Command | Code | Options} _3
+ * @param {Options} _4
+ *
+ * @returns {Task} The reference to the created task.
+ */
+export const xtask: TaskDefinition = (param1: string | Task | TaskParams, _2?: NeedsOrExecutor, _3?: ExecutorOrOptions, _4?: Options): Task => {
+  const log = logger();
+  if (typeof param1 === 'object') {
+    return new Task(param1.name, null, () => log.warn(`The task '${param1.name}' is not executed because it is an 'xtask'.`));
+  }
+
+  return new Task(param1, null, () => log.warn(`The task '${param1}' is not executed because it is an 'xtask'.`));
 };

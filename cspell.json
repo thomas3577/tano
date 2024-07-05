@@ -13,6 +13,7 @@
     "Kröner",
     "pwsh",
     "tano",
-    "tanofile"
+    "tanofile",
+    "xtask"
   ]
 }

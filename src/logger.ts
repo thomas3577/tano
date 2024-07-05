@@ -68,7 +68,8 @@ const streamHandlerOptions: BaseHandlerOptions = {
   formatter: (logRecord: LogRecord): string => {
     const datetime: string = logRecord.datetime.toISOString();
     const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
-    const result: string = JSON.stringify({ ...logRecord, datetime, msg });
+    const args = logRecord.args;
+    const result: string = JSON.stringify({ ...logRecord, datetime, msg, args });
 
     return result;
   },

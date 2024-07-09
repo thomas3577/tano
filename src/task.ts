@@ -14,7 +14,7 @@
 
 import { bold, gray, green, red } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
-import { Logger } from '@std/log';
+import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';

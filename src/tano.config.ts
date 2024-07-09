@@ -5,7 +5,7 @@
 
 import { parseArgs } from '@std/cli';
 import { join } from '@std/path';
-import { Logger } from '@std/log';
+import type { Logger } from '@std/log';
 import { getCwd, getImportUrl, toSnakeCase } from './utils.ts';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';

@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.4.20",
+  "version": "0.4.21",
   "exports": {
     ".": "./mod.ts",
     "./tano": "./tano.ts"
@@ -36,17 +36,6 @@
       "**/*.test.ts",
       "tanofile.ts"
     ]
-  },
-  "lint": {
-    "rules": {
-      "tags": [
-        "recommended"
-      ],
-      "include": [
-        "ban-untagged-todo",
-        "no-deprecated-deno-api"
-      ]
-    }
   },
   "fmt": {
     "useTabs": false,

@@ -1,7 +1,5 @@
-import { Logger } from '@std/log';
-
+import type { Logger } from '@std/log';
 import { logger, needs, setup, task, xtask } from '../mod.ts';
-
 import { task07 } from './tanofile.task.ts';
 
 setup({

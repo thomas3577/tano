@@ -4,7 +4,7 @@
  */
 
 import { bold } from '@std/fmt/colors';
-import { Logger } from '@std/log';
+import type { Logger } from '@std/log';
 import { logger } from './src/logger.ts';
 import { handler } from './src/handler.ts';
 import { parseTanoArgs } from './src/tano.config.ts';

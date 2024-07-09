@@ -1,4 +1,5 @@
-import { needs, Task, task } from '../mod.ts';
+import { needs, task } from '../mod.ts';
+import type { Task } from '../mod.ts';
 
 task('My task 06', `pwsh -c echo 'Task 06'`);
 

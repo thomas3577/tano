@@ -4,10 +4,10 @@
  */
 
 import { normalize, resolve } from '@std/path';
-import { globToRegExp, GlobToRegExpOptions } from '@std/path';
-import { normalizeGlob } from '@std/path';
-import { walk, WalkEntry } from '@std/fs/walk';
-import type { WalkOptions } from '@std/fs/walk';
+import type { GlobToRegExpOptions } from '@std/path';
+import { globToRegExp, normalizeGlob } from '@std/path';
+import { walk } from '@std/fs/walk';
+import type { WalkEntry, WalkOptions } from '@std/fs/walk';
 import type { GlobHashOptionsStrict, GlobHashSource } from './types.ts';
 
 /**

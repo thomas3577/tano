@@ -5,8 +5,8 @@
 
 import { format } from '@std/datetime/format';
 import { gray, white } from '@std/fmt/colors';
-import { BaseHandler, ConsoleHandler, FileHandler, getLogger, LevelName, LogConfig, Logger, LogRecord, setup } from '@std/log';
-import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions } from '@std/log';
+import { BaseHandler, ConsoleHandler, FileHandler, getLogger, setup } from '@std/log';
+import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
 import { consoleMock } from './console.ts';
 import type { LogHandler, LogStream } from './types.ts';
 

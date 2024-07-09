@@ -5,9 +5,9 @@
 
 import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
-import { Logger } from '@std/log';
+import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
-import { Task } from './task.ts';
+import type { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
 import type { IChanges, TanoHandler, TaskRunData, TaskRunOptions } from './types.ts';

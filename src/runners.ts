@@ -3,7 +3,7 @@
  * @module
  */
 
-import { Logger } from '@std/log';
+import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ICommandOptions, ProcessError } from './types.ts';
 

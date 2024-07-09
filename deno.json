@@ -10,9 +10,6 @@
     "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",
     "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --no-cache=true --file ./tanofile.ts"
   },
-  "compilerOptions": {
-    "strict": true
-  },
   "imports": {
     "@std/path": "jsr:@std/path@0.225",
     "@std/fs": "jsr:@std/fs@0.229",
@@ -46,7 +43,6 @@
     "exclude": [
       ".vscode/**",
       ".tano/**",
-      "coverage/**",
       "cspell.json"
     ]
   }

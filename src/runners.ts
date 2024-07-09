@@ -101,7 +101,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
  * @returns {Promise<number>}
  */
 export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
-  const logThis = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
+  const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
   const log: Logger = logger();
 
   log.debug('Run command...');

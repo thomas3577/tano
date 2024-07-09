@@ -5,7 +5,7 @@
 
 import { Logger } from '@std/log';
 import { logger } from './logger.ts';
-import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ProcessError } from './types.ts';
+import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ICommandOptions, ProcessError } from './types.ts';
 
 const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
   try {
@@ -50,7 +50,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
       const funcAsString: string = code.toString();
       const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
-      await runCommand(command, options);
+      await runCommand(command, options as ICommandOptions);
     } else {
       log.debug('Run code function.');
 
@@ -74,7 +74,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
           }
 
           if (typeof options?.output === 'function') {
-            options?.output(err, undefined);
+            options?.output(err);
           }
 
           throw err;
@@ -86,7 +86,7 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: Command = ['deno', 'run', ...(options?.args || []), file];
 
-    await runCommand(command, options);
+    await runCommand(command, options as ICommandOptions);
   }
 
   log.debug('Run code completed.');

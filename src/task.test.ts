@@ -18,7 +18,7 @@ describe(Task.name, () => {
   });
 
   it(`Should run the command line.`, async () => {
-    const needs: any[] = [];
+    const needs: string[] = [];
 
     const actual: Task = new Task('task-test-02', needs, `pwsh -c echo 'Runs my task'`);
 
@@ -33,7 +33,7 @@ describe(Task.name, () => {
 
   it(`Should run the function. (1)`, async () => {
     const func = () => {/* do nothing */};
-    const needs: any[] = [];
+    const needs: string[] = [];
 
     const actual: Task = new Task('task-test-03', needs, func);
 
@@ -48,7 +48,7 @@ describe(Task.name, () => {
 
   it(`Should run the function. (2)`, async () => {
     const func = () => Promise.resolve('my output');
-    const needs: any[] = [];
+    const needs: string[] = [];
 
     await new Promise((resolve) => {
       const options: Options = {
@@ -70,7 +70,7 @@ describe(Task.name, () => {
 
   it(`Should not run if conditions false. (1)`, async () => {
     const func = () => {/* do nothing */};
-    const needs: any[] = [];
+    const needs: string[] = [];
     const options: Options = {
       condition: 1 + 2 === 4,
     };
@@ -88,7 +88,7 @@ describe(Task.name, () => {
 
   it(`Should not run if conditions false. (2)`, async () => {
     const func = () => {/* do nothing */};
-    const needs: any[] = [];
+    const needs: string[] = [];
     const options: Options = {
       condition: () => false,
     };
@@ -106,9 +106,9 @@ describe(Task.name, () => {
 
   it(`Should not run if conditions false. (3)`, async () => {
     const func = () => {/* do nothing */};
-    const needs: any[] = [];
+    const needs: string[] = [];
     const options: Options = {
-      condition: (done: any) => setTimeout(() => done(false), 100),
+      condition: (done) => setTimeout(() => done(false), 100),
     };
 
     const actual: Task = new Task('task-test-07', needs, func, options);
@@ -124,7 +124,7 @@ describe(Task.name, () => {
 
   it(`Should not run if conditions false. (4)`, async () => {
     const func = () => {/* do nothing */};
-    const needs: any[] = [];
+    const needs: string[] = [];
     const options: Options = {
       condition: async () => {
         return await Promise.resolve(false);
@@ -144,7 +144,7 @@ describe(Task.name, () => {
 
   it(`Should not run if conditions false. (5)`, async () => {
     const func = () => {/* do nothing */};
-    const needs: any[] = [];
+    const needs: string[] = [];
     const options: Options = {
       condition: () => {
         return Promise.resolve(false);

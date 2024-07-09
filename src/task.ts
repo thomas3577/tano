@@ -19,7 +19,7 @@ import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
-import type { Command, Executor, Options, TanoHandler, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
+import type { Command, Executor, ICommandOptions, Options, TanoHandler, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
 
 /**
  * A class to create a Task.
@@ -265,7 +265,7 @@ export class Task implements TaskParams {
   async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {
     switch (type) {
       case 'command':
-        await runCommand(toCommand(executor), options);
+        await runCommand(toCommand(executor), options as ICommandOptions);
         break;
       case 'code':
         await runCode(toCode(executor), options);

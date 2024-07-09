@@ -45,10 +45,6 @@
       "include": [
         "ban-untagged-todo",
         "no-deprecated-deno-api"
-      ],
-      "exclude": [
-        "no-explicit-any",
-        "no-inferrable-types"
       ]
     }
   },

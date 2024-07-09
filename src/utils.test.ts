@@ -114,7 +114,7 @@ describe(isCommand.name, () => {
 
   it(`isCommand(null)`, () => {
     const param = null;
-    const actual = isCommand(param as unknown as any);
+    const actual = isCommand(param);
 
     assertEquals(actual, false);
   });
@@ -128,7 +128,7 @@ describe(isCommand.name, () => {
 
   it(`isCommand('')`, () => {
     const param = '';
-    const actual = isCommand(param as any);
+    const actual = isCommand(param);
 
     assertEquals(actual, true);
   });
@@ -142,14 +142,14 @@ describe(isCommand.name, () => {
 
   it(`isCommand([''])`, () => {
     const param = [''];
-    const actual = isCommand(param as any);
+    const actual = isCommand(param);
 
     assertEquals(actual, true);
   });
 
   it(`isCommand(['my', 'command'])`, () => {
     const param = ['my', 'command'];
-    const actual = isCommand(param as any);
+    const actual = isCommand(param);
 
     assertEquals(actual, true);
   });
@@ -165,14 +165,14 @@ describe(isCode.name, () => {
 
   it(`isCode(null)`, () => {
     const param = null;
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
 
   it(`isCode('')`, () => {
     const param = '';
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
@@ -186,7 +186,7 @@ describe(isCode.name, () => {
 
   it(`isCode(true)`, () => {
     const param = true;
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
@@ -200,70 +200,70 @@ describe(isCode.name, () => {
 
   it(`isCode({})`, () => {
     const param = {};
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
 
   it(`isCode({ file: undefined })`, () => {
     const param = { file: undefined };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
 
   it(`isCode({ file: null })`, () => {
     const param = { file: null };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
 
   it(`isCode({ file: 'my-file.js' })`, () => {
     const param = { file: 'my-file.js' };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, true);
   });
 
   it(`isCode({ file: new URL('https://www.contoso.com/my-file.js') })`, () => {
     const param = { file: new URL('https://www.contoso.com/my-file.js') };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, true);
   });
 
   it(`isCode({ file: './my-file.ts' })`, () => {
     const param = { file: './my-file.ts' };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, true);
   });
 
   it(`isCode({ file: new URL('https://www.contoso.com/my-file.ts') })`, () => {
     const param = { file: new URL('https://www.contoso.com/my-file.ts') };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, true);
   });
 
   it(`isCode({ file: 'my-file.exe' })`, () => {
     const param = { file: 'my-file.exe' };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
 
   it(`isCode({ file: new URL('https://www.contoso.com/my-file.exe') })`, () => {
     const param = { file: new URL('https://www.contoso.com/my-file.exe') };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, false);
   });
 
   it(`isCode({ file: new URL('file://test.ts') })`, () => {
     const param = { file: new URL('file://var/test.ts') };
-    const actual = isCode(param as unknown as any);
+    const actual = isCode(param);
 
     assertEquals(actual, true);
   });

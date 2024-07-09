@@ -3,7 +3,7 @@
  * @module
  */
 
-// deno-lint-ignore-file no-unused-vars
+// deno-lint-ignore-file no-unused-vars no-explicit-any
 export const consoleMock: Console = {
   assert(condition?: boolean | undefined, ...data: any[]): void {},
   clear(): void {},

@@ -109,6 +109,12 @@ task('conditions-06', () => {}, {
   },
 });
 
+task('conditions-07', `pwsh -c echo 'BEEP'`, {
+  condition: () => {
+    return true;
+  },
+});
+
 task(
   'few',
   needs(

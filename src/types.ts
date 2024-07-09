@@ -394,42 +394,81 @@ export type CodeFile = {
 /**
  * A simple condition.
  *
- * @example
- * 1 === 1;
+ * @example If condition returns false, the task is skipped.
+ * ```ts
+ * task('myTask', `pwsh -c echo 'BEEP'`, {
+ *   condition: 1 + 2 === 3
+ * });
+ * ```
  */
 export type ConditionType1 = boolean;
 
 /**
  * A function which returns a boolean or a promise of type boolean.
  *
- * @example
- * () => 1 === 1;
+ * @example If condition returns false, the task is skipped.
+ * ```ts
+ * task('myTask', `pwsh -c echo 'BEEP'`, {
+ *   condition: () => 1 + 1 === 3
+ * });
+ * ```
  *
- * @example
- * () => Promise.resolve(1 === 1);
+ * @example with promise
+ * ```ts
+ * task('myTask', `pwsh -c echo 'BEEP'`, {
+ *   condition: () => Promise.resolve(1 === 1)
+ * });
+ * ```
  */
 export type ConditionType2 = () => boolean | Promise<boolean>;
 
 /**
  * A function with a callback function which returns a boolean.
  *
- * @example
- * (done) => done(1 === 1);
+ * @example with don-callback-function
+ * ```ts
+ * task('myTask', `pwsh -c echo 'BEEP'`, {
+ *   condition: (done) => done(1 === 1)
+ * });
+ * ```
  */
 export type ConditionType3 = (done: (result: boolean) => void) => void;
 
 /**
  * Type of all possible condition types.
+ *
+ * @example If condition returns false, the task is skipped.
+ * ```ts
+ * task('myTask', `pwsh -c echo 'BEEP'`, {
+ *   condition: 1 + 2 === 3
+ * });
+ * ```
  */
 export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
 
 /**
  * Defines a function which has a done-callback function.
+ *
+ * @example Calls a function with a done-callback function.
+ * ```ts
+ * task('myTask', (done) => {
+ *   setTimeout(() => {
+ *     done(true);
+ *   }, 250);
+ * });
+ * ```
  */
 export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
 
 /**
  * Defines a function that does not have a done callback function.
+ *
+ * @example Calls a function.
+ * ```ts
+ * task('myTask', () => {
+ *   console.log('Hello World!');
+ * });
+ * ```
  */
 export type CodeFunctionWithoutDone = <T>() => void | T | Promise<void | T>;
 
@@ -484,10 +523,13 @@ export type NeedsOrExecutor = string | Needs | Executor;
 export type TaskDefinition = {
   (task: Task): Task;
   (task: TaskParams): Task;
+  (name: string, needs?: string): Task;
   (name: string, needs?: Needs): Task;
   (name: string, command?: Command, options?: CommandOptions): Task;
+  (name: string, needs?: string, command?: Command, options?: CommandOptions): Task;
   (name: string, needs?: Needs, command?: Command, options?: CommandOptions): Task;
   (name: string, code?: Code, options?: CodeOptions): Task;
+  (name: string, needs?: string, code?: Code, options?: CodeOptions): Task;
   (name: string, needs?: Needs, code?: Code, options?: CodeOptions): Task;
 };
 
@@ -541,7 +583,7 @@ export interface TanoHandler {
    * @param {String} taskName - [optionalParam='default'] Name of the task.
    * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
-   * @returns {Promise<void>} A promise that resolves to void.
+   * @returns {Promise<void>} - A promise that resolves to void.
    */
   run(taskName?: string, options?: TaskRunOptions): Promise<void>;
 
@@ -559,7 +601,7 @@ export interface TanoHandler {
    * Gets a list of all tasks to be executed in the correct order.
    *
    * @param {string} taskName - Name of the entry task.
-   * @param taskNames
+   *
    * @returns {Array<string>} - List of the names of all executed tasks
    */
   getPlan(taskName: string): Array<string>;

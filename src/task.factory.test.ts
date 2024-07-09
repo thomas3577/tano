@@ -300,16 +300,16 @@ describe(task.name, () => {
 
     it(`Should gets an output`, async () => {
       await task('my-task-103', `pwsh -c echo 'First Task'`, {
-        output: (err: unknown, output: string): void => {
+        output: (err: unknown, output?: unknown | string | object): void => {
           assertEquals(err, undefined);
-          assertEquals(output?.includes('First Task'), true);
+          assertEquals((output as string)?.includes('First Task'), true);
         },
       }).run();
     });
 
     it(`Should gets an error output`, async () => {
       const myTask = task('my-task-104', `unknown-command`, {
-        output: (err: unknown, output: string): void => {
+        output: (err, output): void => {
           assertNotEquals(err, undefined);
           assertEquals(output, undefined);
         },

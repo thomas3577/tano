@@ -297,7 +297,7 @@ export interface ITaskOptions extends Deno.CommandOptions {
    * @remarks
    * Unstable! The output property will probably change again.
    */
-  output?: (err: unknown, output: any) => void;
+  output?: (err: unknown, output?: unknown | string | object) => void;
 
   /**
    * If `true`, the output of the task will be logged.
@@ -338,7 +338,7 @@ export interface ICommandOptions extends TaskOptions {
   /**
    * Note! Currently there are no command specific properties.
    */
-  [key: string]: any;
+  [key: string]: boolean | number | string | object | undefined;
 }
 
 /**
@@ -466,7 +466,7 @@ export type Options = CodeOptions | CommandOptions;
 /**
  * Defines the executor.
  */
-export type Executor = Command | Code;
+export type Executor = Command | Code | unknown;
 
 /**
  * Defines a parameter, which can be an option object or an executor object.
@@ -476,7 +476,7 @@ export type ExecutorOrOptions = Executor | Options;
 /**
  * Defines a parameter, which can be an needs object or an executor object.
  */
-export type NeedsOrExecutor = Needs | Executor;
+export type NeedsOrExecutor = string | Needs | Executor;
 
 /**
  * Variants of possible sets of parameters.

@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf, assertNotEquals } from '@std/assert';
+import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { Logger, LogLevels, LogRecord } from '@std/log';
 import { logger, logStream } from './logger.ts';

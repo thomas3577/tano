@@ -35,9 +35,9 @@ import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, Needs
  * const result = isNeeds(value); // true
  * ```
  *
- * @param {Object} param - A object to check.
+ * @param {object} param - A object to check.
  *
- * @returns {Boolean} if `true` the object is of type `Needs`.
+ * @returns {boolean} if `true` the object is of type `Needs`.
  */
 export const isNeeds = (param?: NeedsOrExecutor): boolean => {
   return typeof param === 'object' && !(param as CodeFile)?.file && Array.isArray((param as Needs)?.values);
@@ -93,9 +93,9 @@ export const isNeeds = (param?: NeedsOrExecutor): boolean => {
  * const result = isExecutor(value); // true
  * ```
  *
- * @param {Object} param - A object to check.
+ * @param {object} param - A object to check.
  *
- * @returns {Boolean} if `true` the object is of type `Executor`.
+ * @returns {boolean} if `true` the object is of type `Executor`.
  */
 export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean => {
   return isCommand(param as Executor) || isCode(param as Executor);
@@ -118,9 +118,9 @@ export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean
  * const result = isCommand(value); // true
  * ```
  *
- * @param {Object} param - A object to check.
+ * @param {object} param - A object to check.
  *
- * @returns {Boolean} if `true` the object is of type `Command`.
+ * @returns {boolean} if `true` the object is of type `Command`.
  */
 export const isCommand = (param?: Executor): boolean => {
   return typeof param === 'string' || (typeof param === 'object' && Array.isArray(param));
@@ -162,9 +162,9 @@ export const isCommand = (param?: Executor): boolean => {
  * const result = isCode(value); // true
  * ```
  *
- * @param {Object} param - A object to check.
+ * @param {object} param - A object to check.
  *
- * @returns {Boolean} if `true` the object is of type `Code`.
+ * @returns {boolean} if `true` the object is of type `Code`.
  */
 export const isCode = (param?: Executor): boolean => {
   return !!param && (isCodeFile(param as CodeFile) || typeof param === 'function');
@@ -187,9 +187,9 @@ export const isCode = (param?: Executor): boolean => {
  * const result = isCodeFile(value); // true
  * ```
  *
- * @param {Object} param - A object to check.
+ * @param {object} param - A object to check.
  *
- * @returns {Boolean} if `true` the object is of type `CodeFile`.
+ * @returns {boolean} if `true` the object is of type `CodeFile`.
  */
 export const isCodeFile = (param: CodeFile): boolean => {
   const regex = new RegExp(/\.(js|ts)$/);
@@ -202,9 +202,9 @@ export const isCodeFile = (param: CodeFile): boolean => {
 /**
  * Just a converter that converts Objects of type NeedsOrExecutor or ExecutorOrOptions to Executor.
  *
- * @param {Object} param - A object to convert.
+ * @param {object} param - A object to convert.
  *
- * @returns {Object} An object of type Executor.
+ * @returns {object} An object of type Executor.
  */
 export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
   return (isExecutor(param) ? param : undefined as unknown) as Executor;
@@ -213,9 +213,9 @@ export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executo
 /**
  * Just a converter that converts Objects of type Executor to Command.
  *
- * @param {Object} param - A object to convert.
+ * @param {object} param - A object to convert.
  *
- * @returns {Object} An object of type Command.
+ * @returns {object} An object of type Command.
  */
 export const toCommand = (param?: Executor): Command => {
   return (isCommand(param) ? param : undefined as unknown) as Command;
@@ -224,9 +224,9 @@ export const toCommand = (param?: Executor): Command => {
 /**
  * Just a converter that converts Objects of type Executor to Code.
  *
- * @param {Object} param - A object to convert.
+ * @param {object} param - A object to convert.
  *
- * @returns {Object} An object of type Code.
+ * @returns {object} An object of type Code.
  */
 export const toCode = (param?: Executor): Code => {
   return (isCode(param) ? param : undefined as unknown) as Code;

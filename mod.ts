@@ -6,4 +6,4 @@ export { handler } from './src/handler.ts';
 export { Task } from './src/task.ts';
 export { logger, logStream } from './src/logger.ts';
 export { setup } from './src/tano.config.ts';
-export type { Code, CodeFile, CodeFunction, CodeOptions, Command, CommandOptions, Condition, GlobHashSource, LogHandler, LogStream, Needs, TanoConfig, TanoHandler, TaskParams, TaskStatus } from './src/types.ts';
+export type { Code, CodeFile, CodeFunction, CodeOptions, Command, CommandOptions, Condition, Executor, ExecutorOrOptions, GlobHashSource, LogHandler, LogStream, Needs, NeedsOrExecutor, Options, TanoConfig, TanoHandler, TaskDefinition, TaskParams, TaskRunOptions, TaskStatus } from './src/types.ts';

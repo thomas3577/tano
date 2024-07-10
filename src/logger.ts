@@ -19,18 +19,6 @@ const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDec
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
 const levelName: LevelName = 'DEBUG';
 
-/**
- * A readable stream of the log.
- */
-const logStream: LogStream = {
-  /**
-   * The readable stream of the log.
-   */
-  get readable(): ReadableStream<string> {
-    return readable;
-  },
-};
-
 class StreamHandler extends BaseHandler {
   async handle(logRecord: LogRecord): Promise<void> {
     const chunk = this.format(logRecord);
@@ -87,6 +75,18 @@ const fileHandlerOptions: FileHandlerOptions = {
 const fileHandler = new FileHandler(levelName, fileHandlerOptions);
 
 /**
+ * A readable stream of the log.
+ */
+export const logStream: LogStream = {
+  /**
+   * The readable stream of the log.
+   */
+  get readable(): ReadableStream<string> {
+    return readable;
+  },
+};
+
+/**
  * Creates an instance of a logger.
  *
  * @example Creates a new task and runs it.
@@ -100,7 +100,7 @@ const fileHandler = new FileHandler(levelName, fileHandlerOptions);
  *
  * @returns {Logger}
  */
-const logger = (): Logger => {
+export const logger = (): Logger => {
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
   const level: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
   const handlers: LogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as LogHandler[] || ['console'] as LogHandler[];
@@ -138,7 +138,3 @@ const logger = (): Logger => {
 
   return getLogger();
 };
-
-export type { LogHandler, LogStream };
-
-export { logger, logStream };

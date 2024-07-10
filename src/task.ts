@@ -179,7 +179,7 @@ export class Task implements TaskParams {
   /**
    * Executes only this task (without the dependencies).
    *
-   * @param {Boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
+   * @param {boolean} force - [optionalParam=false] If `true`, the task will be executed even if the task is to be skipped by `source`.
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */

@@ -44,7 +44,15 @@ const setEnv = (config: TanoConfig, setBy?: EnvSetBy): void => {
  * Sets up the environment variables for the CLI.
  *
  * @param {TanoConfig} config The tano configuration.
- * @param {boolean} [override] Whether to override the existing environment variables.
+ *
+ * @example Set config in your `tanofile.ts`:
+ * ```ts
+ * import { setup } from 'jsr:@dx/tano';
+ *
+ * setup({
+ *   logLevel: 'DEBUG',
+ * });
+ * ```
  */
 export const setup = (config: TanoConfig): void => {
   setEnv(config, 'setup');

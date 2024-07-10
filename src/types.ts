@@ -399,6 +399,8 @@ export type CodeFile = {
  *
  * @example If condition returns false, the task is skipped.
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', `pwsh -c echo 'BEEP'`, {
  *   condition: 1 + 2 === 3
  * });
@@ -411,6 +413,8 @@ export type ConditionType1 = boolean;
  *
  * @example If condition returns false, the task is skipped.
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', `pwsh -c echo 'BEEP'`, {
  *   condition: () => 1 + 1 === 3
  * });
@@ -418,6 +422,8 @@ export type ConditionType1 = boolean;
  *
  * @example with promise
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', `pwsh -c echo 'BEEP'`, {
  *   condition: () => Promise.resolve(1 === 1)
  * });
@@ -430,6 +436,8 @@ export type ConditionType2 = () => boolean | Promise<boolean>;
  *
  * @example with don-callback-function
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', `pwsh -c echo 'BEEP'`, {
  *   condition: (done) => done(1 === 1)
  * });
@@ -442,6 +450,8 @@ export type ConditionType3 = (done: (result: boolean) => void) => void;
  *
  * @example If condition returns false, the task is skipped.
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', `pwsh -c echo 'BEEP'`, {
  *   condition: 1 + 2 === 3
  * });
@@ -454,6 +464,8 @@ export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
  *
  * @example Calls a function with a done-callback function.
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', (done) => {
  *   setTimeout(() => {
  *     done(true);
@@ -468,6 +480,8 @@ export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
  *
  * @example Calls a function.
  * ```ts
+ * import { task } from 'jsr:@dx/tano';
+ *
  * task('myTask', () => {
  *   console.log('Hello World!');
  * });

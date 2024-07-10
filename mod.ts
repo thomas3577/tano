@@ -35,7 +35,7 @@ export { handler } from './src/handler.ts';
  *
  * @example Creates a new task and runs it.
  * ```ts
- * import { Task } from '../src/task.ts';
+ * import { Task } from 'jsr:@dx/tano';
  *
  * const task = new Task('my-task', null, () => console.log('Hello World!'));
  *

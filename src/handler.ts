@@ -111,7 +111,7 @@ class Handler implements TanoHandler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
-   * @param {String} taskName - [optionalParam='default'] Name of the task.
+   * @param {string} taskName - [optionalParam='default'] Name of the task.
    * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} A promise that resolves to void.
@@ -165,7 +165,7 @@ class Handler implements TanoHandler {
    * Gets a list of all tasks to be executed in the correct order.
    *
    * @param {string} taskName - Name of the entry task.
-   * @param taskNames
+   *
    * @returns {Array<string>} - List of the names of all executed tasks
    */
   getPlan(taskName: string): Array<string> {
@@ -185,7 +185,7 @@ class Handler implements TanoHandler {
    * The event is triggered when a task changes its state.
    * The event detail contains the task name and the new state.
    *
-   * @param fn - The event listener to add.
+   * @param {EventListenerOrEventListenerObject} fn - The event listener to add.
    */
   onChanged(fn: EventListenerOrEventListenerObject): void {
     this.#eventTarget.addEventListener('changed', fn);
@@ -194,7 +194,7 @@ class Handler implements TanoHandler {
   /**
    * Removes an event listener for the `changed` event.
    *
-   * @param fn - The event listener to remove.
+   * @param {EventListenerOrEventListenerObject} fn - The event listener to remove.
    */
   offChanged(fn: EventListenerOrEventListenerObject): void {
     this.#eventTarget.removeEventListener('changed', fn);
@@ -280,6 +280,13 @@ class Handler implements TanoHandler {
 }
 
 /**
- * Instance of Handler.
+ * An initial instance of the handler to run the tasks.
+ *
+ * @example Runs the task handler.
+ * ```ts
+ * import { handler } from 'jsr:@dx/tano';
+ *
+ * handler();
+ * ```
  */
 export const handler: TanoHandler = new Handler();

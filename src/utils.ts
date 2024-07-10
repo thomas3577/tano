@@ -234,7 +234,7 @@ export const toCode = (param?: Executor): Code => {
 
 /**
  * Gets a valid import url.
- * @param {String} fileOrUrl - A path or URL to a tanofile.
+ * @param {string} fileOrUrl - A path or URL to a tanofile.
  *
  * @returns A valid import url.
  */
@@ -265,9 +265,9 @@ export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
 /**
  * Gets the current working directory depens on the import url.
  *
- * @param {String} importUrl - A valid import url.
+ * @param {string} importUrl - A valid import url.
  *
- * @returns {String} The CWD.
+ * @returns {string} The CWD.
  */
 export const getCwd = (importUrl?: string): string => {
   if (!importUrl?.startsWith('file:')) {
@@ -283,9 +283,9 @@ export const getCwd = (importUrl?: string): string => {
 /**
  * Converts a string to snake case.
  *
- * @param {String} value - The string to convert.
+ * @param {string} value - The string to convert.
  *
- * @returns {String | undefined} The converted string.
+ * @returns {string | undefined} The converted string.
  */
 export const toSnakeCase = (value: string): string | undefined => {
   const words = value.match(/[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)/g);

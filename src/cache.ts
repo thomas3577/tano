@@ -14,7 +14,7 @@ import type { TanoRunData, TaskRunData } from './types.ts';
 /**
  * Creates the directory to the tano cache.
  *
- * @param {String} dir - The directory in which the database is located.
+ * @param {string} dir - The directory in which the database is located.
  *
  * @returns {Promise<void>}
  */
@@ -23,9 +23,9 @@ const createDir = async (dir: string): Promise<void> => await Deno.mkdir(dir, { 
 /**
  * Converts a KvKey in a Taskname.
  *
- * @param key {Deno.KvKey} - The key from which the task name is to be taken.
+ * @param {Deno.KvKey} key - The key from which the task name is to be taken.
  *
- * @returns  {String} - The Taskname
+ * @returns {string} - The Taskname
  */
 const toTaskName = (key: Deno.KvKey): undefined | string => key.at(1) as string;
 
@@ -55,7 +55,7 @@ export class TanoCache {
   /**
    * The path where the database is stored.
    *
-   * @returns {String} The database path.
+   * @returns {string} The database path.
    */
   get path(): string {
     return this.#path;

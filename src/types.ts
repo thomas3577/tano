@@ -597,7 +597,7 @@ export interface TanoHandler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
-   * @param {String} taskName - [optionalParam='default'] Name of the task.
+   * @param {string} taskName - [optionalParam='default'] Name of the task.
    * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} - A promise that resolves to void.

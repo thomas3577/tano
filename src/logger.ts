@@ -89,6 +89,15 @@ const fileHandler = new FileHandler(levelName, fileHandlerOptions);
 /**
  * Creates an instance of a logger.
  *
+ * @example Creates a new task and runs it.
+ * ```ts
+ * import { logger } from 'jsr:@dx/tano';
+ *
+ * const log = logger();
+ *
+ * log.info('Hello World!');
+ * ```
+ *
  * @returns {Logger}
  */
 const logger = (): Logger => {

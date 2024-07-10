@@ -25,6 +25,15 @@ import type { Command, Executor, ICommandOptions, Options, TanoHandler, TaskPara
 
 /**
  * A class to create a Task.
+ *
+ * @example Creates a new task and runs it.
+ * ```ts
+ * import { Task } from 'jsr:@dx/tano';
+ *
+ * const task = new Task('my-task', null, () => console.log('Hello World!'));
+ *
+ * await task.runThis();
+ * ```
  */
 export class Task implements TaskParams {
   readonly #log: Logger = logger();

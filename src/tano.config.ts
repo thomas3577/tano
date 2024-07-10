@@ -41,9 +41,9 @@ const setEnv = (config: TanoConfig, setBy?: EnvSetBy): void => {
 };
 
 /**
- * Sets up the environment variables for the CLI.
+ * Possibility to setup the tano configuration. Just add to your `tanofile.ts`.
  *
- * @param {TanoConfig} config The tano configuration.
+ * @param {TanoConfig} config - The tano configuration.
  *
  * @example Set config in your `tanofile.ts`:
  * ```ts

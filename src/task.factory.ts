@@ -21,12 +21,20 @@ import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, Task
 /**
  * Creates a new task.
  *
- * @param {String | Task | TaskParams} param1
+ * @example Creates a default task which requires another task:
+ * ```ts
+ * import { needs, task } from 'jsr:@dx/tano';
+ *
+ * task('pre-task', `echo 'These were ...'`);
+ * task('default', needs('pre-task'), `echo '...two tasks.'`).run();
+ * ```
+ *
+ * @param {string | Task | TaskParams} param1
  * @param {Needs | Command | Code} param2
  * @param {Command | Code | Options} param3
  * @param {Options} param4
  *
- * @returns {Task} The reference to the created task.
+ * @returns {Task} - The reference to the created task.
  */
 export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?: NeedsOrExecutor, param3?: ExecutorOrOptions, param4?: Options): Task => {
   if (param1 instanceof Task) {
@@ -62,12 +70,20 @@ export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?
 /**
  * Creates a dummy task.
  *
- * @param {String | Task | TaskParams} param1
+ * @example The task `task01` is skipped:
+ * ```ts
+ * import { needs, task, xtask } from 'jsr:@dx/tano';
+ *
+ * xtask('task01', `echo 'I will be skipped'`);
+ * task('default', needs('task01'), `echo 'Just one tasks.'`).run();
+ * ```
+ *
+ * @param {string | Task | TaskParams} param1
  * @param {Needs | Command | Code} _2
  * @param {Command | Code | Options} _3
  * @param {Options} _4
  *
- * @returns {Task} The reference to the created task.
+ * @returns {Task} - The reference to the created task.
  */
 export const xtask: TaskDefinition = (param1: string | Task | TaskParams, _2?: NeedsOrExecutor, _3?: ExecutorOrOptions, _4?: Options): Task => {
   const log = logger();

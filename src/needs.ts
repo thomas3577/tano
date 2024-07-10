@@ -1,5 +1,6 @@
 /**
  * The Module container only the needs helper function.
+ *
  * @module
  */
 

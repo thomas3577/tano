@@ -1,6 +1,4 @@
 /**
- * @module
- *
  * This module contains the task function to create new tasks.
  *
  * ```ts
@@ -9,6 +7,8 @@
  * task('pre-task', `echo 'These were ...'`);
  * task('default', needs('pre-task'), `echo '...two tasks.'`).run();
  * ```
+ *
+ * @module
  */
 
 import { Task } from './task.ts';

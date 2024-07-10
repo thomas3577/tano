@@ -1,5 +1,6 @@
 /**
  * This module contains the logger function to create a new logger.
+ *
  * @module
  */
 

@@ -1,5 +1,6 @@
 /**
  * This is the initial module to start the Tano CLI.
+ *
  * @module
  */
 

@@ -1,6 +1,4 @@
 /**
- * @module
- *
  * This module contains the Task class.
  *
  * ```ts
@@ -10,6 +8,8 @@
  *
  * await task.runThis();
  * ```
+ *
+ * @module
  */
 
 import { bold, gray, green, red } from '@std/fmt/colors';

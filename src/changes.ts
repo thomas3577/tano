@@ -1,5 +1,6 @@
 /**
  * This module provides a class to determine if there are file changes in the glob area.
+ *
  * @module
  */
 

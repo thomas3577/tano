@@ -1,5 +1,6 @@
 /**
  * Just a mock for the console object.
+ *
  * @module
  */
 

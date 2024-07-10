@@ -1,5 +1,6 @@
 /**
  * This module provides the task handler class and an initial instance.
+ *
  * @module
  */
 

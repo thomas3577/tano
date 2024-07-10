@@ -1,8 +1,8 @@
 /**
- * @module
- *
  * Experimental cache to keep the hash of all affected files of a task.
  * This allows a decision to be made at the next run as to whether a task needs to be executed again or not.
+ *
+ * @module
  */
 
 import { format, join } from '@std/path';

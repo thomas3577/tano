@@ -1,5 +1,6 @@
 /**
  * This module contains functions for type checks, type conversions and other helpers.
+ *
  * @module
  */
 

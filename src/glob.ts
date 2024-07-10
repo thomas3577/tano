@@ -1,5 +1,6 @@
 /**
  * This module contains a function to compute a hash by glob.
+ *
  * @module
  */
 

@@ -1,5 +1,6 @@
 /**
  * This module contains types.
+ *
  * @module
  */
 

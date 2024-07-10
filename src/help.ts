@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 /**
  * This module provides the help message for the CLI.
  *

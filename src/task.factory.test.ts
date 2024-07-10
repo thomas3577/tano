@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 import { assertEquals, assertNotEquals } from '@std/assert';
 import { afterAll, afterEach, describe, it } from '@std/testing/bdd';
 import { task } from './task.factory.ts';

@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 import type { Logger } from '@std/log';
 import { logger, needs, setup, task, xtask } from '../mod.ts';
 import { task07 } from './tanofile.task.ts';

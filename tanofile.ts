@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 import { needs, task } from './mod.ts';
 
 task('fmt', 'deno fmt --check');

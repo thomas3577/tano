@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 import { assertEquals, assertInstanceOf, assertNotEquals } from '@std/assert';
 import { afterEach, describe, it } from '@std/testing/bdd';
 import { handler } from './handler.ts';

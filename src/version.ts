@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 /**
  * This Module is used to get the version of the tano app.
  *

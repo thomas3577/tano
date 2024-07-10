@@ -1,3 +1,5 @@
+// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+
 /**
  * This module contains the Task class.
  *
@@ -41,7 +43,7 @@ export class Task implements TaskParams {
   #measure: null | PerformanceMeasure = null;
 
   /**
-   * Creates a new instance ot Task.
+   * Creates a new instance of a Task.
    *
    * @param {string | TaskParams} nameOrTask - The name or an object which provides all task parameters.
    * @param {Array<string>} needs - Defines the dependencies which should be executed before this task.

@@ -56,8 +56,3 @@ tano my-task
 ```bash
 tano --help
 ```
-
-## Documentation
-
-- [api](./docs/api.md)
-- [examples](./docs/examples.md)

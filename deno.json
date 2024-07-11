@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.4.25",
+  "version": "0.4.26",
   "exports": {
     ".": "./mod.ts",
     "./tano": "./tano.ts"
@@ -25,6 +25,7 @@
     "exclude": [
       ".github",
       ".vscode",
+      "docs",
       "examples",
       ".gitignore",
       ".editorconfig",

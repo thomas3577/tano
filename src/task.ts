@@ -44,7 +44,7 @@ export class Task implements TaskParams {
   readonly #executor: Executor;
   readonly #options: Options;
   readonly #type: TaskType = undefined;
-  readonly #eventTarget = new EventTarget();
+  readonly #eventTarget: EventTarget = new EventTarget();
 
   #status: TaskStatus = 'ready';
   #starting: null | PerformanceMark = null;

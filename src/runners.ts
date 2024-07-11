@@ -41,7 +41,7 @@ const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProce
  * @returns {Promise<void>}
  */
 export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
-  const logThis = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
+  const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
   const log: Logger = logger();
 
   log.debug('Run code...');

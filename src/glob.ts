@@ -7,7 +7,7 @@
  */
 
 import { normalize, resolve } from '@std/path';
-import type { GlobToRegExpOptions } from '@std/path';
+import type { GlobOptions } from '@std/path';
 import { globToRegExp, normalizeGlob } from '@std/path';
 import { walk } from '@std/fs/walk';
 import type { WalkEntry, WalkOptions } from '@std/fs/walk';
@@ -36,11 +36,11 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
  *
  * @param {Array<string>} globs - An array of globs.
  * @param {string} root - The root path.
- * @param {GlobToRegExpOptions} globToRegExpOptions - Options for the GlobToRegExp
+ * @param {GlobOptions} globToRegExpOptions - Options for the GlobToRegExp
  *
  * @returns {Promise<Array<string>>} A promise to resolve the globs.
  */
-const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?: GlobToRegExpOptions): Promise<string[]> => {
+const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?: GlobOptions): Promise<string[]> => {
   globToRegExpOptions = globToRegExpOptions || {
     globstar: false,
     caseInsensitive: false,

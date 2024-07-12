@@ -6,7 +6,7 @@
  * @module
  */
 
-import type { GlobToRegExpOptions } from '@std/path';
+import type { GlobOptions } from '@std/path';
 import type { Task } from './task.ts';
 
 /**
@@ -84,7 +84,7 @@ export type GlobHashOptionsStrict = {
   /**
    * Deno GlobToRegExpOptions
    */
-  globToRegExpOptions: GlobToRegExpOptions;
+  globToRegExpOptions: GlobOptions;
 };
 
 /**
@@ -121,12 +121,6 @@ export type LogStream = {
    */
   readable: ReadableStream<string>;
 };
-
-/**
- * RunOptions are almost the same as the Deno.RunOptions with the difference that we exclude the attribute "cmd"
- * because we handle this outside of these options.
- */
-export type RunOptions = Omit<Deno.RunOptions, 'cmd'>;
 
 /**
  * These are the tano actions that you can run through the CLI.
@@ -498,11 +492,6 @@ export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
  * Defines a function or a file for execution.
  */
 export type Code = CodeFunction | CodeFile;
-
-/**
- * Excludes selected properties.
- */
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 /**
  * Defines the status of a task.

@@ -4,7 +4,7 @@ import { assertEquals, assertInstanceOf, assertNotEquals } from '@std/assert';
 import { afterEach, describe, it } from '@std/testing/bdd';
 import { handler } from './handler.ts';
 import { Task } from './task.ts';
-import type { Options } from './types.ts';
+import type { TOptions } from './types.ts';
 
 describe(Task.name, () => {
   afterEach(() => {
@@ -53,7 +53,7 @@ describe(Task.name, () => {
     const needs: string[] = [];
 
     await new Promise((resolve) => {
-      const options: Options = {
+      const options: TOptions = {
         output: (_, event) => {
           assertEquals(event, 'my output');
           resolve(true);
@@ -73,7 +73,7 @@ describe(Task.name, () => {
   it(`Should not run if conditions false. (1)`, async () => {
     const func = () => {/* do nothing */};
     const needs: string[] = [];
-    const options: Options = {
+    const options: TOptions = {
       condition: 1 + 2 === 4,
     };
 
@@ -91,7 +91,7 @@ describe(Task.name, () => {
   it(`Should not run if conditions false. (2)`, async () => {
     const func = () => {/* do nothing */};
     const needs: string[] = [];
-    const options: Options = {
+    const options: TOptions = {
       condition: () => false,
     };
 
@@ -109,7 +109,7 @@ describe(Task.name, () => {
   it(`Should not run if conditions false. (3)`, async () => {
     const func = () => {/* do nothing */};
     const needs: string[] = [];
-    const options: Options = {
+    const options: TOptions = {
       condition: (done) => setTimeout(() => done(false), 100),
     };
 
@@ -127,7 +127,7 @@ describe(Task.name, () => {
   it(`Should not run if conditions false. (4)`, async () => {
     const func = () => {/* do nothing */};
     const needs: string[] = [];
-    const options: Options = {
+    const options: TOptions = {
       condition: async () => {
         return await Promise.resolve(false);
       },
@@ -147,7 +147,7 @@ describe(Task.name, () => {
   it(`Should not run if conditions false. (5)`, async () => {
     const func = () => {/* do nothing */};
     const needs: string[] = [];
-    const options: Options = {
+    const options: TOptions = {
       condition: () => {
         return Promise.resolve(false);
       },

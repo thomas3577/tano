@@ -12,11 +12,11 @@ import type { Logger } from '@std/log';
 import { getCwd, getImportUrl, toSnakeCase } from './utils.ts';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
-import type { TanoArgs, TanoCliAction, TanoConfig } from './types.ts';
+import type { TTanoArgs, TTanoCliAction, TTanoConfig } from './types.ts';
 
 type EnvSetBy = 'setup';
 
-const setEnv = (config: TanoConfig, setBy?: EnvSetBy): void => {
+const setEnv = (config: TTanoConfig, setBy?: EnvSetBy): void => {
   const overwrittenBy = setBy ? ` (overwritten by ${setBy})` : '';
 
   Object.entries(config).forEach(([key, value]) => {
@@ -43,7 +43,7 @@ const setEnv = (config: TanoConfig, setBy?: EnvSetBy): void => {
 /**
  * Possibility to setup the tano configuration. Just add to your `tanofile.ts`.
  *
- * @param {TanoConfig} config - The tano configuration.
+ * @param {TTanoConfig} config - The tano configuration.
  *
  * @example Set config in your `tanofile.ts`:
  * ```ts
@@ -54,16 +54,16 @@ const setEnv = (config: TanoConfig, setBy?: EnvSetBy): void => {
  * });
  * ```
  */
-export const setup = (config: TanoConfig): void => {
+export const setup = (config: TTanoConfig): void => {
   setEnv(config, 'setup');
 };
 
 /**
  * Executed on every CLI call to prepare and provide all options.
  *
- * @returns {Promise<TanoArgs>} The tano args.
+ * @returns {Promise<TTanoArgs>} The tano args.
  */
-export const parseTanoArgs = async (): Promise<TanoArgs> => {
+export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   const flags = parseArgs(Deno.args, {
     alias: {
       f: 'file',
@@ -89,7 +89,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
     },
   });
 
-  let action: TanoCliAction = 'run';
+  let action: TTanoCliAction = 'run';
   if (flags.version) {
     action = 'version';
   } else if (flags.help) {
@@ -110,7 +110,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
   const quiet: boolean = flags.quiet;
   const noCache: boolean = flags['no-cache'];
 
-  const config: TanoConfig = {
+  const config: TTanoConfig = {
     tanoCwd,
     failFast,
     force,
@@ -124,7 +124,7 @@ export const parseTanoArgs = async (): Promise<TanoArgs> => {
 
   setEnv(config);
 
-  const args: TanoArgs = {
+  const args: TTanoArgs = {
     action,
     failFast,
     file,

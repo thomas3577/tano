@@ -11,7 +11,7 @@ import { gray, white } from '@std/fmt/colors';
 import { BaseHandler, ConsoleHandler, FileHandler, getLogger, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
 import { consoleMock } from './console.ts';
-import type { LogHandler, LogStream } from './types.ts';
+import type { TLogHandler, TLogStream } from './types.ts';
 
 const log = console.log;
 const stream: TextEncoderStream = new TextEncoderStream();
@@ -77,7 +77,7 @@ const fileHandler = new FileHandler(levelName, fileHandlerOptions);
 /**
  * A readable stream of the log.
  */
-export const logStream: LogStream = {
+export const logStream: TLogStream = {
   /**
    * The readable stream of the log.
    */
@@ -103,7 +103,7 @@ export const logStream: LogStream = {
 export const logger = (): Logger => {
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
   const level: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
-  const handlers: LogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as LogHandler[] || ['console'] as LogHandler[];
+  const handlers: TLogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as TLogHandler[] || ['console'] as TLogHandler[];
 
   // deno-lint-ignore no-global-assign
   console = quiet ? consoleMock : console;

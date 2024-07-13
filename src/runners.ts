@@ -8,9 +8,9 @@
 
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
-import type { Code, CodeFunction, CodeOptions, Command, CommandOptions, Condition, ConditionType2, ICommandOptions, ProcessError } from './types.ts';
+import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2, TProcessError } from './types.ts';
 
-const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProcess | ProcessError => {
+const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess | TProcessError => {
   try {
     const args: string[] = Array.isArray(command) ? command : command.split(' ');
     const cmd: Deno.Command = new Deno.Command(args.shift() as string | URL, {
@@ -35,12 +35,12 @@ const getProcess = (command: Command, options?: CommandOptions): Deno.ChildProce
  * @remarks
  * This can be a function or a path to a JavaScript/TypeScript file.
  *
- * @param {Code} code - The code which should be executed.
- * @param {CodeOptions} options - [optionalParam=undefined] Options.
+ * @param {TCode} code - The code which should be executed.
+ * @param {TCodeOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<void>}
  */
-export const runCode = async (code: Code, options?: CodeOptions): Promise<void> => {
+export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void> => {
   const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
   const log: Logger = logger();
 
@@ -51,9 +51,9 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
       log.debug('Run code with repl.');
 
       const funcAsString: string = code.toString();
-      const command: Command = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
+      const command: TCommand = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
-      await runCommand(command, options as ICommandOptions);
+      await runCommand(command, options as TCommandOptions);
     } else {
       log.debug('Run code function.');
 
@@ -87,9 +87,9 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
     log.debug('Run code from file.');
 
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
-    const command: Command = ['deno', 'run', ...(options?.args || []), file];
+    const command: TCommand = ['deno', 'run', ...(options?.args || []), file];
 
-    await runCommand(command, options as ICommandOptions);
+    await runCommand(command, options as TCommandOptions);
   }
 
   log.debug('Run code completed.');
@@ -98,12 +98,12 @@ export const runCode = async (code: Code, options?: CodeOptions): Promise<void> 
 /**
  * Runs a command.
  *
- * @param {Command} command - The command which should be executed.
- * @param {CommandOptions} options - [optionalParam=undefined] Options.
+ * @param {TCommand} command - The command which should be executed.
+ * @param {TCommandOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<number>}
  */
-export const runCommand = async (command: Command, options?: CommandOptions): Promise<void> => {
+export const runCommand = async (command: TCommand, options?: TCommandOptions): Promise<void> => {
   const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
   const log: Logger = logger();
 
@@ -111,8 +111,8 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 
   const textDecoder = new TextDecoder();
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const processOrError: Deno.ChildProcess | ProcessError = getProcess(command, options);
-  const processError: ProcessError = processOrError as ProcessError;
+  const processOrError: Deno.ChildProcess | TProcessError = getProcess(command, options);
+  const processError: TProcessError = processOrError as TProcessError;
   const process: Deno.ChildProcess = processOrError as Deno.ChildProcess;
 
   if (processError.error) {
@@ -189,14 +189,14 @@ export const runCommand = async (command: Command, options?: CommandOptions): Pr
 /**
  * Runs code as a condition.
  *
- * @param {Condition} condition - The code which should be executed.
+ * @param {TCondition} condition - The code which should be executed.
  *
  * @remarks
  * It is important that the code returns a boolean.
  *
  * @returns {Promise<Boolean>} If `true`, the task will be executed. Otherwise it will be skipped.
  */
-export const executeCondition = async (condition: Condition): Promise<boolean> => {
+export const executeCondition = async (condition: TCondition): Promise<boolean> => {
   const log: Logger = logger();
 
   log.debug('Execute condition...');
@@ -207,7 +207,7 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
         if (condition.length > 0) {
           condition((result) => resolve(result));
         } else {
-          resolve((condition as ConditionType2)());
+          resolve((condition as TConditionType2)());
         }
       } else {
         resolve(condition === true);
@@ -225,11 +225,11 @@ export const executeCondition = async (condition: Condition): Promise<boolean> =
 /**
  * Runs a code function.
  *
- * @param {CodeFunction} code - The code which should be executed.
+ * @param {TCodeFunction} code - The code which should be executed.
  *
  * @returns {Promise<void | T>}
  */
-export const executeCodeFunction = async <T>(code: CodeFunction): Promise<void | T> => {
+export const executeCodeFunction = async <T>(code: TCodeFunction): Promise<void | T> => {
   const log: Logger = logger();
 
   log.debug('Execute code function...');

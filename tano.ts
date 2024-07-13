@@ -10,11 +10,11 @@ import { parseTanoArgs } from './src/tano.config.ts';
 import { help } from './src/help.ts';
 import { VERSION } from './src/version.ts';
 import { task } from './src/task.factory.ts';
-import type { TanoArgs } from './src/types.ts';
-import { cli } from './cli.ts';
+import type { TTanoArgs } from './src/types.ts';
+import { cli } from './src/cli.ts';
 
 if (import.meta.main) {
-  const args: TanoArgs = await parseTanoArgs();
+  const args: TTanoArgs = await parseTanoArgs();
 
   switch (args.action) {
     case 'help':

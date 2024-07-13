@@ -8,13 +8,13 @@
 
 import { TanoCache } from './cache.ts';
 import { computeHash } from './glob.ts';
-import type { GlobHashSource, IChanges, TanoRunData, TaskRunData, TaskStatus } from './types.ts';
+import type { TChanges, TGlobHashSource, TTanoRunData, TTaskRunData, TTaskStatus } from './types.ts';
 
 /**
- * Dummy implementation of the changes interface.
+ * Dummy implementation of the changes type.
  * Used instead of Changes if no-cache is true.
  */
-export class ChangesMock implements IChanges {
+export class ChangesMock implements TChanges {
   /**
    * Only a mock implementation.
    */
@@ -25,14 +25,14 @@ export class ChangesMock implements IChanges {
   /**
    * Only a mock implementation.
    */
-  async update(_1: string, _2: Date, _3: TaskStatus): Promise<void> {
+  async update(_1: string, _2: Date, _3: TTaskStatus): Promise<void> {
     return await Promise.resolve();
   }
 
   /**
    * Only a mock implementation.
    */
-  async get(_: string): Promise<TaskRunData | undefined> {
+  async get(_: string): Promise<TTaskRunData | undefined> {
     return await Promise.resolve(undefined);
   }
 
@@ -47,9 +47,9 @@ export class ChangesMock implements IChanges {
 /**
  * To determine if there are file changes in the glob area.
  */
-export class Changes implements IChanges {
+export class Changes implements TChanges {
   readonly #cache: TanoCache;
-  #data: undefined | TanoRunData;
+  #data: undefined | TTanoRunData;
 
   /**
    * Constructor of changes.
@@ -64,9 +64,9 @@ export class Changes implements IChanges {
    * Indicates whether something has changed at the source or not.
    *
    * @param {string} taskName - Name of the desired task.
-   * @param {GlobHashSource} source - Global hash source of the files to be checked for changes.
+   * @param {TGlobHashSource} source - Global hash source of the files to be checked for changes.
    */
-  async hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean> {
+  async hasChanged(taskName: string, source?: TGlobHashSource): Promise<boolean> {
     if (!source) {
       return true;
     }
@@ -82,10 +82,10 @@ export class Changes implements IChanges {
    *
    * @param {string} taskName - Name of the desired task.
    * @param {Date} timestamp - execution date.
-   * @param {TaskStatus} status - Execution status of the task.
-   * @param {GlobHashSource} source - Global hash source of the files.
+   * @param {TTaskStatus} status - Execution status of the task.
+   * @param {TGlobHashSource} source - Global hash source of the files.
    */
-  async update(taskName: string, timestamp: Date, status: TaskStatus, source?: GlobHashSource): Promise<void> {
+  async update(taskName: string, timestamp: Date, status: TTaskStatus, source?: TGlobHashSource): Promise<void> {
     if (!this.#data) {
       return;
     }
@@ -107,7 +107,7 @@ export class Changes implements IChanges {
    *
    * @param {string} taskName - Name of the desired task.
    */
-  async get(taskName: string): Promise<undefined | TaskRunData> {
+  async get(taskName: string): Promise<undefined | TTaskRunData> {
     const data = await this.#getAll();
 
     return data?.tasks[taskName];
@@ -124,7 +124,7 @@ export class Changes implements IChanges {
     return (await this.get(taskName))?.hash;
   }
 
-  async #getAll(): Promise<undefined | TanoRunData> {
+  async #getAll(): Promise<undefined | TTanoRunData> {
     if (!this.#data) {
       this.#data = await this.#cache.read();
     }

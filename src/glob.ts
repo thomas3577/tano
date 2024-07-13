@@ -11,7 +11,7 @@ import type { GlobOptions } from '@std/path';
 import { globToRegExp, normalizeGlob } from '@std/path';
 import { walk } from '@std/fs/walk';
 import type { WalkEntry, WalkOptions } from '@std/fs/walk';
-import type { GlobHashOptionsStrict, GlobHashSource } from './types.ts';
+import type { TGlobHashOptionsStrict, TGlobHashSource } from './types.ts';
 
 /**
  * Gets a list files infos.
@@ -81,12 +81,12 @@ const hashFiles = async (fileInfos: Deno.FileInfo[]): Promise<string> => {
 /**
  * Parsed `source` and converts a strict glob-hash options object.
  *
- * @param {GlobHashSource} source - A boolean, string, array of string or the GlobHashSource.
+ * @param {TGlobHashSource} source - A boolean, string, array of string or the GlobHashSource.
  * @param {Array<string>} additionalExcludes - Additional excludes only for internals.
  *
- * @returns {GlobHashOptionsStrict} An object of type GlobHashOptionsStrict.
+ * @returns {TGlobHashOptionsStrict} An object of type GlobHashOptionsStrict.
  */
-const parseOptions = (source?: GlobHashSource, additionalExcludes?: string[]): undefined | GlobHashOptionsStrict => {
+const parseOptions = (source?: TGlobHashSource, additionalExcludes?: string[]): undefined | TGlobHashOptionsStrict => {
   if (!source) {
     return undefined;
   }
@@ -105,7 +105,7 @@ const parseOptions = (source?: GlobHashSource, additionalExcludes?: string[]): u
     };
   }
 
-  const options: GlobHashOptionsStrict = source as GlobHashOptionsStrict;
+  const options: TGlobHashOptionsStrict = source as TGlobHashOptionsStrict;
 
   options.root = resolve(normalize(source?.root || '.'));
   options.exclude = [...(options.exclude || []), ...(additionalExcludes || [])];
@@ -116,13 +116,13 @@ const parseOptions = (source?: GlobHashSource, additionalExcludes?: string[]): u
 /**
  * Creates a hash by glob options.
  *
- * @param {GlobHashSource} source - A string, Array of string or the GlobHashOptions.
+ * @param {TGlobHashSource} source - A string, Array of string or the GlobHashOptions.
  * @param {Array<string>} additionalExcludes - Additional excludes only for internals.
  *
  * @returns {string} A computed hash
  */
-export const computeHash = async (source?: GlobHashSource, additionalExcludes?: string[]): Promise<undefined | string> => {
-  const options: undefined | GlobHashOptionsStrict = parseOptions(source, additionalExcludes);
+export const computeHash = async (source?: TGlobHashSource, additionalExcludes?: string[]): Promise<undefined | string> => {
+  const options: undefined | TGlobHashOptionsStrict = parseOptions(source, additionalExcludes);
   if (!options) {
     return undefined;
   }

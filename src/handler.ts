@@ -13,12 +13,12 @@ import { logger } from './logger.ts';
 import type { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
-import type { IChanges, TanoHandler, TaskRunData, TaskRunOptions } from './types.ts';
+import type { TChanges, TTanoHandler, TTaskRunData, TTaskRunOptions } from './types.ts';
 
 /**
  * The task handler.
  */
-class Handler implements TanoHandler {
+class Handler implements TTanoHandler {
   readonly #created: Date = new Date();
   readonly #cache: Map<string, Task> = new Map();
   readonly #eventTarget = new EventTarget();
@@ -27,8 +27,8 @@ class Handler implements TanoHandler {
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
-  #changes: null | IChanges = null;
-  #options: TaskRunOptions = {
+  #changes: null | TChanges = null;
+  #options: TTaskRunOptions = {
     failFast: true,
     force: false,
     noCache: false,
@@ -79,7 +79,7 @@ class Handler implements TanoHandler {
   /**
    * Managed the tano data.
    */
-  get changes(): null | IChanges {
+  get changes(): null | TChanges {
     if (!this.#changes) {
       if (this.#options.noCache === true) {
         this.#changes = new ChangesMock();
@@ -112,11 +112,11 @@ class Handler implements TanoHandler {
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
    * @param {string} taskName - [optionalParam='default'] Name of the task.
-   * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
+   * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(taskName: string = 'default', options?: TaskRunOptions): Promise<void> {
+  async run(taskName: string = 'default', options?: TTaskRunOptions): Promise<void> {
     this.#options = {
       failFast: options?.failFast !== undefined ? options?.failFast : this.#options.failFast,
       force: options?.force !== undefined ? options?.force : this.#options.force,
@@ -208,7 +208,7 @@ class Handler implements TanoHandler {
   }
 
   async #preRun(taskName: string): Promise<void> {
-    const data: undefined | TaskRunData = await this.changes?.get(taskName);
+    const data: undefined | TTaskRunData = await this.changes?.get(taskName);
 
     this.#log.info(`Deno        v${Deno.version.deno}`);
     this.#log.info(`TypeScript  v${Deno.version.typescript}`);
@@ -289,4 +289,4 @@ class Handler implements TanoHandler {
  * handler();
  * ```
  */
-export const handler: TanoHandler = new Handler();
+export const handler: TTanoHandler = new Handler();

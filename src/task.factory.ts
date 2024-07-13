@@ -16,7 +16,7 @@
 import { Task } from './task.ts';
 import { isExecutor, isNeeds, toExecutor } from './utils.ts';
 import { logger } from './logger.ts';
-import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, TaskDefinition, TaskParams } from './types.ts';
+import type { TExecutor, TExecutorOrOptions, TNeeds, TNeedsOrExecutor, TOptions, TTaskDefinition, TTaskParams } from './types.ts';
 
 /**
  * Creates a new task.
@@ -29,14 +29,14 @@ import type { Executor, ExecutorOrOptions, Needs, NeedsOrExecutor, Options, Task
  * task('default', needs('pre-task'), `echo '...two tasks.'`).run();
  * ```
  *
- * @param {string | Task | TaskParams} param1
- * @param {Needs | Command | Code} param2
- * @param {Command | Code | Options} param3
- * @param {Options} param4
+ * @param {string | Task | TTaskParams} param1
+ * @param {TNeeds | Command | Code} param2
+ * @param {Command | Code | TOptions} param3
+ * @param {TOptions} param4
  *
  * @returns {Task} - The reference to the created task.
  */
-export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?: NeedsOrExecutor, param3?: ExecutorOrOptions, param4?: Options): Task => {
+export const task: TTaskDefinition = (param1: string | Task | TTaskParams, param2?: TNeedsOrExecutor, param3?: TExecutorOrOptions, param4?: TOptions): Task => {
   if (param1 instanceof Task) {
     return param1;
   }
@@ -47,19 +47,19 @@ export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?
 
   let needs: Array<string> = [];
   if (isNeeds(param2)) {
-    needs = (param2 as Needs).values.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
+    needs = (param2 as TNeeds).values.map((item) => typeof item === 'object' ? item.name : item).filter((item) => item !== undefined);
   }
 
-  let executor: Executor = undefined as unknown as Executor;
+  let executor: TExecutor = undefined as unknown as TExecutor;
   if (isExecutor(param3)) {
     executor = toExecutor(param3);
   } else if (isExecutor(param2)) {
     executor = toExecutor(param2);
   }
 
-  let options: Options = undefined as unknown as Options;
+  let options: TOptions = undefined as unknown as TOptions;
   if (typeof param3 === 'object') {
-    options = param3 as Options;
+    options = param3 as TOptions;
   } else if (typeof param4 === 'object') {
     options = param4;
   }
@@ -78,14 +78,14 @@ export const task: TaskDefinition = (param1: string | Task | TaskParams, param2?
  * task('default', needs('task01'), `echo 'Just one tasks.'`).run();
  * ```
  *
- * @param {string | Task | TaskParams} param1
- * @param {Needs | Command | Code} _2
- * @param {Command | Code | Options} _3
- * @param {Options} _4
+ * @param {string | Task | TTaskParams} param1
+ * @param {TNeeds | Command | Code} _2
+ * @param {Command | Code | TOptions} _3
+ * @param {TOptions} _4
  *
  * @returns {Task} - The reference to the created task.
  */
-export const xtask: TaskDefinition = (param1: string | Task | TaskParams, _2?: NeedsOrExecutor, _3?: ExecutorOrOptions, _4?: Options): Task => {
+export const xtask: TTaskDefinition = (param1: string | Task | TTaskParams, _2?: TNeedsOrExecutor, _3?: TExecutorOrOptions, _4?: TOptions): Task => {
   const log = logger();
   if (typeof param1 === 'object') {
     return new Task(param1.name, null, () => log.warn(`The task '{name}' is not executed because it is an 'xtask'.`, { name: param1.name }));

@@ -7,7 +7,7 @@ import { handler } from './handler.ts';
 import { Task } from './task.ts';
 import { needs } from './needs.ts';
 
-import type { CodeFile, TaskParams } from './types.ts';
+import type { TCodeFile, TTaskParams } from './types.ts';
 
 describe(task.name, () => {
   describe('create tasks', () => {
@@ -211,7 +211,7 @@ describe(task.name, () => {
     });
 
     it(`Task Var 21`, () => {
-      const taskParams: TaskParams = {
+      const taskParams: TTaskParams = {
         name: 'my-task-21',
       };
 
@@ -243,7 +243,7 @@ describe(task.name, () => {
 
     it(`Task Var 24`, () => {
       const file = new URL('file://var/test.ts');
-      const codeFile: CodeFile = { file };
+      const codeFile: TCodeFile = { file };
       const myTask: Task = task('my-task-24', codeFile);
 
       assertEquals(myTask.name, 'my-task-24');

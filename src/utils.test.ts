@@ -4,7 +4,7 @@ import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { toFileUrl } from '@std/path';
 import { getCwd, getImportUrl, isCode, isCommand, isExecutor, isNeeds, toCode, toCommand, toExecutor } from './utils.ts';
-import type { Executor, NeedsOrExecutor } from './types.ts';
+import type { TExecutor, TNeedsOrExecutor } from './types.ts';
 
 describe(isNeeds.name, () => {
   it(`if isNeeds(undefined)`, () => {
@@ -16,91 +16,91 @@ describe(isNeeds.name, () => {
 
   it(`if isNeeds(null)`, () => {
     const param = null;
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds('')`, () => {
     const param = '';
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds('task')`, () => {
     const param = 'task';
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds(true)`, () => {
     const param = true;
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds(1)`, () => {
     const param = 1;
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds({})`, () => {
     const param = {};
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds([])`, () => {
     const param: unknown = [];
-    const actual = isNeeds(param as NeedsOrExecutor);
+    const actual = isNeeds(param as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds({ file: 'something.json' })`, () => {
     const param = { file: 'something.json' };
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds({ values: undefined })`, () => {
     const param = { values: undefined };
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds({ values: null })`, () => {
     const param = { values: null };
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds({ values: 'task' })`, () => {
     const param = { values: 'task' };
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, false);
   });
 
   it(`if isNeeds({ values: [] })`, () => {
     const param = { values: [] };
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, true);
   });
 
   it(`if isNeeds({ values: ['task'] })`, () => {
     const param = { values: ['task'] };
-    const actual = isNeeds(param as unknown as NeedsOrExecutor);
+    const actual = isNeeds(param as unknown as TNeedsOrExecutor);
 
     assertEquals(actual, true);
   });
@@ -297,7 +297,7 @@ describe(toExecutor.name, () => {
 
   it(`if toExecutor(null)`, () => {
     const executor = null;
-    const actual = toExecutor(executor as unknown as Executor);
+    const actual = toExecutor(executor as unknown as TExecutor);
 
     assertEquals(actual, undefined);
   });
@@ -332,21 +332,21 @@ describe(toExecutor.name, () => {
 
   it(`toExecutor([''])`, () => {
     const executor = [''];
-    const actual = toExecutor(executor as unknown as Executor);
+    const actual = toExecutor(executor as unknown as TExecutor);
 
     assertEquals(actual, ['']);
   });
 
   it(`toExecutor(() => {})`, () => {
     const executor = () => {/* do nothing */};
-    const actual = toExecutor(executor as unknown as Executor);
+    const actual = toExecutor(executor as unknown as TExecutor);
 
     assertEquals(actual, executor);
   });
 
   it(`toExecutor({ file: 'test.ts' })`, () => {
     const executor = { file: 'test.ts' };
-    const actual = toExecutor(executor as unknown as Executor);
+    const actual = toExecutor(executor as unknown as TExecutor);
 
     assertEquals(actual, { file: 'test.ts' });
   });
@@ -362,7 +362,7 @@ describe(toCommand.name, () => {
 
   it(`if toCommand(null)`, () => {
     const executor = null;
-    const actual = toCommand(executor as unknown as Executor);
+    const actual = toCommand(executor as unknown as TExecutor);
 
     assertEquals(actual, undefined);
   });
@@ -413,35 +413,35 @@ describe(toCode.name, () => {
 
   it(`toCode(null)`, () => {
     const executor = null;
-    const actual = toCode(executor as unknown as Executor);
+    const actual = toCode(executor as unknown as TExecutor);
 
     assertEquals(actual, undefined);
   });
 
   it(`toCode('')`, () => {
     const executor = '';
-    const actual = toCode(executor as unknown as Executor);
+    const actual = toCode(executor as unknown as TExecutor);
 
     assertEquals(actual, undefined);
   });
 
   it(`toCode([''])`, () => {
     const executor = [''];
-    const actual = toCode(executor as unknown as Executor);
+    const actual = toCode(executor as unknown as TExecutor);
 
     assertEquals(actual, undefined);
   });
 
   it(`toCode(() => {})`, () => {
     const executor = () => {/* do nothing */};
-    const actual = toCode(executor as unknown as Executor);
+    const actual = toCode(executor as unknown as TExecutor);
 
     assertEquals(actual, executor);
   });
 
   it(`toCode({ file: 'test.ts' })`, () => {
     const executor = { file: 'test.ts' };
-    const actual = toCode(executor as unknown as Executor);
+    const actual = toCode(executor as unknown as TExecutor);
 
     assertEquals(actual, { file: 'test.ts' });
   });

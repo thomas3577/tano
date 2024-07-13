@@ -10,53 +10,53 @@ import type { GlobOptions } from '@std/path';
 import type { Task } from './task.ts';
 
 /**
- * The changes interface to determine if there are file changes in the glob area.
+ * The changes type to determine if there are file changes in the glob area.
  */
-export interface IChanges {
+export type TChanges = {
   /**
    * Indicates whether something has changed at the source or not.
    *
    * @param {string} taskName - Name of the desired task.
-   * @param {GlobHashSource} source - Global hash source of the files to be checked for changes.
+   * @param {TGlobHashSource} source - Global hash source of the files to be checked for changes.
    */
-  hasChanged(taskName: string, source?: GlobHashSource): Promise<boolean>;
+  hasChanged(taskName: string, source?: TGlobHashSource): Promise<boolean>;
 
   /**
    * Writes the information of the executed task to the database.
    *
    * @param {string} taskName - Name of the desired task.
    * @param {Date} timestamp - execution date.
-   * @param {TaskStatus} status - Execution status of the task.
-   * @param {GlobHashSource} source - Global hash source of the files.
+   * @param {TTaskStatus} status - Execution status of the task.
+   * @param {TGlobHashSource} source - Global hash source of the files.
    */
-  update(taskName: string, timestamp: Date, status: TaskStatus, source?: GlobHashSource): Promise<void>;
+  update(taskName: string, timestamp: Date, status: TTaskStatus, source?: TGlobHashSource): Promise<void>;
 
   /**
    * Gets information about the last run.
    *
    * @param {string} taskName - Name of the desired task.
    */
-  get(taskName: string): Promise<undefined | TaskRunData>;
+  get(taskName: string): Promise<undefined | TTaskRunData>;
 
   /**
    * Disposes of resources held by the object.
    */
   dispose(): void;
-}
+};
 
 /**
  * Great idea from Peter Kröner <peter@peterkroener.de> to make Properties optional.
  */
-export type Optional<Source, Keys extends keyof Source> =
+export type TOptional<Source, Keys extends keyof Source> =
   & {
     [Key in Keys]?: Source[Key];
   }
   & Pick<Source, Exclude<keyof Source, Keys>>;
 
 /**
- * Same like {@linkcode GlobHashOptionsStrict} but `root` and `globToRegExpOptions` are optional.
+ * Same like {@linkcode TGlobHashOptionsStrict} but `root` and `globToRegExpOptions` are optional.
  */
-export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root' | 'globToRegExpOptions'>;
+export type TGlobHashOptions = TOptional<TGlobHashOptionsStrict, 'root' | 'globToRegExpOptions'>;
 
 /**
  * Defines the files that must be included in the hash.
@@ -64,7 +64,7 @@ export type GlobHashOptions = Optional<GlobHashOptionsStrict, 'root' | 'globToRe
  * @remarks
  * Internal type of The GlobHashOptions. The `root` property does have to be set.
  */
-export type GlobHashOptionsStrict = {
+export type TGlobHashOptionsStrict = {
   /**
    * Array of glob rules.
    */
@@ -93,29 +93,29 @@ export type GlobHashOptionsStrict = {
  * @remarks
  * The `root` property does not have to be set. Default is `.`.
  */
-export type GlobHashSource = boolean | string | string[] | GlobHashOptions;
+export type TGlobHashSource = boolean | string | string[] | TGlobHashOptions;
 
 /**
  * There are two types of task. Commands, i.e. command line commands and code (JavaScript/TypeScript).
  */
-export type TaskType = 'command' | 'code' | undefined;
+export type TTaskType = 'command' | 'code' | undefined;
 
 /**
  * Defines a process error.
  */
-export type ProcessError = {
+export type TProcessError = {
   error?: string;
 };
 
 /**
  * Defines the possible log handler.
  */
-export type LogHandler = 'console' | 'stream' | 'file';
+export type TLogHandler = 'console' | 'stream' | 'file';
 
 /**
  * The log stream.
  */
-export type LogStream = {
+export type TLogStream = {
   /**
    * The readable stream of the log.
    */
@@ -125,16 +125,16 @@ export type LogStream = {
 /**
  * These are the tano actions that you can run through the CLI.
  */
-export type TanoCliAction = 'run' | 'help' | 'version' | 'update';
+export type TTanoCliAction = 'run' | 'help' | 'version' | 'update';
 
 /**
  * These are the tano options that you can specify either via environment variables or args.
  */
-export type TanoArgs = {
+export type TTanoArgs = {
   /**
    * The CLI action.
    */
-  action: TanoCliAction;
+  action: TTanoCliAction;
 
   /**
    * If `true`, it will be aborted at the first error.
@@ -166,7 +166,7 @@ export type TanoArgs = {
 /**
  * These are the tano options that you can specify either via environment variables or args.
  */
-export type TanoConfig = {
+export type TTanoConfig = {
   /**
    * The working directory of the tanofile.
    */
@@ -217,7 +217,7 @@ export type TanoConfig = {
 /**
  * Options for a task run.
  */
-export type TaskRunOptions = {
+export type TTaskRunOptions = {
   /**
    * If `true`, it will be aborted at the first error.
    */
@@ -241,7 +241,7 @@ export type TaskRunOptions = {
  * @remarks
  * The path where the data will be stored is `{cwd}/.tano/cache.json`.
  */
-export type TaskRunData = {
+export type TTaskRunData = {
   /**
    * Timestamp of the last execution of the task.
    */
@@ -250,7 +250,7 @@ export type TaskRunData = {
   /**
    * Status of the last execution of the task.
    */
-  lastStatus: TaskStatus;
+  lastStatus: TTaskStatus;
 
   /**
    * Checksum of all files by GlobHashOptions.
@@ -264,21 +264,21 @@ export type TaskRunData = {
  * @remarks
  * The path where the data will be stored is `{cwd}/.tano/cache.json`.
  */
-export type TanoRunData = {
+export type TTanoRunData = {
   /**
    * List of Tasks.
    */
-  tasks: Record<string, TaskRunData>;
+  tasks: Record<string, TTaskRunData>;
 };
 
 /**
  * These are the additional task run options (besides the `RunOptions`)
  */
-export interface ITaskOptions extends Deno.CommandOptions {
+export type TTaskOptions = Deno.CommandOptions & {
   /**
    * You can specify a function that returns a boolean. As a condition whether a task must be executed or skipped. If `true`, the task is executed.
    */
-  condition?: Condition;
+  condition?: TCondition;
 
   /**
    * The source to which this task surely refers. You can use `glob` for this.
@@ -286,7 +286,7 @@ export interface ITaskOptions extends Deno.CommandOptions {
    * @remarks
    * `source` is only necessary if a task is to be executed only if something has changed at the source.
    */
-  source?: GlobHashSource;
+  source?: TGlobHashSource;
 
   /**
    * Callback function to get output from the task.
@@ -300,17 +300,12 @@ export interface ITaskOptions extends Deno.CommandOptions {
    * If `true`, the output of the task will be logged.
    */
   logThis?: boolean;
-}
-
-/**
- * These are the additional task run options (besides the `RunOptions`)
- */
-export type TaskOptions = ITaskOptions;
+};
 
 /**
  * These are the additional task run options for code tasks (besides the `TaskOptions`)
  */
-export interface ICodeOptions extends TaskOptions {
+export type TCodeOptions = TTaskOptions & {
   /**
    * If you want, you can run your code with Deno repl.
    * This has the advantage that the code is executed in a separate process. But there are also some disadvantages :-)
@@ -321,32 +316,22 @@ export interface ICodeOptions extends TaskOptions {
    * If your runs a TypeScript/JavaScript file, you can add Deno args here.
    */
   args?: Array<string>;
-}
-
-/**
- * These are the additional task run options for code tasks (besides the `TaskOptions`)
- */
-export type CodeOptions = ICodeOptions;
+};
 
 /**
  * These are the additional task run options for command tasks (besides the `TaskOptions`)
  */
-export interface ICommandOptions extends TaskOptions {
+export type TCommandOptions = TTaskOptions & {
   /**
    * Note! Currently there are no command specific properties.
    */
   [key: string]: boolean | number | string | object | undefined;
-}
-
-/**
- * These are the additional task run options for command tasks (besides the `TaskOptions`)
- */
-export type CommandOptions = ICommandOptions;
+};
 
 /**
  * The task parameters.
  */
-export type TaskParams = {
+export type TTaskParams = {
   /**
    * The name of the task. This name have to be unique.
    */
@@ -360,28 +345,28 @@ export type TaskParams = {
   /**
    * Options depending on the executor type.
    */
-  options?: TaskOptions;
+  options?: TTaskOptions;
 
   /**
    * There are two different types of tasks. Code tasks and command tasks.
    */
-  executor?: Executor;
+  executor?: TExecutor;
 };
 
 /**
  * Defines a list of tasks that have to be executed before the parent task is executed.
  */
-export type Needs = {
+export type TNeeds = {
   /**
    * List of task names or task objects.
    */
-  values: Array<string | TaskParams>;
+  values: Array<string | TTaskParams>;
 };
 
 /**
  * Defines a file that can be executed with Deno.
  */
-export type CodeFile = {
+export type TCodeFile = {
   /**
    * If the `code` is a TypeScript/JavaScript file.
    */
@@ -400,7 +385,7 @@ export type CodeFile = {
  * });
  * ```
  */
-export type ConditionType1 = boolean;
+export type TConditionType1 = boolean;
 
 /**
  * A function which returns a boolean or a promise of type boolean.
@@ -423,7 +408,7 @@ export type ConditionType1 = boolean;
  * });
  * ```
  */
-export type ConditionType2 = () => boolean | Promise<boolean>;
+export type TConditionType2 = () => boolean | Promise<boolean>;
 
 /**
  * A function with a callback function which returns a boolean.
@@ -437,7 +422,7 @@ export type ConditionType2 = () => boolean | Promise<boolean>;
  * });
  * ```
  */
-export type ConditionType3 = (done: (result: boolean) => void) => void;
+export type TConditionType3 = (done: (result: boolean) => void) => void;
 
 /**
  * Type of all possible condition types.
@@ -451,7 +436,7 @@ export type ConditionType3 = (done: (result: boolean) => void) => void;
  * });
  * ```
  */
-export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
+export type TCondition = TConditionType1 | TConditionType2 | TConditionType3;
 
 /**
  * Defines a function which has a done-callback function.
@@ -467,7 +452,7 @@ export type Condition = ConditionType1 | ConditionType2 | ConditionType3;
  * });
  * ```
  */
-export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
+export type TCodeFunctionWithDone = (done: (err?: unknown) => void) => void;
 
 /**
  * Defines a function that does not have a done callback function.
@@ -481,65 +466,68 @@ export type CodeFunctionWithDone = (done: (err?: unknown) => void) => void;
  * });
  * ```
  */
-export type CodeFunctionWithoutDone = <T>() => void | T | Promise<void | T>;
+export type TCodeFunctionWithoutDone = <T>() => void | T | Promise<void | T>;
 
 /**
  * Defines a function for execution.
  */
-export type CodeFunction = CodeFunctionWithDone | CodeFunctionWithoutDone;
+export type TCodeFunction = TCodeFunctionWithDone | TCodeFunctionWithoutDone;
 
 /**
  * Defines a function or a file for execution.
  */
-export type Code = CodeFunction | CodeFile;
+export type TCode = TCodeFunction | TCodeFile;
 
 /**
  * Defines the status of a task.
  */
-export type TaskStatus = 'ready' | 'skipped' | 'running' | 'success' | 'failed';
+export type TTaskStatus = 'ready' | 'skipped' | 'running' | 'success' | 'failed';
 
 /**
  * Defines a command for execution.
  */
-export type Command = string | Array<string>;
+export type TCommand = string | Array<string>;
 
 /**
  * Defines the options for code or command.
  */
-export type Options = CodeOptions | CommandOptions;
+export type TOptions = TCodeOptions | TCommandOptions;
 
 /**
  * Defines the executor.
  */
-export type Executor = Command | Code | unknown;
+export type TExecutor = TCommand | TCode | unknown;
 
 /**
  * Defines a parameter, which can be an option object or an executor object.
  */
-export type ExecutorOrOptions = Executor | Options;
+export type TExecutorOrOptions = TExecutor | TOptions;
 
 /**
  * Defines a parameter, which can be an needs object or an executor object.
  */
-export type NeedsOrExecutor = string | Needs | Executor;
+export type TNeedsOrExecutor = string | TNeeds | TExecutor;
 
 /**
  * Variants of possible sets of parameters.
  */
-export type TaskDefinition = {
+export type TTaskDefinition = {
   (task: Task): Task;
-  (task: TaskParams): Task;
+  (task: TTaskParams): Task;
   (name: string, needs?: string): Task;
-  (name: string, needs?: Needs): Task;
-  (name: string, command?: Command, options?: CommandOptions): Task;
-  (name: string, needs?: string, command?: Command, options?: CommandOptions): Task;
-  (name: string, needs?: Needs, command?: Command, options?: CommandOptions): Task;
-  (name: string, code?: Code, options?: CodeOptions): Task;
-  (name: string, needs?: string, code?: Code, options?: CodeOptions): Task;
-  (name: string, needs?: Needs, code?: Code, options?: CodeOptions): Task;
+  (name: string, needs?: TNeeds): Task;
+  (name: string, command?: TCommand, options?: TCommandOptions): Task;
+  (name: string, needs?: string, command?: TCommand, options?: TCommandOptions): Task;
+  (name: string, needs?: TNeeds, command?: TCommand, options?: TCommandOptions): Task;
+  (name: string, code?: TCode, options?: TCodeOptions): Task;
+  (name: string, needs?: string, code?: TCode, options?: TCodeOptions): Task;
+  (name: string, needs?: TNeeds, code?: TCode, options?: TCodeOptions): Task;
 };
 
-export interface TanoHandler {
+/**
+ * Type of Tano handler
+ */
+export type TTanoHandler = {
   /**
    * Gets the timestamp when the handler was created.
    */
@@ -573,7 +561,7 @@ export interface TanoHandler {
   /**
    * Managed the tano data.
    */
-  changes: null | IChanges;
+  changes: null | TChanges;
 
   /**
    * Adds a task to the cache.
@@ -587,11 +575,11 @@ export interface TanoHandler {
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
    * @param {string} taskName - [optionalParam='default'] Name of the task.
-   * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
+   * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} - A promise that resolves to void.
    */
-  run(taskName?: string, options?: TaskRunOptions): Promise<void>;
+  run(taskName?: string, options?: TTaskRunOptions): Promise<void>;
 
   /**
    * Resets all tasks so that you can run them again.
@@ -637,4 +625,4 @@ export interface TanoHandler {
    * Hack: Updates the logger of this handler.
    */
   updateLogger(): void;
-}
+};

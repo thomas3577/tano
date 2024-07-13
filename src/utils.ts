@@ -7,7 +7,7 @@
  */
 
 import { dirname, fromFileUrl, isAbsolute, join, toFileUrl } from '@std/path';
-import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, NeedsOrExecutor } from './types.ts';
+import type { TCode, TCodeFile, TCommand, TExecutor, TExecutorOrOptions, TNeeds, TNeedsOrExecutor } from './types.ts';
 
 /**
  * Checks if a parameter is of type `Needs`.
@@ -39,8 +39,8 @@ import type { Code, CodeFile, Command, Executor, ExecutorOrOptions, Needs, Needs
  *
  * @returns {boolean} if `true` the object is of type `Needs`.
  */
-export const isNeeds = (param?: NeedsOrExecutor): boolean => {
-  return typeof param === 'object' && !(param as CodeFile)?.file && Array.isArray((param as Needs)?.values);
+export const isNeeds = (param?: TNeedsOrExecutor): boolean => {
+  return typeof param === 'object' && !(param as TCodeFile)?.file && Array.isArray((param as TNeeds)?.values);
 };
 
 /**
@@ -97,8 +97,8 @@ export const isNeeds = (param?: NeedsOrExecutor): boolean => {
  *
  * @returns {boolean} if `true` the object is of type `Executor`.
  */
-export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean => {
-  return isCommand(param as Executor) || isCode(param as Executor);
+export const isExecutor = (param?: TNeedsOrExecutor | TExecutorOrOptions): boolean => {
+  return isCommand(param as TExecutor) || isCode(param as TExecutor);
 };
 
 /**
@@ -122,7 +122,7 @@ export const isExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): boolean
  *
  * @returns {boolean} if `true` the object is of type `Command`.
  */
-export const isCommand = (param?: Executor): boolean => {
+export const isCommand = (param?: TExecutor): boolean => {
   return typeof param === 'string' || (typeof param === 'object' && Array.isArray(param));
 };
 
@@ -166,8 +166,8 @@ export const isCommand = (param?: Executor): boolean => {
  *
  * @returns {boolean} if `true` the object is of type `Code`.
  */
-export const isCode = (param?: Executor): boolean => {
-  return !!param && (isCodeFile(param as CodeFile) || typeof param === 'function');
+export const isCode = (param?: TExecutor): boolean => {
+  return !!param && (isCodeFile(param as TCodeFile) || typeof param === 'function');
 };
 
 /**
@@ -191,7 +191,7 @@ export const isCode = (param?: Executor): boolean => {
  *
  * @returns {boolean} if `true` the object is of type `CodeFile`.
  */
-export const isCodeFile = (param: CodeFile): boolean => {
+export const isCodeFile = (param: TCodeFile): boolean => {
   const regex = new RegExp(/\.(js|ts)$/);
 
   return typeof param === 'object' &&
@@ -206,8 +206,8 @@ export const isCodeFile = (param: CodeFile): boolean => {
  *
  * @returns {object} An object of type Executor.
  */
-export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executor => {
-  return (isExecutor(param) ? param : undefined as unknown) as Executor;
+export const toExecutor = (param?: TNeedsOrExecutor | TExecutorOrOptions): TExecutor => {
+  return (isExecutor(param) ? param : undefined as unknown) as TExecutor;
 };
 
 /**
@@ -217,8 +217,8 @@ export const toExecutor = (param?: NeedsOrExecutor | ExecutorOrOptions): Executo
  *
  * @returns {object} An object of type Command.
  */
-export const toCommand = (param?: Executor): Command => {
-  return (isCommand(param) ? param : undefined as unknown) as Command;
+export const toCommand = (param?: TExecutor): TCommand => {
+  return (isCommand(param) ? param : undefined as unknown) as TCommand;
 };
 
 /**
@@ -228,8 +228,8 @@ export const toCommand = (param?: Executor): Command => {
  *
  * @returns {object} An object of type Code.
  */
-export const toCode = (param?: Executor): Code => {
-  return (isCode(param) ? param : undefined as unknown) as Code;
+export const toCode = (param?: TExecutor): TCode => {
+  return (isCode(param) ? param : undefined as unknown) as TCode;
 };
 
 /**

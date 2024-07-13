@@ -2,11 +2,11 @@
 
 import { bold } from '@std/fmt/colors';
 import type { Logger } from '@std/log';
-import { logger } from './src/logger.ts';
-import { handler } from './src/handler.ts';
-import type { TanoArgs } from './src/types.ts';
+import { logger } from './logger.ts';
+import { handler } from './handler.ts';
+import type { TTanoArgs } from './types.ts';
 
-export const cli = async (args: TanoArgs): Promise<void> => {
+export const cli = async (args: TTanoArgs): Promise<void> => {
   const log: Logger = logger();
 
   try {

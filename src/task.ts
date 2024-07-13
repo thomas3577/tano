@@ -21,7 +21,7 @@ import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
-import type { Command, Executor, ICommandOptions, Options, TanoHandler, TaskParams, TaskRunOptions, TaskStatus, TaskType } from './types.ts';
+import type { TCommand, TCommandOptions, TExecutor, TOptions, TTanoHandler, TTaskParams, TTaskRunOptions, TTaskStatus, TTaskType } from './types.ts';
 
 /**
  * A class to create a Task.
@@ -35,18 +35,18 @@ import type { Command, Executor, ICommandOptions, Options, TanoHandler, TaskPara
  * await task.runThis();
  * ```
  */
-export class Task implements TaskParams {
+export class Task implements TTaskParams {
   readonly #log: Logger = logger();
   readonly #created: Date = new Date();
-  readonly #handler: TanoHandler = handler;
+  readonly #handler: TTanoHandler = handler;
   readonly #name: string;
   readonly #needs: Array<string>;
-  readonly #executor: Executor;
-  readonly #options: Options;
-  readonly #type: TaskType = undefined;
+  readonly #executor: TExecutor;
+  readonly #options: TOptions;
+  readonly #type: TTaskType = undefined;
   readonly #eventTarget: EventTarget = new EventTarget();
 
-  #status: TaskStatus = 'ready';
+  #status: TTaskStatus = 'ready';
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
@@ -54,15 +54,15 @@ export class Task implements TaskParams {
   /**
    * Creates a new instance of a Task.
    *
-   * @param {string | TaskParams} nameOrTask - The name or an object which provides all task parameters.
+   * @param {string | TTaskParams} nameOrTask - The name or an object which provides all task parameters.
    * @param {Array<string>} needs - Defines the dependencies which should be executed before this task.
-   * @param {Command | Code} executor - A command, function or JS/TS-file to execute.
-   * @param {Options} options - Options, depending on whether the executor is of type Command or Code.
+   * @param {TCommand | Code} executor - A command, function or JS/TS-file to execute.
+   * @param {TOptions} options - Options, depending on whether the executor is of type Command or Code.
    */
-  constructor(nameOrTask: string | TaskParams, needs?: Array<string> | null, executor?: Executor, options?: Options) {
+  constructor(nameOrTask: string | TTaskParams, needs?: Array<string> | null, executor?: TExecutor, options?: TOptions) {
     needs = needs == null ? [] : needs;
 
-    const task: TaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as TaskParams : {
+    const task: TTaskParams = typeof nameOrTask === 'object' ? nameOrTask as unknown as TTaskParams : {
       name: nameOrTask,
       needs,
       executor,
@@ -71,8 +71,8 @@ export class Task implements TaskParams {
 
     this.#name = task.name;
     this.#needs = task.needs ?? [];
-    this.#executor = task.executor as Command;
-    this.#options = task.options as Options;
+    this.#executor = task.executor as TCommand;
+    this.#options = task.options as TOptions;
     this.#handler.add(this);
 
     if (isCommand(executor)) {
@@ -92,7 +92,7 @@ export class Task implements TaskParams {
   /**
    * Status of the task.
    */
-  get status(): TaskStatus {
+  get status(): TTaskStatus {
     return this.#status;
   }
 
@@ -134,14 +134,14 @@ export class Task implements TaskParams {
   /**
    * The command or code that will be executed by this task if it is set.
    */
-  get executor(): Executor {
+  get executor(): TExecutor {
     return this.#executor;
   }
 
   /**
    * Options, depending on whether the executor is of type Command or Code.
    */
-  get options(): Options {
+  get options(): TOptions {
     return this.#options;
   }
 
@@ -168,11 +168,11 @@ export class Task implements TaskParams {
   /**
    * Executes all dependent tasks and its own.
    *
-   * @param {TaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
+   * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
-  async run(options?: TaskRunOptions): Promise<void> {
+  async run(options?: TTaskRunOptions): Promise<void> {
     await this.#handler.run(this.#name, options);
   }
 
@@ -254,7 +254,7 @@ export class Task implements TaskParams {
     this.#updateStatus('running');
   }
 
-  async #postRun(options: Options): Promise<void> {
+  async #postRun(options: TOptions): Promise<void> {
     this.#updateStatus('success');
 
     this.#finished = performance.mark(`finished_${this.#name}`, {
@@ -273,10 +273,10 @@ export class Task implements TaskParams {
     this.#handler.changes?.dispose();
   }
 
-  async #run(type: TaskType, executor: Executor, options: Options): Promise<void> {
+  async #run(type: TTaskType, executor: TExecutor, options: TOptions): Promise<void> {
     switch (type) {
       case 'command':
-        await runCommand(toCommand(executor), options as ICommandOptions);
+        await runCommand(toCommand(executor), options as TCommandOptions);
         break;
       case 'code':
         await runCode(toCode(executor), options);
@@ -284,12 +284,12 @@ export class Task implements TaskParams {
     }
   }
 
-  #updateStatus(status: TaskStatus, error?: Error): void {
+  #updateStatus(status: TTaskStatus, error?: Error): void {
     this.#status = status;
     this.#emitChanges(status, error);
   }
 
-  #emitChanges(status: TaskStatus, error?: Error): void {
+  #emitChanges(status: TTaskStatus, error?: Error): void {
     this.#eventTarget.dispatchEvent(
       new CustomEvent('changed', {
         detail: {

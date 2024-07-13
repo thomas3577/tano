@@ -9,7 +9,7 @@
 
 import { format, join } from '@std/path';
 import { exists } from '@std/fs';
-import type { TanoRunData, TaskRunData } from './types.ts';
+import type { TTanoRunData, TTaskRunData } from './types.ts';
 
 /**
  * Creates the directory to the tano cache.
@@ -64,21 +64,21 @@ export class TanoCache {
   /**
    * Reads the tano run data from Kv.
    *
-   * @returns {Promise<TanoRunData>} The tano run data.
+   * @returns {Promise<TTanoRunData>} The tano run data.
    */
-  async read(): Promise<TanoRunData> {
-    const data: TanoRunData = {
+  async read(): Promise<TTanoRunData> {
+    const data: TTanoRunData = {
       tasks: {},
     };
 
     const db: Deno.Kv = await this.#openKy();
-    const tasks: Record<string, TaskRunData> = {};
-    const entries: Deno.KvListIterator<TaskRunData> = db.list<TaskRunData>({ prefix: ['users'] });
+    const tasks: Record<string, TTaskRunData> = {};
+    const entries: Deno.KvListIterator<TTaskRunData> = db.list<TTaskRunData>({ prefix: ['users'] });
 
     for await (const entry of entries) {
       const taskName: undefined | string = toTaskName(entry.key);
       if (taskName) {
-        tasks[taskName] = entry.value as TaskRunData;
+        tasks[taskName] = entry.value as TTaskRunData;
       }
     }
 
@@ -90,11 +90,11 @@ export class TanoCache {
   /**
    * Writes tano run data to Kv.
    *
-   * @param {TanoRunData} data - The tano run data.
+   * @param {TTanoRunData} data - The tano run data.
    *
    * @returns {Promise<void>}
    */
-  async write(data?: TanoRunData): Promise<void> {
+  async write(data?: TTanoRunData): Promise<void> {
     const db: Deno.Kv = await this.#openKy();
 
     for (const promise of Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value))) {

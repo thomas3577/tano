@@ -28,6 +28,7 @@ class Handler implements TTanoHandler {
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
   #changes: null | TChanges = null;
+  #abort: boolean = false;
   #options: TTaskRunOptions = {
     failFast: true,
     force: false,
@@ -127,23 +128,23 @@ class Handler implements TTanoHandler {
 
     const taskNames: Array<string> = this.#getPlan(taskName);
 
-    let abort = false;
+    this.#abort = false;
 
     for (const tn of taskNames) {
-      if (abort) {
+      if (this.#abort) {
         break;
       }
 
       await this.#cache.get(tn)?.runThis(this.#options.force)
         .catch((err) => {
           if (this.#options.failFast) {
-            abort = true;
+            this.abort();
             throw err;
           }
         });
     }
 
-    this.#postRun(!taskNames || taskNames.length === 0 || abort);
+    this.#postRun(!taskNames || taskNames.length === 0 || this.#abort);
   }
 
   /**
@@ -151,6 +152,13 @@ class Handler implements TTanoHandler {
    */
   reset(): void {
     this.#cache.forEach((task: Task) => task.reset());
+  }
+
+  /**
+   * Aborts the execution of the tasks.
+   */
+  abort(): void {
+    this.#abort = true;
   }
 
   /**

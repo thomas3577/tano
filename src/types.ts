@@ -587,6 +587,11 @@ export type TTanoHandler = {
   reset(): void;
 
   /**
+   * Aborts the execution of the tasks.
+   */
+  abort(): void;
+
+  /**
    * Clears the cache. The handler will then have no more tasks to execute.
    */
   clear(): void;

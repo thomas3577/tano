@@ -1,2 +1,3 @@
 .tano
 coverage
+*.log

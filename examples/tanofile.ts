@@ -6,7 +6,7 @@ import { task07 } from './tanofile.task.ts';
 
 setup({
   logLevel: 'DEBUG',
-  logOutput: ['console', 'stream'],
+  logOutput: ['console', 'stream', 'file'],
 });
 
 task(

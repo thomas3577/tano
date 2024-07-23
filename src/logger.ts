@@ -38,41 +38,63 @@ const interpolate = (msg: string, params?: unknown): string => {
   return msg;
 };
 
-const consoleHandlerOptions: ConsoleHandlerOptions = {
-  formatter: (logRecord: LogRecord): string => {
-    const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
-    const params = logRecord.args?.at(0);
-    let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
-    msg = interpolate(msg, params);
+let consoleHandler: ConsoleHandler;
+const getConsoleHandler = (): ConsoleHandler => {
+  if (!consoleHandler) {
+    const consoleHandlerOptions: ConsoleHandlerOptions = {
+      formatter: (logRecord: LogRecord): string => {
+        const timestamp: string = format(logRecord.datetime, 'HH:mm:ss');
+        const params = logRecord.args?.at(0);
+        let msg: string = !logRecord.msg ? '' : `${white('[')}${gray(timestamp)}${white(']')} ${logRecord.msg}`;
+        msg = interpolate(msg, params);
 
-    if (logRecord.levelName === 'DEBUG') {
-      msg = gray(msg);
-    }
+        if (logRecord.levelName === 'DEBUG') {
+          msg = gray(msg);
+        }
 
-    return msg;
-  },
+        return msg;
+      },
+    };
+
+    consoleHandler = new ConsoleHandler(levelName, consoleHandlerOptions);
+    consoleHandler.log = log;
+  }
+
+  return consoleHandler;
 };
 
-const consoleHandler: ConsoleHandler = new ConsoleHandler(levelName, consoleHandlerOptions);
+let streamHandler: StreamHandler;
+const getStreamHandler = (): StreamHandler => {
+  if (!streamHandler) {
+    const streamHandlerOptions: BaseHandlerOptions = {
+      formatter: (logRecord: LogRecord): string => {
+        const datetime: string = logRecord.datetime.toISOString();
+        const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
+        const args = logRecord.args;
+        const result: string = JSON.stringify({ ...logRecord, datetime, msg, args });
 
-const streamHandlerOptions: BaseHandlerOptions = {
-  formatter: (logRecord: LogRecord): string => {
-    const datetime: string = logRecord.datetime.toISOString();
-    const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
-    const args = logRecord.args;
-    const result: string = JSON.stringify({ ...logRecord, datetime, msg, args });
+        return result;
+      },
+    };
 
-    return result;
-  },
+    streamHandler = new StreamHandler(levelName, streamHandlerOptions);
+  }
+
+  return streamHandler;
 };
 
-const streamHandler: StreamHandler = new StreamHandler(levelName, streamHandlerOptions);
+let fileHandler: FileHandler;
+const getFileHandler = (): FileHandler => {
+  if (!fileHandler) {
+    const fileHandlerOptions: FileHandlerOptions = {
+      filename: Deno.env.get('LOG_FILE') || './tano.log',
+    };
 
-const fileHandlerOptions: FileHandlerOptions = {
-  filename: Deno.env.get('LOG_FILE') as string,
+    fileHandler = new FileHandler(levelName, fileHandlerOptions);
+  }
+
+  return fileHandler;
 };
-
-const fileHandler = new FileHandler(levelName, fileHandlerOptions);
 
 /**
  * A readable stream of the log.
@@ -119,19 +141,18 @@ export const logger = (): Logger => {
   };
 
   if (handlers.includes('console')) {
-    consoleHandler.log = log;
     config.handlers = config.handlers ?? {};
-    config.handlers['console'] = consoleHandler;
+    config.handlers['console'] = getConsoleHandler();
   }
 
   if (handlers.includes('stream')) {
     config.handlers = config.handlers ?? {};
-    config.handlers['stream'] = streamHandler;
+    config.handlers['stream'] = getStreamHandler();
   }
 
   if (handlers.includes('file')) {
     config.handlers = config.handlers ?? {};
-    config.handlers['file'] = fileHandler;
+    config.handlers['file'] = getFileHandler();
   }
 
   setup(config);

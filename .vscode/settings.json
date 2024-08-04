@@ -1,15 +1,4 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "extensions": {
-    "recommendations": [
-      "denoland.vscode-deno"
-    ]
-  },
-  "settings": {
     "editor.formatOnSave": true,
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
@@ -38,6 +27,14 @@
     },
     "[markdown]": {
       "editor.defaultFormatter": "denoland.vscode-deno"
-    }
+    },
+    "cSpell.allowCompoundWords": true,
+    "cSpell.words": [
+      "esbenp",
+      "Kröner",
+      "pwsh",
+      "tano",
+      "tanofile",
+      "xtask"
+    ]
   }
-}

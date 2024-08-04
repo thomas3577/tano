@@ -6,7 +6,7 @@
     "./tano": "./tano.ts"
   },
   "tasks": {
-    "lock": "deno cache --lock=deno.lock ./mod.ts ./src/**/*.ts",
+    "lock": "deno cache ./mod.ts ./src/**/*.ts",
     "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",
     "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --no-cache=true --file ./tanofile.ts",
     "check": "deno task lock && deno fmt --check && deno lint && deno task test && deno task run && deno publish --dry-run"

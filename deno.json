@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.4.33",
+  "version": "0.4.34",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
@@ -8,8 +8,8 @@
   },
   "tasks": {
     "lock": "deno cache ./mod.ts ./src/**/*.ts",
-    "test": "deno test --unstable-kv --allow-read --allow-run --allow-env --allow-write",
-    "run": "cd ./examples && deno run --unstable-kv --allow-read --allow-run --allow-env --allow-write ../tano.ts --no-cache=true --file ./tanofile.ts",
+    "test": "deno test --allow-run -RWE --unstable-kv",
+    "run": "cd ./examples && deno run --allow-run -RWE --unstable-kv ../tano.ts --no-cache=true --file ./tanofile.ts",
     "check": "deno task lock && deno fmt --check && deno lint && deno task test && deno task run && deno publish --dry-run"
   },
   "imports": {

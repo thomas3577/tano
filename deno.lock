@@ -4,14 +4,14 @@
     "specifiers": {
       "jsr:@std/assert@1.0.2": "jsr:@std/assert@1.0.2",
       "jsr:@std/assert@^1.0.2": "jsr:@std/assert@1.0.2",
-      "jsr:@std/cli@1.0.2": "jsr:@std/cli@1.0.2",
-      "jsr:@std/datetime@0.224.4": "jsr:@std/datetime@0.224.4",
+      "jsr:@std/cli@1.0.3": "jsr:@std/cli@1.0.3",
+      "jsr:@std/datetime@0.225.0": "jsr:@std/datetime@0.225.0",
       "jsr:@std/fmt@1.0.0": "jsr:@std/fmt@1.0.0",
       "jsr:@std/fmt@^1.0.0-rc.1": "jsr:@std/fmt@1.0.0",
       "jsr:@std/fs@1.0.1": "jsr:@std/fs@1.0.1",
       "jsr:@std/fs@^1.0.0-rc.5": "jsr:@std/fs@1.0.1",
       "jsr:@std/internal@^1.0.1": "jsr:@std/internal@1.0.1",
-      "jsr:@std/io@^0.224.3": "jsr:@std/io@0.224.3",
+      "jsr:@std/io@^0.224.3": "jsr:@std/io@0.224.5",
       "jsr:@std/log@0.224.5": "jsr:@std/log@0.224.5",
       "jsr:@std/path@1.0.2": "jsr:@std/path@1.0.2",
       "jsr:@std/path@^1.0.2": "jsr:@std/path@1.0.2",
@@ -24,11 +24,11 @@
           "jsr:@std/internal@^1.0.1"
         ]
       },
-      "@std/cli@1.0.2": {
-        "integrity": "fc12cf1a16d0e6c073dce3f95c202e580c428047ed719007617460b98e57923d"
+      "@std/cli@1.0.3": {
+        "integrity": "9a0488b5d2e58d29dce106a941eecec7181fae996bf0d2225563f1ca7e4b100c"
       },
-      "@std/datetime@0.224.4": {
-        "integrity": "d8f4d9efbb38dd9f8d515e4eed36737ec097311aaf6c1b4163d7a734095542dc"
+      "@std/datetime@0.225.0": {
+        "integrity": "73ee4457218e06f50d3680fb0c430ba94006305e4104c84e783b3f5c0ec78900"
       },
       "@std/fmt@1.0.0": {
         "integrity": "8a95c9fdbb61559418ccbc0f536080cf43341655e1444f9d375a66886ceaaa3d"
@@ -50,6 +50,9 @@
       },
       "@std/io@0.224.3": {
         "integrity": "b402edeb99c6b3778d9ae3e9927bc9085b170b41e5a09bbb7064ab2ee394ae2f"
+      },
+      "@std/io@0.224.5": {
+        "integrity": "cb84fe655d1273fca94efcff411465027a8b0b4225203f19d6ee98d9c8920a2d"
       },
       "@std/log@0.224.5": {
         "integrity": "4612a45189438441bbd923a4cad1cce5c44c6c4a039195a3e8d831ce38894eee",
@@ -74,8 +77,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1.0.2",
-      "jsr:@std/cli@1.0.2",
-      "jsr:@std/datetime@0.224.4",
+      "jsr:@std/cli@1.0.3",
+      "jsr:@std/datetime@0.225.0",
       "jsr:@std/fmt@1.0.0",
       "jsr:@std/fs@1.0.1",
       "jsr:@std/log@0.224.5",

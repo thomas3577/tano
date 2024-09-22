@@ -18,9 +18,9 @@ jobs:
         uses: actions/checkout@v4.1.7
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1.3.0
+        uses: denoland/setup-deno@v1.5.1
         with:
-          deno-version: v1.46.0
+          deno-version: v1.46.3
 
       - name: Verify formatting
         run: deno fmt --check

@@ -20,6 +20,8 @@ const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
 const levelName: LevelName = 'DEBUG';
 
 class StreamHandler extends BaseHandler {
+  log(_: string): void {}
+
   async handle(logRecord: LogRecord): Promise<void> {
     const chunk = this.format(logRecord);
 

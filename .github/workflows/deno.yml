@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Setup repo
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.1
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1.5.1
+        uses: denoland/setup-deno@v2.0.0
         with:
-          deno-version: v1.46.3
+          deno-version: v2.0.0
 
       - name: Verify formatting
         run: deno fmt --check

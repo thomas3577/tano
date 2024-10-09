@@ -22,7 +22,7 @@ const levelName: LevelName = 'DEBUG';
 class StreamHandler extends BaseHandler {
   log(_: string): void {}
 
-  async handle(logRecord: LogRecord): Promise<void> {
+  override async handle(logRecord: LogRecord): Promise<void> {
     const chunk = this.format(logRecord);
 
     await writer.ready;

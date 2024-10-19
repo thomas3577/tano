@@ -125,7 +125,7 @@ export type TLogStream = {
 /**
  * These are the tano actions that you can run through the CLI.
  */
-export type TTanoCliAction = 'run' | 'help' | 'version' | 'update';
+export type TTanoCliAction = 'run' | 'help' | 'version' | 'upgrade';
 
 /**
  * These are the tano options that you can specify either via environment variables or args.

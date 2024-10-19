@@ -69,5 +69,9 @@ export const help = (): void => {
 
           --no-cache
               Disables the cache mechanism.
+
+      -U, --upgrade
+              Upgrades @dx/tano
+
   `);
 };

@@ -72,11 +72,11 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
       q: 'quiet',
       l: 'log-level',
       V: 'version',
-      U: 'update',
+      U: 'upgrade',
     },
     string: ['file', 'task', 'log-level', 'log-file'],
     collect: ['log-output'],
-    boolean: ['help', 'quiet', 'fail-fast', 'version', 'update', 'force', 'no-cache', 'log-everything'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version', 'upgrade', 'force', 'no-cache', 'log-everything'],
     default: {
       file: 'tanofile.ts',
       quiet: false,
@@ -95,7 +95,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   } else if (flags.help) {
     action = 'help';
   } else if (flags.update) {
-    action = 'update';
+    action = 'upgrade';
   }
 
   const file: string | undefined = action === 'run' ? await getImportUrl(flags.file) : undefined;

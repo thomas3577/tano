@@ -24,7 +24,7 @@ if (import.meta.main) {
       console.log(`v${VERSION}`);
       break;
     case 'upgrade':
-      await task('upgrade', 'deno install --unstable-kv --allow-read --allow-run --allow-env --allow-write -g -f -n tano jsr:@dx/tano/tano').run();
+      await task('upgrade', 'deno install --allow-run -RWE --unstable-kv -g -f -n tano jsr:@dx/tano/tano').run();
       break;
     default:
       await cli(args);

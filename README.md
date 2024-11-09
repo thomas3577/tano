@@ -20,6 +20,20 @@ deno install --allow-run -RWE --unstable-kv -g -n tano jsr:@dx/tano/tano
 
 Your tasks may need additional permissions.
 
+## Upgrade
+
+Upgrades the dx cli.
+
+```bash
+tano --upgrade
+```
+
+## Help
+
+```bash
+tano --help
+```
+
 ## Preparation
 
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.

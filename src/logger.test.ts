@@ -2,7 +2,8 @@
 
 import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
-import { Logger, LogLevels, LogRecord } from '@std/log';
+import { Logger, LogLevels } from '@std/log';
+import type { LogRecord } from '@std/log';
 import { logger, logStream } from './logger.ts';
 
 describe(`logger`, () => {
@@ -46,12 +47,14 @@ describe(`logStream`, () => {
     const actual: Logger = logger();
     const reader = logStream.readable.getReader();
 
-    let log: LogRecord = new LogRecord({
+    let log: LogRecord = {
       msg: 'msg',
       args: [],
       level: LogLevels.INFO,
       loggerName: 'loggerName',
-    });
+      levelName: '',
+      datetime: new Date(),
+    } as unknown as LogRecord;
 
     assertEquals(actual.handlers.length, 2);
 

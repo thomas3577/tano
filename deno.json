@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",

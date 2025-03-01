@@ -8,11 +8,9 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "--unstable-kv",
-        "--allow-read",
         "--allow-run",
-        "--allow-env",
-        "--allow-write",
+        "-RWE",
+        "--unstable-kv",
         "--inspect-brk",
         "../tano.ts",
         "--file",
@@ -29,11 +27,9 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "--unstable-kv",
-        "--allow-read",
         "--allow-run",
-        "--allow-env",
-        "--allow-write",
+        "-RWE",
+        "--unstable-kv",
         "--inspect-brk",
         "./src/**/*.test.ts"
       ],
@@ -48,11 +44,9 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "--unstable-kv",
-        "--allow-read",
         "--allow-run",
-        "--allow-env",
-        "--allow-write",
+        "-RWE",
+        "--unstable-kv",
         "--inspect-brk",
         "${file}"
       ],

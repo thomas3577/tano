@@ -21,6 +21,23 @@
       "attachSimplePort": 9229
     },
     {
+      "name": "Upgrade",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-run",
+        "-RWE",
+        "--unstable-kv",
+        "--inspect-brk",
+        "../tano.ts",
+        "--upgrade",
+      ],
+      "cwd": "${workspaceFolder}/examples",
+      "attachSimplePort": 9229
+    },
+    {
       "name": "Test",
       "request": "launch",
       "type": "node",

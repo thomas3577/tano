@@ -29,6 +29,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
     return { error };
   }
 };
+
 /**
  * Runs code.
  *

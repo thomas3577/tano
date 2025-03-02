@@ -94,7 +94,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
     action = 'version';
   } else if (flags.help) {
     action = 'help';
-  } else if (flags.update) {
+  } else if (flags.upgrade) {
     action = 'upgrade';
   }
 

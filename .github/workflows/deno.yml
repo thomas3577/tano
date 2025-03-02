@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
   publish:
@@ -32,7 +34,5 @@ jobs:
         run: deno run test
 
       - name: Publish package
+        if: startsWith(github.ref, 'refs/tags/')
         run: deno publish
-
-      - name: Create tag
-        run: deno run --allow-run .github/workflows/create_git_tag.ts

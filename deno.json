@@ -4,7 +4,7 @@
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
-    "./tano": "./tano.ts"
+    "./cli": "./cli.ts"
   },
   "tasks": {
     "lock": "deno cache ./mod.ts ./src/**/*.ts",

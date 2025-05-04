@@ -1,4 +1,4 @@
-// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module contains the task function to create new tasks.

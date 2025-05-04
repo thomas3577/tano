@@ -1,4 +1,4 @@
-// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module provides a class to determine if there are file changes in the glob area.

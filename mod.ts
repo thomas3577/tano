@@ -1,4 +1,4 @@
-// Copyright 2018-2024 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
 export { task, xtask } from './src/task.factory.ts';
 export { needs } from './src/needs.ts';

@@ -22,7 +22,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2.0.3
         with:
-          deno-version: v2.4.2
+          deno-version: v2.4.4
 
       - name: Verify formatting
         run: deno fmt --check

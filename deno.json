@@ -1,6 +1,6 @@
 {
   "name": "@dx/tano",
-  "version": "0.5.21",
+  "version": "0.5.22",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
@@ -20,7 +20,7 @@
     "@std/testing": "jsr:@std/testing@^1.0.15",
     "@std/datetime": "jsr:@std/datetime@^0.225.5",
     "@std/log": "jsr:@std/log@^0.224.14",
-    "@std/cli": "jsr:@std/cli@^1.0.21"
+    "@std/cli": "jsr:@std/cli@^1.0.22"
   },
   "publish": {
     "exclude": [

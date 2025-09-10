@@ -71,7 +71,7 @@ const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?:
 const hashFiles = async (fileInfos: Deno.FileInfo[]): Promise<string> => {
   const algorithm: AlgorithmIdentifier = 'SHA-256';
   const keys: string[] = fileInfos.map((fileInfo) => [fileInfo.dev, fileInfo.ino, fileInfo.size, fileInfo.mtime].join('-'));
-  const encoded: Uint8Array = new TextEncoder().encode(keys.join('\n'));
+  const encoded: Uint8Array<ArrayBuffer> = new TextEncoder().encode(keys.join('\n'));
   const arrayBuffer: ArrayBuffer = await crypto.subtle.digest(algorithm, encoded);
   const hash: string = Array.from(new Uint8Array(arrayBuffer)).map((b) => b.toString(16).padStart(2, '0')).join('');
 

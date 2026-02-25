@@ -6,7 +6,7 @@
   "typescript.preferences.quoteStyle": "single",
   "deno.lint": true,
   "deno.enable": true,
-  "deno.unstable": ["ky"],
+  "deno.unstable": ["kv"],
   "deno.config": "./deno.json",
   "deno.codeLens.references": false,
   "deno.codeLens.referencesAllFunctions": false,

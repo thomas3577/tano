@@ -1,12 +1,56 @@
 // Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf } from '@std/assert';
-import { describe, it } from '@std/testing/bdd';
+import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { Logger, LogLevels } from '@std/log';
 import type { LogRecord } from '@std/log';
 import { logger, logStream } from './logger.ts';
 
+const envKeys = ['QUIET', 'LOG_LEVEL', 'LOG_OUTPUT'] as const;
+type TEnvKey = (typeof envKeys)[number];
+type TEnvSnapshot = Record<TEnvKey, string | undefined>;
+
+const snapshotEnv = (): TEnvSnapshot => {
+  const snapshot = {} as TEnvSnapshot;
+
+  for (const key of envKeys) {
+    snapshot[key] = Deno.env.get(key);
+  }
+
+  return snapshot;
+};
+
+const restoreEnv = (snapshot: TEnvSnapshot): void => {
+  for (const key of envKeys) {
+    const value = snapshot[key];
+
+    if (value === undefined) {
+      Deno.env.delete(key);
+      continue;
+    }
+
+    Deno.env.set(key, value);
+  }
+};
+
+const resetLoggerEnv = (): void => {
+  Deno.env.set('QUIET', 'false');
+  Deno.env.delete('LOG_LEVEL');
+  Deno.env.delete('LOG_OUTPUT');
+};
+
 describe(`logger`, () => {
+  let envSnapshot: TEnvSnapshot;
+
+  beforeEach(() => {
+    envSnapshot = snapshotEnv();
+    resetLoggerEnv();
+  });
+
+  afterEach(() => {
+    restoreEnv(envSnapshot);
+  });
+
   it(`Should create a instance of Logger`, () => {
     const actual: Logger = logger();
 
@@ -39,6 +83,17 @@ describe(`logger`, () => {
 });
 
 describe(`logStream`, () => {
+  let envSnapshot: TEnvSnapshot;
+
+  beforeEach(() => {
+    envSnapshot = snapshotEnv();
+    resetLoggerEnv();
+  });
+
+  afterEach(() => {
+    restoreEnv(envSnapshot);
+  });
+
   it('Should stream the log output', async () => {
     Deno.env.set('QUIET', 'false');
     Deno.env.set('LOG_LEVEL', 'debug');

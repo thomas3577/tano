@@ -3,7 +3,6 @@
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.defaultFormatter": "denoland.vscode-deno",
-  "typescript.preferences.quoteStyle": "single",
   "deno.lint": true,
   "deno.enable": true,
   "deno.unstable": ["kv"],

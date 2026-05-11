@@ -94,7 +94,7 @@ task('My Task', {
 **Example with embedded, needed tasks (Var 2):**
 
 ```ts
-import { , task } from 'jsr:@dx/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('My Task', needs(task('My Pre Task')));
 ```
@@ -150,7 +150,7 @@ const needs: Needs = {
 
 task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
 task('My Task 3', ['bash', '-c', 'ls -la'], { cwd: 'C:\\temp' });
-task('default', needs 'ls -la', { cwd: 'C:\\temp' });
+task('default', needs, 'ls -la', { cwd: 'C:\\temp' });
 ```
 
 ## Overload 6
@@ -162,7 +162,7 @@ task(taskName: string, code?: Code, options?: CommandOptions) => Task;
 **Parameters:**
 
 - `taskName` (string): Sets the name of the task.
-- `code` (Code]): A JavaScript/TypeScript Function or File.
+- `code` (Code): A JavaScript/TypeScript function or file.
 - _(optional)_ `options` (CodeOptions): Options for code executor.
 
 **Example:**
@@ -187,7 +187,7 @@ task('My Task 2', (done) => {
 task('My Task 3', (): Promise<void> => {
   // Do something.
 
-  Promise.resolve();
+  return Promise.resolve();
 });
 
 // Var 4
@@ -226,16 +226,16 @@ task(taskName: string, needs?: Needs, code?: Code, options?: CommandOptions) => 
 
 - `taskName` (string): Sets the name of the task.
 - `needs` (Needs): Names of tasks to be executed before this task.
-- `code` (Code]): A JavaScript/TypeScript Function or File.
+- `code` (Code): A JavaScript/TypeScript function or file.
 - _(optional)_ `options` (CodeOptions): Options for code executor.
 
 **Example:**
 
 ```ts
-import { task } from 'jsr:@dx/tano';
+import { needs, task } from 'jsr:@dx/tano';
 
 task('My Task 2', ['ls', '-la'], { cwd: 'C:\\temp' });
-task('default', needs(), ('My Task 2') => {
+task('default', needs('My Task 2'), () => {
   // Do something.
 });
 ```

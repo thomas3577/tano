@@ -50,7 +50,7 @@ import { task } from 'jsr:@dx/tano';
 
 task('default', (): Promise<void> => {
   console.log('Hello world');
-  Promise.resolve();
+  return Promise.resolve();
 });
 
 // Output:
@@ -172,9 +172,9 @@ task(
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@dx/tano';
+import { task } from 'jsr:@dx/tano';
 
-task('default', () => console.log('Hello world'), { eval: true });
+task('default', () => console.log('Hello world'), { repl: true });
 
 // Output:
 // Hello world
@@ -191,7 +191,7 @@ console.log('Hello world');
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@dx/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', { file: 'func.ts' });
 
@@ -210,7 +210,7 @@ console.log('Hello world');
 **tanofile.ts:**
 
 ```ts
-import { needs, task } from 'jsr:@dx/tano';
+import { task } from 'jsr:@dx/tano';
 
 task('default', { file: 'func.ts' }, { cwd: '/usr/bin' });
 

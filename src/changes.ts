@@ -86,20 +86,23 @@ export class Changes implements TChanges {
    * @param {TGlobHashSource} source - Global hash source of the files.
    */
   async update(taskName: string, timestamp: Date, status: TTaskStatus, source?: TGlobHashSource): Promise<void> {
-    if (!this.#data) {
+    const data = await this.#getAll();
+    if (!data) {
       return;
     }
+
+    this.#data = data;
 
     const lastRun: string = timestamp.toISOString();
     const hash: undefined | string = await computeHash(source, [this.#cache.path]);
 
-    this.#data.tasks[taskName] = {
+    data.tasks[taskName] = {
       lastRun,
       lastStatus: status,
       hash,
     };
 
-    await this.#cache.write(this.#data);
+    await this.#cache.write(data);
   }
 
   /**

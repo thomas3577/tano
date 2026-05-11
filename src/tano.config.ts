@@ -81,7 +81,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
       file: 'tanofile.ts',
       quiet: false,
       force: false,
-      'fail-fast': false,
+      'fail-fast': true,
       'log-level': 'INFO',
       'log-output': ['console'],
       'no-cache': false,

@@ -10,7 +10,7 @@ import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
 
-const hasShellQuotingOrEscaping = (value: string): boolean => /["']|\\[\s"'\\]/.test(value);
+const hasUnsupportedStringCommandSyntax = (value: string): boolean => /"|\\[\s"'\\]/.test(value);
 
 const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess => {
   if (command == null) {
@@ -23,7 +23,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
 
   const isCommandArray = Array.isArray(command);
 
-  if (!isCommandArray && hasShellQuotingOrEscaping(command)) {
+  if (!isCommandArray && hasUnsupportedStringCommandSyntax(command)) {
     throw new Error('String commands do not support shell quoting or escaping. Please pass command as an array of arguments.');
   }
 

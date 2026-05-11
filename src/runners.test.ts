@@ -72,8 +72,8 @@ describe(runCommand.name, () => {
     assertEquals(actual, false);
   });
 
-  it(`if runCommand('pwsh -c ls')`, async () => {
-    const command = 'pwsh -c ls';
+  it(`if runCommand('deno eval 1+1')`, async () => {
+    const command = 'deno eval 1+1';
     const actual = await runCommand(command as unknown as TCommand)
       .then(() => true)
       .catch((err) => {
@@ -84,8 +84,8 @@ describe(runCommand.name, () => {
     assertEquals(actual, true);
   });
 
-  it(`if runCommand('pwsh -c echo Hello World!')`, async () => {
-    const command = 'pwsh -c echo Hello World!';
+  it(`if runCommand(['deno', 'eval', 'console.log("Hello World!")'])`, async () => {
+    const command = ['deno', 'eval', 'console.log("Hello World!")'];
     const actual = await runCommand(command as unknown as TCommand)
       .then(() => true)
       .catch(() => false);
@@ -93,11 +93,11 @@ describe(runCommand.name, () => {
     assertEquals(actual, true);
   });
 
-  it(`if runCommand(['pwsh', '-c', 'echo Hello World!'])`, async () => {
-    const command = ['pwsh', '-c', 'echo Hello World!'];
+  it(`if runCommand(['deno', 'eval', 'Deno.exit(2)'])`, async () => {
+    const command = ['deno', 'eval', 'Deno.exit(2)'];
     const actual = await runCommand(command as unknown as TCommand)
-      .then(() => true)
-      .catch(() => false);
+      .then(() => false)
+      .catch(() => true);
 
     assertEquals(actual, true);
   });

@@ -1,6 +1,6 @@
 // Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { executeCodeFunction, executeCondition, runCode, runCommand } from './runners.ts';
 import type { TCode, TCodeFunction, TCommand, TCondition } from './types.ts';
@@ -100,6 +100,21 @@ describe(runCommand.name, () => {
       .catch(() => true);
 
     assertEquals(actual, true);
+  });
+
+  it(`if runCommand('deno eval "console.log(1+1)"')`, async () => {
+    const command = 'deno eval "console.log(1+1)"';
+
+    let message = '';
+    const actual = await runCommand(command as unknown as TCommand)
+      .then(() => false)
+      .catch((err) => {
+        message = err instanceof Error ? err.message : String(err);
+        return true;
+      });
+
+    assertEquals(actual, true);
+    assertStringIncludes(message, 'Please pass command as an array of arguments.');
   });
 });
 

@@ -10,6 +10,8 @@ import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
 
+const hasShellQuotingOrEscaping = (value: string): boolean => /["']|\\[\s"'\\]/.test(value);
+
 const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess => {
   if (command == null) {
     throw new Error('Command is required.');
@@ -19,7 +21,13 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
     throw new Error('Command must be a string or an array of strings.');
   }
 
-  const args: string[] = Array.isArray(command) ? [...command] : command.split(' ');
+  const isCommandArray = Array.isArray(command);
+
+  if (!isCommandArray && hasShellQuotingOrEscaping(command)) {
+    throw new Error('String commands do not support shell quoting or escaping. Please pass command as an array of arguments.');
+  }
+
+  const args: string[] = isCommandArray ? [...command] : command.split(' ');
   const executable = args.shift();
 
   if (!executable || executable.trim().length < 1) {
@@ -107,7 +115,7 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
 /**
  * Runs a command.
  *
- * @param {TCommand} command - The command which should be executed.
+ * @param {TCommand} command - The command which should be executed. If this is a string, it is split by spaces into `args` and must not contain shell-style quoting/escaping. Use the array form to pass pre-split arguments safely.
  * @param {TCommandOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<number>}

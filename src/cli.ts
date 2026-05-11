@@ -13,7 +13,12 @@ export const cli = async (args: TTanoArgs): Promise<void> => {
     log.info(`Using       ${args.file}`);
 
     if (args.file) {
-      await import(args.file);
+      try {
+        await import(args.file);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : `${err}`;
+        throw new Error(`Failed to load tanofile '${args.file}': ${msg}`);
+      }
     }
 
     await handler.run(args.task, {

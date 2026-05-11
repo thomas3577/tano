@@ -11,6 +11,8 @@ import { format, join } from '@std/path';
 import { exists } from '@std/fs';
 import type { TTanoRunData, TTaskRunData } from './types.ts';
 
+const TASK_PREFIX: Deno.KvKeyPart = 'task';
+
 /**
  * Creates the directory to the tano cache.
  *
@@ -73,7 +75,7 @@ export class TanoCache {
 
     const db: Deno.Kv = await this.#openKy();
     const tasks: Record<string, TTaskRunData> = {};
-    const entries: Deno.KvListIterator<TTaskRunData> = db.list<TTaskRunData>({ prefix: ['users'] });
+    const entries: Deno.KvListIterator<TTaskRunData> = db.list<TTaskRunData>({ prefix: [TASK_PREFIX] });
 
     for await (const entry of entries) {
       const taskName: undefined | string = toTaskName(entry.key);
@@ -97,8 +99,14 @@ export class TanoCache {
   async write(data?: TTanoRunData): Promise<void> {
     const db: Deno.Kv = await this.#openKy();
 
-    for (const promise of Object.entries(data?.tasks || {}).map(([key, value]) => db.set(['task', key], value))) {
-      await promise;
+    for (const [key, value] of Object.entries(data?.tasks || {})) {
+      try {
+        await db.set([TASK_PREFIX, key], value);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : `${err}`;
+
+        throw new Error(`Failed to persist cache for task '${key}': ${msg}`);
+      }
     }
   }
 

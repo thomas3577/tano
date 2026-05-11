@@ -8,26 +8,42 @@
 
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
-import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2, TProcessError } from './types.ts';
+import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
 
-const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess | TProcessError => {
-  try {
-    const args: string[] = Array.isArray(command) ? command : command.split(' ');
-    const cmd: Deno.Command = new Deno.Command(args.shift() as string | URL, {
-      args,
-      cwd: options?.cwd || Deno.cwd(),
-      env: options?.env,
-      stdout: options?.stdout || 'piped',
-      stderr: options?.stderr || 'piped',
-      stdin: options?.stdin || 'piped',
-    });
+const hasShellQuotingOrEscaping = (value: string): boolean => /["']|\\[\s"'\\]/.test(value);
 
-    return cmd.spawn();
-  } catch (err: unknown) {
-    const error = typeof err === 'string' ? err : (err as Error)?.message ?? 'Unknown error';
-
-    return { error };
+const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess => {
+  if (command == null) {
+    throw new Error('Command is required.');
   }
+
+  if (typeof command !== 'string' && !Array.isArray(command)) {
+    throw new Error('Command must be a string or an array of strings.');
+  }
+
+  const isCommandArray = Array.isArray(command);
+
+  if (!isCommandArray && hasShellQuotingOrEscaping(command)) {
+    throw new Error('String commands do not support shell quoting or escaping. Please pass command as an array of arguments.');
+  }
+
+  const args: string[] = isCommandArray ? [...command] : command.split(' ');
+  const executable = args.shift();
+
+  if (!executable || executable.trim().length < 1) {
+    throw new Error('Command is empty.');
+  }
+
+  const cmd: Deno.Command = new Deno.Command(executable, {
+    args,
+    cwd: options?.cwd || Deno.cwd(),
+    env: options?.env,
+    stdout: options?.stdout || 'piped',
+    stderr: options?.stderr || 'piped',
+    stdin: options?.stdin || 'piped',
+  });
+
+  return cmd.spawn();
 };
 
 /**
@@ -99,7 +115,7 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
 /**
  * Runs a command.
  *
- * @param {TCommand} command - The command which should be executed.
+ * @param {TCommand} command - The command which should be executed. If this is a string, it is split by spaces into `args` and must not contain shell-style quoting/escaping. Use the array form to pass pre-split arguments safely.
  * @param {TCommandOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<number>}
@@ -112,21 +128,7 @@ export const runCommand = async (command: TCommand, options?: TCommandOptions): 
 
   const textDecoder = new TextDecoder();
   const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const processOrError: Deno.ChildProcess | TProcessError = getProcess(command, options);
-  const processError: TProcessError = processOrError as TProcessError;
-  const process: Deno.ChildProcess = processOrError as Deno.ChildProcess;
-
-  if (processError.error) {
-    await Promise.reject(processError.error);
-
-    if (logThis) {
-      log.error(processError.error);
-    }
-
-    if (typeof options?.output === 'function') {
-      options?.output(processError.error, undefined);
-    }
-  }
+  const process: Deno.ChildProcess = getProcess(command, options);
 
   // Output pipe
   process.stdout.pipeTo(
@@ -183,6 +185,21 @@ export const runCommand = async (command: TCommand, options?: TCommandOptions): 
   process.stdin.close();
 
   const status: Deno.CommandStatus = await process.status;
+
+  if (status.code !== 0) {
+    const commandText = Array.isArray(command) ? command.join(' ') : command;
+    const error = `Command failed with exit code ${status.code}: ${commandText}`;
+
+    if (logThis) {
+      log.error(error);
+    }
+
+    if (typeof options?.output === 'function') {
+      options?.output(error, undefined);
+    }
+
+    throw new Error(error);
+  }
 
   log.debug(`Run command completed with code '{code}'.`, status);
 };

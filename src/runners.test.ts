@@ -1,6 +1,6 @@
 // Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { executeCodeFunction, executeCondition, runCode, runCommand } from './runners.ts';
 import type { TCode, TCodeFunction, TCommand, TCondition } from './types.ts';
@@ -72,8 +72,8 @@ describe(runCommand.name, () => {
     assertEquals(actual, false);
   });
 
-  it(`if runCommand('pwsh -c ls')`, async () => {
-    const command = 'pwsh -c ls';
+  it(`if runCommand('deno eval 1+1')`, async () => {
+    const command = 'deno eval 1+1';
     const actual = await runCommand(command as unknown as TCommand)
       .then(() => true)
       .catch((err) => {
@@ -84,8 +84,8 @@ describe(runCommand.name, () => {
     assertEquals(actual, true);
   });
 
-  it(`if runCommand('pwsh -c echo Hello World!')`, async () => {
-    const command = 'pwsh -c echo Hello World!';
+  it(`if runCommand(['deno', 'eval', 'console.log("Hello World!")'])`, async () => {
+    const command = ['deno', 'eval', 'console.log("Hello World!")'];
     const actual = await runCommand(command as unknown as TCommand)
       .then(() => true)
       .catch(() => false);
@@ -93,13 +93,28 @@ describe(runCommand.name, () => {
     assertEquals(actual, true);
   });
 
-  it(`if runCommand(['pwsh', '-c', 'echo Hello World!'])`, async () => {
-    const command = ['pwsh', '-c', 'echo Hello World!'];
+  it(`if runCommand(['deno', 'eval', 'Deno.exit(2)'])`, async () => {
+    const command = ['deno', 'eval', 'Deno.exit(2)'];
     const actual = await runCommand(command as unknown as TCommand)
-      .then(() => true)
-      .catch(() => false);
+      .then(() => false)
+      .catch(() => true);
 
     assertEquals(actual, true);
+  });
+
+  it(`if runCommand('deno eval "console.log(1+1)"')`, async () => {
+    const command = 'deno eval "console.log(1+1)"';
+
+    let message = '';
+    const actual = await runCommand(command as unknown as TCommand)
+      .then(() => false)
+      .catch((err) => {
+        message = err instanceof Error ? err.message : String(err);
+        return true;
+      });
+
+    assertEquals(actual, true);
+    assertStringIncludes(message, 'Please pass command as an array of arguments.');
   });
 });
 

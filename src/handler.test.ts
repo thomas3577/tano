@@ -1,6 +1,6 @@
 // Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
 
-import { assertEquals, assertInstanceOf } from '@std/assert';
+import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { afterEach, beforeAll, describe, it } from '@std/testing/bdd';
 import { spy } from '@std/testing/mock';
 import { handler } from './handler.ts';
@@ -117,5 +117,32 @@ describe('handler', () => {
     await handler.run('default', { failFast: false });
 
     assertEquals(handler.executed, 3);
+  });
+
+  it(`Should deduplicate shared dependencies in execution plan`, async () => {
+    task('shared', () => {});
+    task('task-a', needs('shared'), () => {});
+    task('task-b', needs('shared'), () => {});
+    task('default', needs('task-a', 'task-b'), () => {});
+
+    const plan = handler.getPlan('default');
+
+    assertEquals(plan, ['shared', 'task-a', 'task-b', 'default']);
+
+    await handler.run('default');
+
+    assertEquals(handler.executed, 4);
+  });
+
+  it(`Should fail on circular dependencies`, async () => {
+    task('task-a', needs('task-b'), () => {});
+    task('task-b', needs('task-a'), () => {});
+    task('default', needs('task-a'), () => {});
+
+    await assertRejects(
+      async () => await handler.run('default'),
+      Error,
+      'Circular dependency detected',
+    );
   });
 });

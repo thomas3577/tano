@@ -256,15 +256,35 @@ class Handler implements TTanoHandler {
     }
   }
 
-  #getPlan(taskName: string, taskNames: Array<string> = []): Array<string> {
+  #getPlan(
+    taskName: string,
+    taskNames: Array<string> = [],
+    planned: Set<string> = new Set(),
+    visiting: Set<string> = new Set(),
+  ): Array<string> {
+    if (visiting.has(taskName)) {
+      throw new Error(`Circular dependency detected at task '${taskName}'.`);
+    }
+
+    if (planned.has(taskName)) {
+      return taskNames;
+    }
+
     if (this.#cache.has(taskName)) {
       const task: Task = this.#cache.get(taskName) as Task;
 
-      if (task?.needs?.length > 0) {
-        task.needs.forEach((tn) => this.#getPlan(tn, taskNames));
+      visiting.add(taskName);
+
+      try {
+        if (task?.needs?.length > 0) {
+          task.needs.forEach((tn) => this.#getPlan(tn, taskNames, planned, visiting));
+        }
+      } finally {
+        visiting.delete(taskName);
       }
 
       taskNames.push(taskName);
+      planned.add(taskName);
     } else {
       this.#log.warn('A task with the name {name} does not exist.', {
         name: `'${taskName}'`,

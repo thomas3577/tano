@@ -20,7 +20,7 @@
     "@std/testing": "jsr:@std/testing@^1.0.19",
     "@std/datetime": "jsr:@std/datetime@^0.225.7",
     "@std/log": "jsr:@std/log@^0.224.14",
-    "@std/cli": "jsr:@std/cli@^1.0.31"
+    "@std/cli": "jsr:@std/cli@^1.0.32"
   },
   "publish": {
     "exclude": [

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Running deno fmt..."
+deno fmt --check
+if [ $? -ne 0 ]; then
+  echo "deno fmt failed"
+  exit 1
+fi
+
+echo "Running deno lint..."
+deno lint
+if [ $? -ne 0 ]; then
+  echo "deno lint failed"
+  exit 1
+fi

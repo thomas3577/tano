@@ -395,7 +395,7 @@ export type TCodeFile = {
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: 1 + 2 === 3
  * });
  * ```
@@ -409,7 +409,7 @@ export type TConditionType1 = boolean;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: () => 1 + 1 === 3
  * });
  * ```
@@ -418,7 +418,7 @@ export type TConditionType1 = boolean;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: () => Promise.resolve(1 === 1)
  * });
  * ```
@@ -432,7 +432,7 @@ export type TConditionType2 = () => boolean | Promise<boolean>;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: (done) => done(1 === 1)
  * });
  * ```
@@ -446,7 +446,7 @@ export type TConditionType3 = (done: (result: boolean) => void) => void;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: 1 + 2 === 3
  * });
  * ```

@@ -12,7 +12,7 @@ setup({
 task(
   'default',
   needs(
-    task('My task 01', `pwsh -c echo 'Hello World from pwsh.'`),
+    task('My task 01', `pwsh -c "echo 'Hello World from pwsh.'"`),
     task('My task 02', () => console.log('Hello World from code at repl.'), { repl: true }),
     task('My task 03', { file: 'tanofile.code.ts' }),
     task('My task 04', async (): Promise<void> => {
@@ -51,9 +51,9 @@ task(
       args: ['--allow-write'],
       logThis: true,
     }),
-    xtask('My task 10', `pwsh -c echo 'Hello World from pwsh.'`),
+    xtask('My task 10', `pwsh -c "echo 'Hello World from pwsh.'"`),
   ),
-  `pwsh -c echo 'The END!'`,
+  `pwsh -c "echo 'The END!'"`,
   {
     logThis: true,
   },
@@ -109,7 +109,7 @@ task('conditions-06', () => {}, {
   },
 });
 
-task('conditions-07', `pwsh -c echo 'BEEP'`, {
+task('conditions-07', `pwsh -c "echo 'BEEP'"`, {
   condition: () => {
     return true;
   },
@@ -129,13 +129,13 @@ task(
   ),
 );
 
-task('output-01', `pwsh -c echo 'OUTPUT'`, {
+task('output-01', `pwsh -c "echo 'OUTPUT'"`, {
   output: (_, result) => {
     const log: Logger = logger();
     log.info('Output 01', result);
   },
 });
 
-task('log-this-01', `pwsh -c echo 'OUTPUT'`, {
+task('log-this-01', `pwsh -c "echo 'OUTPUT'"`, {
   logThis: true,
 });

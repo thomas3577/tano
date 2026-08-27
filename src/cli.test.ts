@@ -152,6 +152,13 @@ task('default', needs('build'));
     assertEquals(actual.stdout.includes('BUILD_RAN'), false);
   });
 
+  it(`Should pass a quoted argument to a non-shell process as one argument.`, async () => {
+    const actual = await runCli(`task('quoted', \`deno eval 'console.log("ARGS=" + JSON.stringify(Deno.args))' one 'two three'\`);`, ['quoted']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'ARGS=["one","two three"]');
+  });
+
   it(`Should exit with 1 on --dry-run if the task does not exist.`, async () => {
     const actual = await runCli(`task('ok', ['deno', 'eval', '1']);`, ['nope', '--dry-run']);
 

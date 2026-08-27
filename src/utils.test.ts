@@ -518,7 +518,7 @@ describe(getImportUrl.name, () => {
     const fileOrUrl = await Deno.realPath('./examples/tanofile.ts');
     const actual = await getImportUrl(fileOrUrl);
 
-    assertEquals(actual.endsWith('tanofile.ts'), true);
+    assertEquals(actual, toFileUrl(fileOrUrl).toString());
   });
 });
 

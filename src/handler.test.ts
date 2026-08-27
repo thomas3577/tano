@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { afterEach, beforeAll, describe, it } from '@std/testing/bdd';

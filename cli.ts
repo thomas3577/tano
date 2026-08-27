@@ -27,7 +27,7 @@ if (import.meta.main) {
       await task('upgrade', 'deno install --allow-run -RWEN --unstable-kv -f -g -n tano jsr:@dx/tano/cli').run();
       break;
     default:
-      await cli(args);
+      Deno.exitCode = await cli(args);
       break;
   }
 }

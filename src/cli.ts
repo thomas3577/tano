@@ -6,7 +6,14 @@ import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import type { TTanoArgs } from './types.ts';
 
-export const cli = async (args: TTanoArgs): Promise<void> => {
+/**
+ * Loads the tanofile and runs the requested task.
+ *
+ * @param {TTanoArgs} args - The tano args.
+ *
+ * @returns {Promise<number>} The exit code. `0` if the run succeeded, `1` if it was aborted with errors.
+ */
+export const cli = async (args: TTanoArgs): Promise<number> => {
   const log: Logger = logger();
 
   try {
@@ -26,8 +33,12 @@ export const cli = async (args: TTanoArgs): Promise<void> => {
       force: args.force,
       noCache: args.noCache,
     });
+
+    return 0;
   } catch (err: unknown) {
     log.error(bold('Aborted with errors.'));
     log.error(err);
+
+    return 1;
   }
 };

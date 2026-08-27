@@ -225,6 +225,14 @@ export type TTanoConfig = {
 };
 
 /**
+ * Same like {@linkcode TTanoConfig} but with all defaults applied, so every property is set.
+ *
+ * @remarks
+ * An empty `tanoCwd` means the current working directory.
+ */
+export type TTanoConfigStrict = Required<TTanoConfig>;
+
+/**
  * Options for a task run.
  */
 export type TTaskRunOptions = {

@@ -1,56 +1,17 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf } from '@std/assert';
-import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
+import { afterEach, describe, it } from '@std/testing/bdd';
 import { Logger, LogLevels } from '@std/log';
 import type { LogRecord } from '@std/log';
 import { logger, logStream } from './logger.ts';
+import { resetConfig, setup } from './config.ts';
 
-const envKeys = ['QUIET', 'LOG_LEVEL', 'LOG_OUTPUT'] as const;
-type TEnvKey = (typeof envKeys)[number];
-type TEnvSnapshot = Record<TEnvKey, string | undefined>;
-
-const snapshotEnv = (): TEnvSnapshot => {
-  const snapshot = {} as TEnvSnapshot;
-
-  for (const key of envKeys) {
-    snapshot[key] = Deno.env.get(key);
-  }
-
-  return snapshot;
-};
-
-const restoreEnv = (snapshot: TEnvSnapshot): void => {
-  for (const key of envKeys) {
-    const value = snapshot[key];
-
-    if (value === undefined) {
-      Deno.env.delete(key);
-      continue;
-    }
-
-    Deno.env.set(key, value);
-  }
-};
-
-const resetLoggerEnv = (): void => {
-  Deno.env.set('QUIET', 'false');
-  Deno.env.delete('LOG_LEVEL');
-  Deno.env.delete('LOG_OUTPUT');
-};
+afterEach(() => {
+  resetConfig();
+});
 
 describe(`logger`, () => {
-  let envSnapshot: TEnvSnapshot;
-
-  beforeEach(() => {
-    envSnapshot = snapshotEnv();
-    resetLoggerEnv();
-  });
-
-  afterEach(() => {
-    restoreEnv(envSnapshot);
-  });
-
   it(`Should create a instance of Logger`, () => {
     const actual: Logger = logger();
 
@@ -60,8 +21,7 @@ describe(`logger`, () => {
   });
 
   it(`Should have log level 'ERROR' (1)`, () => {
-    Deno.env.set('QUIET', 'false');
-    Deno.env.set('LOG_LEVEL', 'ERROR');
+    setup({ logLevel: 'ERROR' });
 
     const actual: Logger = logger();
 
@@ -70,9 +30,8 @@ describe(`logger`, () => {
     assertEquals(actual.level, LogLevels.ERROR);
   });
 
-  it(`Should have log level 'ERROR' (1)`, () => {
-    Deno.env.set('QUIET', 'false');
-    Deno.env.set('LOG_LEVEL', 'error');
+  it(`Should have log level 'ERROR' (1) for a lowercase log level`, () => {
+    setup({ logLevel: 'error' });
 
     const actual: Logger = logger();
 
@@ -83,21 +42,8 @@ describe(`logger`, () => {
 });
 
 describe(`logStream`, () => {
-  let envSnapshot: TEnvSnapshot;
-
-  beforeEach(() => {
-    envSnapshot = snapshotEnv();
-    resetLoggerEnv();
-  });
-
-  afterEach(() => {
-    restoreEnv(envSnapshot);
-  });
-
   it('Should stream the log output', async () => {
-    Deno.env.set('QUIET', 'false');
-    Deno.env.set('LOG_LEVEL', 'debug');
-    Deno.env.set('LOG_OUTPUT', 'console, stream');
+    setup({ logLevel: 'debug', logOutput: ['console', 'stream'] });
 
     const actual: Logger = logger();
     const reader = logStream.readable.getReader();
@@ -120,7 +66,6 @@ describe(`logStream`, () => {
           break;
         }
 
-        console.log(value);
         log = JSON.parse(value);
       }
     })();

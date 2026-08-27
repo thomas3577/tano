@@ -282,16 +282,3 @@ export const getCwd = (importUrl?: string): string => {
 
   return importDirectory;
 };
-
-/**
- * Converts a string to snake case.
- *
- * @param {string} value - The string to convert.
- *
- * @returns {string | undefined} The converted string.
- */
-export const toSnakeCase = (value: string): string | undefined => {
-  const words = value.match(/[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)/g);
-
-  return words?.join('_');
-};

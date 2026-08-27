@@ -152,6 +152,14 @@ task('default', needs('build'));
     assertEquals(actual.stdout.includes('BUILD_RAN'), false);
   });
 
+  it(`Should not leak tano configuration into the environment of a task.`, async () => {
+    const keys = `["QUIET","FORCE","NO_CACHE","FAIL_FAST","LOG_LEVEL","LOG_OUTPUT","LOG_FILE","LOG_EVERYTHING","TANO_CWD"]`;
+    const actual = await runCli(`task('env', ['deno', 'eval', 'console.log("LEAKED=" + ${keys}.filter((key) => Deno.env.get(key) !== undefined).join(","))']);`, ['env']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'LEAKED=\n');
+  });
+
   it(`Should pass a quoted argument to a non-shell process as one argument.`, async () => {
     const actual = await runCli(`task('quoted', \`deno eval 'console.log("ARGS=" + JSON.stringify(Deno.args))' one 'two three'\`);`, ['quoted']);
 

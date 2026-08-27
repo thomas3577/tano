@@ -10,6 +10,7 @@ import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
+import { config } from './config.ts';
 import type { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
@@ -92,7 +93,7 @@ class Handler implements TTanoHandler {
       if (this.#options.noCache === true) {
         this.#changes = new ChangesMock();
       } else {
-        this.#changes = new Changes(Deno.env.get('TANO_CWD'));
+        this.#changes = new Changes(config().tanoCwd);
       }
     }
 

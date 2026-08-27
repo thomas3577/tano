@@ -11,6 +11,7 @@ import { gray, white } from '@std/fmt/colors';
 import { BaseHandler, ConsoleHandler, FileHandler, getLogger, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
 import { consoleMock } from './console.ts';
+import { config } from './config.ts';
 import type { TLogHandler, TLogStream } from './types.ts';
 
 const log = console.log;
@@ -89,7 +90,7 @@ let fileHandler: FileHandler;
 const getFileHandler = (): FileHandler => {
   if (!fileHandler) {
     const fileHandlerOptions: FileHandlerOptions = {
-      filename: Deno.env.get('LOG_FILE') || './tano.log',
+      filename: config().logFile,
     };
 
     fileHandler = new FileHandler(levelName, fileHandlerOptions);
@@ -125,14 +126,14 @@ export const logStream: TLogStream = {
  * @returns {Logger}
  */
 export const logger = (): Logger => {
-  const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const level: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
-  const handlers: TLogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as TLogHandler[] || ['console'] as TLogHandler[];
+  const { quiet, logLevel, logOutput } = config();
+  const level: LevelName = logLevel.toUpperCase() as LevelName;
+  const handlers: TLogHandler[] = logOutput as TLogHandler[];
 
   // deno-lint-ignore no-global-assign
   console = quiet ? consoleMock : console;
 
-  const config: LogConfig = {
+  const logConfig: LogConfig = {
     handlers: {},
     loggers: {
       default: {
@@ -143,21 +144,21 @@ export const logger = (): Logger => {
   };
 
   if (handlers.includes('console')) {
-    config.handlers = config.handlers ?? {};
-    config.handlers['console'] = getConsoleHandler();
+    logConfig.handlers = logConfig.handlers ?? {};
+    logConfig.handlers['console'] = getConsoleHandler();
   }
 
   if (handlers.includes('stream')) {
-    config.handlers = config.handlers ?? {};
-    config.handlers['stream'] = getStreamHandler();
+    logConfig.handlers = logConfig.handlers ?? {};
+    logConfig.handlers['stream'] = getStreamHandler();
   }
 
   if (handlers.includes('file')) {
-    config.handlers = config.handlers ?? {};
-    config.handlers['file'] = getFileHandler();
+    logConfig.handlers = logConfig.handlers ?? {};
+    logConfig.handlers['file'] = getFileHandler();
   }
 
-  setup(config);
+  setup(logConfig);
 
   return getLogger();
 };

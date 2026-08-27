@@ -8,6 +8,7 @@
 
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
+import { config } from './config.ts';
 import { tokenize } from './tokenize.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
 
@@ -51,7 +52,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
  * @returns {Promise<void>}
  */
 export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void> => {
-  const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
+  const logThis: boolean = options?.logThis ?? config().logEverything;
   const log: Logger = logger();
 
   log.debug('Run code...');
@@ -114,13 +115,13 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
  * @returns {Promise<number>}
  */
 export const runCommand = async (command: TCommand, options?: TCommandOptions): Promise<void> => {
-  const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
+  const logThis: boolean = options?.logThis ?? config().logEverything;
   const log: Logger = logger();
 
   log.debug('Run command...');
 
   const textDecoder = new TextDecoder();
-  const quiet: boolean = Deno.env.get('QUIET') === 'true';
+  const quiet: boolean = config().quiet;
   const process: Deno.ChildProcess = getProcess(command, options);
 
   // Output pipe

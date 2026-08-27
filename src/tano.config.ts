@@ -1,7 +1,7 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
- * This module contains the setup function for the CLI.
+ * This module parses the CLI arguments.
  *
  * @module
  */
@@ -9,54 +9,11 @@
 import { parseArgs } from '@std/cli';
 import { join } from '@std/path';
 import type { Logger } from '@std/log';
-import { getCwd, getImportUrl, toSnakeCase } from './utils.ts';
+import { getCwd, getImportUrl } from './utils.ts';
 import { logger } from './logger.ts';
+import { setup } from './config.ts';
 import { handler } from './handler.ts';
 import type { TTanoArgs, TTanoCliAction, TTanoConfig } from './types.ts';
-
-type EnvSetBy = 'setup';
-
-const setEnv = (config: TTanoConfig, setBy?: EnvSetBy): void => {
-  const overwrittenBy = setBy ? ` (overwritten by ${setBy})` : '';
-
-  Object.entries(config).forEach(([key, value]) => {
-    const envKey = toSnakeCase(key)?.toUpperCase();
-    if (envKey && value !== undefined) {
-      Deno.env.set(envKey, `${value}`);
-    }
-  });
-
-  const log: Logger = logger();
-
-  handler.updateLogger();
-
-  Object.keys(config).forEach((key) => {
-    const envKey = toSnakeCase(key)?.toUpperCase();
-    if (envKey) {
-      log.debug(`${(envKey + ':').padEnd(16)}${Deno.env.get(envKey)}${overwrittenBy}`);
-    }
-  });
-
-  log.debug('');
-};
-
-/**
- * Possibility to setup the tano configuration. Just add to your `tanofile.ts`.
- *
- * @param {TTanoConfig} config - The tano configuration.
- *
- * @example Set config in your `tanofile.ts`:
- * ```ts
- * import { setup } from 'jsr:@dx/tano';
- *
- * setup({
- *   logLevel: 'DEBUG',
- * });
- * ```
- */
-export const setup = (config: TTanoConfig): void => {
-  setEnv(config, 'setup');
-};
 
 /**
  * Executed on every CLI call to prepare and provide all options.
@@ -127,7 +84,14 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
     quiet,
   };
 
-  setEnv(config);
+  setup(config);
+
+  const log: Logger = logger();
+
+  handler.updateLogger();
+
+  log.debug(`Config      ${JSON.stringify(config)}`);
+  log.debug('');
 
   const args: TTanoArgs = {
     action,

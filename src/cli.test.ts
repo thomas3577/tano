@@ -122,4 +122,40 @@ describe('cli', () => {
     assertStringIncludes(actual.stdout, 'B_RAN');
     assertStringIncludes(actual.stdout, 'Failed tasks: a, c');
   });
+
+  it(`Should list all tasks sorted by name and run nothing.`, async () => {
+    const tanofile = `
+task('build', ['deno', 'eval', 'console.log("BUILD_RAN")'], { description: 'Builds the thing' });
+task('audit', ['deno', 'eval', '1']);
+task('default', needs('audit', 'build'));
+`;
+    const actual = await runCli(tanofile, ['--list']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, '  audit\n  build     Builds the thing\n  default\n');
+    assertEquals(actual.stdout.includes('BUILD_RAN'), false);
+    assertEquals(actual.stdout.includes('Starting...'), false);
+  });
+
+  it(`Should print the execution plan and run nothing on --dry-run.`, async () => {
+    const tanofile = `
+task('audit', ['deno', 'eval', 'console.log("AUDIT_RAN")']);
+task('build', needs('audit'), ['deno', 'eval', 'console.log("BUILD_RAN")']);
+task('default', needs('build'));
+`;
+    const actual = await runCli(tanofile, ['--dry-run']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, `Plan for 'default':`);
+    assertStringIncludes(actual.stdout, '  1. audit\n  2. build\n  3. default\n');
+    assertEquals(actual.stdout.includes('AUDIT_RAN'), false);
+    assertEquals(actual.stdout.includes('BUILD_RAN'), false);
+  });
+
+  it(`Should exit with 1 on --dry-run if the task does not exist.`, async () => {
+    const actual = await runCli(`task('ok', ['deno', 'eval', '1']);`, ['nope', '--dry-run']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
+  });
 });

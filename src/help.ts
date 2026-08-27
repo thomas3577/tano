@@ -47,6 +47,13 @@ export const help = (): void => {
       -t, --task <TASK_NAME>
               As an alternative to set the task name.
 
+          --list
+              Prints all tasks of the tanofile instead of running one.
+
+          --dry-run
+              Prints the tasks that would be executed, in order, without
+              running them.
+
       -l, --log-level <LOG_LEVEL>
               To change the log level. Default is 'INFO'.
               See https://deno.land/std@log/levels.ts

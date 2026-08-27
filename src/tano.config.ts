@@ -76,7 +76,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
     },
     string: ['file', 'task', 'log-level', 'log-file'],
     collect: ['log-output'],
-    boolean: ['help', 'quiet', 'fail-fast', 'version', 'upgrade', 'force', 'no-cache', 'log-everything'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version', 'upgrade', 'force', 'no-cache', 'log-everything', 'list', 'dry-run'],
     negatable: ['fail-fast'],
     default: {
       file: 'tanofile.ts',
@@ -87,6 +87,8 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
       'log-output': ['console'],
       'no-cache': false,
       'log-everything': false,
+      list: false,
+      'dry-run': false,
     },
   });
 
@@ -110,6 +112,8 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   const logOutput: string[] = flags['log-output'] as string[];
   const quiet: boolean = flags.quiet;
   const noCache: boolean = flags['no-cache'];
+  const list: boolean = flags.list;
+  const dryRun: boolean = flags['dry-run'];
 
   const config: TTanoConfig = {
     tanoCwd,
@@ -128,7 +132,9 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   const args: TTanoArgs = {
     action,
     failFast,
+    dryRun,
     file,
+    list,
     noCache,
     force,
     task,

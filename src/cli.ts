@@ -4,6 +4,7 @@ import { bold } from '@std/fmt/colors';
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
+import { listPlan, listTasks } from './list.ts';
 import type { TTanoArgs } from './types.ts';
 
 /**
@@ -26,6 +27,20 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
         const msg = err instanceof Error ? err.message : `${err}`;
         throw new Error(`Failed to load tanofile '${args.file}': ${msg}`);
       }
+    }
+
+    if (args.list) {
+      listTasks(handler.tasks, args.file as string);
+
+      return 0;
+    }
+
+    if (args.dryRun) {
+      const taskName: string = args.task || 'default';
+
+      listPlan(taskName, handler.getPlan(taskName));
+
+      return 0;
     }
 
     await handler.run(args.task, {

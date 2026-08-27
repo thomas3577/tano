@@ -153,6 +153,16 @@ export type TTanoArgs = {
   force: boolean;
 
   /**
+   * If `true`, the tasks that would be executed are printed instead of running them.
+   */
+  dryRun: boolean;
+
+  /**
+   * If `true`, all tasks of the tanofile are printed instead of running one.
+   */
+  list: boolean;
+
+  /**
    * If false, the cache mechanism is disabled.
    */
   noCache: boolean;
@@ -275,6 +285,11 @@ export type TTanoRunData = {
  * These are the additional task run options (besides the `RunOptions`)
  */
 export type TTaskOptions = Deno.CommandOptions & {
+  /**
+   * A short description of what this task does. Shown by `tano --list`.
+   */
+  description?: string;
+
   /**
    * You can specify a function that returns a boolean. As a condition whether a task must be executed or skipped. If `true`, the task is executed.
    */
@@ -552,6 +567,11 @@ export type TTanoHandler = {
    * Gets the number of tasks that are in the cache.
    */
   count: number;
+
+  /**
+   * Gets all tasks that are in the cache.
+   */
+  tasks: Array<Task>;
 
   /**
    * Gets the number of executed tasks.

@@ -71,6 +71,13 @@ class Handler implements TTanoHandler {
   }
 
   /**
+   * Gets all tasks that are in the cache.
+   */
+  get tasks(): Array<Task> {
+    return Array.from(this.#cache.values());
+  }
+
+  /**
    * Gets the number of executed tasks.
    */
   get executed(): number {

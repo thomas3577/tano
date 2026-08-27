@@ -14,7 +14,7 @@ describe(`config`, () => {
       tanoCwd: '',
       failFast: true,
       force: false,
-      logFile: './tano.log',
+      logFile: '',
       logLevel: 'INFO',
       logOutput: ['console'],
       logEverything: false,

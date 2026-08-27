@@ -7,7 +7,8 @@
  */
 
 import { format } from '@std/datetime/format';
-import { gray, white } from '@std/fmt/colors';
+import { join } from '@std/path';
+import { gray, stripAnsiCode, white } from '@std/fmt/colors';
 import { BaseHandler, ConsoleHandler, FileHandler, getLogger, LogLevels, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
 import { config, configVersion } from './config.ts';
@@ -61,6 +62,18 @@ const interpolate = (msg: string, params?: unknown): string => {
   return msg;
 };
 
+/**
+ * Builds the message for a handler that is not a terminal.
+ *
+ * @remarks
+ * Colours are applied at the call site, so the raw message carries escape codes that only make sense on a console. A file or a stream consumer gets the plain text with its placeholders filled in.
+ *
+ * @param {LogRecord} logRecord - The record to build the message for.
+ *
+ * @returns {string} The interpolated message without escape codes.
+ */
+const plainMessage = (logRecord: LogRecord): string => stripAnsiCode(interpolate(logRecord.msg, logRecord.args?.at(0)));
+
 let consoleHandler: TanoConsoleHandler;
 const getConsoleHandler = (): TanoConsoleHandler => {
   if (!consoleHandler) {
@@ -91,7 +104,7 @@ const getStreamHandler = (): StreamHandler => {
     const streamHandlerOptions: BaseHandlerOptions = {
       formatter: (logRecord: LogRecord): string => {
         const datetime: string = logRecord.datetime.toISOString();
-        const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
+        const msg: string = plainMessage(logRecord);
         const args = logRecord.args;
         const result: string = JSON.stringify({ ...logRecord, datetime, msg, args });
 
@@ -109,7 +122,8 @@ let fileHandler: FileHandler;
 const getFileHandler = (): FileHandler => {
   if (!fileHandler) {
     const fileHandlerOptions: FileHandlerOptions = {
-      filename: config().logFile,
+      filename: config().logFile || join(config().tanoCwd || Deno.cwd(), 'tano.log'),
+      formatter: (logRecord: LogRecord): string => `${logRecord.levelName} ${plainMessage(logRecord)}`,
     };
 
     fileHandler = new FileHandler(levelName, fileHandlerOptions);

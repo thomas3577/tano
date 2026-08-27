@@ -2,6 +2,7 @@
 
 import { assertEquals, assertInstanceOf } from '@std/assert';
 import { afterEach, describe, it } from '@std/testing/bdd';
+import { gray } from '@std/fmt/colors';
 import { Logger, LogLevels } from '@std/log';
 import type { LogRecord } from '@std/log';
 import { logger, logStream } from './logger.ts';
@@ -77,6 +78,12 @@ describe(`logStream`, () => {
     assertEquals(log.msg, 'Hello, world!');
     assertEquals(log.levelName, 'INFO');
     assertEquals(log.loggerName, 'default');
+
+    actual.info(`Starting '${gray('{name}')}'...`, { name: 'my-task' });
+
+    await new Promise((resolve) => setTimeout(resolve, 250));
+
+    assertEquals(log.msg, `Starting 'my-task'...`);
 
     await reader.cancel();
   });

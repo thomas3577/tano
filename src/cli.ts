@@ -5,6 +5,7 @@ import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { listPlan, listTasks } from './list.ts';
+import { setup } from './config.ts';
 import type { TTanoArgs } from './types.ts';
 
 /**
@@ -29,6 +30,8 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
       }
     }
 
+    setup(args.config);
+
     if (args.list) {
       listTasks(handler.tasks, args.file as string);
 
@@ -43,11 +46,7 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
       return 0;
     }
 
-    await handler.run(args.task, {
-      failFast: args.failFast,
-      force: args.force,
-      noCache: args.noCache,
-    });
+    await handler.run(args.task);
 
     return 0;
   } catch (err: unknown) {

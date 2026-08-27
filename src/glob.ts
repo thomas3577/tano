@@ -6,29 +6,32 @@
  * @module
  */
 
-import { normalize, resolve } from '@std/path';
+import { isAbsolute, normalize, relative, resolve } from '@std/path';
 import type { GlobOptions } from '@std/path';
-import { globToRegExp, normalizeGlob } from '@std/path';
+import { globToRegExp, joinGlobs, normalizeGlob } from '@std/path';
 import { walk } from '@std/fs/walk';
 import type { WalkEntry, WalkOptions } from '@std/fs/walk';
 import type { TGlobHashOptionsStrict, TGlobHashSource } from './types.ts';
 
 /**
- * Gets a list files infos.
+ * Directories that are never walked.
  *
- * @param {Array<string>} paths - An array of paths.
- *
- * @returns {Promise<Array<Deno.FileInfo>>} filtered list of file infos.
+ * @remarks
+ * A recursive glob would otherwise reach the git index, installed packages and tano's own cache. All three change without the sources of a task changing, which would make the hash useless.
  */
-const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
-  const promises: Promise<Deno.FileInfo>[] = paths.map((path: string) => Deno.stat(path));
-  const fileInfos: Deno.FileInfo[] = [];
+const skip: RegExp[] = [/[\\/]\.git([\\/]|$)/, /[\\/]node_modules([\\/]|$)/, /[\\/]\.tano([\\/]|$)/];
 
-  for (const promise of promises) {
-    await promise.then((fileInfo) => fileInfos.push(fileInfo));
-  }
+/**
+ * Hashes bytes with SHA-256.
+ *
+ * @param {Uint8Array} data - The bytes to hash.
+ *
+ * @returns {Promise<string>} The hash as a hex string.
+ */
+const digest = async (data: Uint8Array<ArrayBufferLike>): Promise<string> => {
+  const arrayBuffer: ArrayBuffer = await crypto.subtle.digest('SHA-256', data as Uint8Array<ArrayBuffer>);
 
-  return fileInfos;
+  return Array.from(new Uint8Array(arrayBuffer)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
 };
 
 /**
@@ -42,14 +45,14 @@ const getFileInfos = async (paths: string[]): Promise<Deno.FileInfo[]> => {
  */
 const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?: GlobOptions): Promise<string[]> => {
   globToRegExpOptions = globToRegExpOptions || {
-    globstar: false,
+    globstar: true,
     caseInsensitive: false,
   };
 
   const files: string[] = [];
-  const match: RegExp[] = globs.map((g) => globToRegExp(resolve(normalizeGlob(g)), globToRegExpOptions));
+  const match: RegExp[] = globs.map((glob) => globToRegExp(isAbsolute(glob) ? normalizeGlob(glob) : joinGlobs([root, glob], globToRegExpOptions), globToRegExpOptions));
 
-  const options: WalkOptions = { match };
+  const options: WalkOptions = { match, skip };
   const iterator: AsyncIterableIterator<WalkEntry> = walk(root, options);
 
   for await (const entry of iterator) {
@@ -62,20 +65,26 @@ const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?:
 };
 
 /**
- * Hashes the contents of an array of file infos.
+ * Hashes the contents of the given files, each together with its path relative to the root.
  *
- * @param {Array<Deno.FileInfo>} fileInfos - An array of file infos.
+ * @remarks
+ * The content is hashed instead of the file metadata, because inode and modification time are new after a fresh clone and `dev` and `ino` are unavailable on Windows, which made the cache unable to ever hit in CI. The path is taken relative to the root so that the same sources hash equally no matter where they are checked out.
+ *
+ * @param {string} root - The directory the paths are relative to.
+ * @param {Array<string>} paths - The files to hash, in a stable order.
  *
  * @returns {Promise<string>} A promise to hash the input.
  */
-const hashFiles = async (fileInfos: Deno.FileInfo[]): Promise<string> => {
-  const algorithm: AlgorithmIdentifier = 'SHA-256';
-  const keys: string[] = fileInfos.map((fileInfo) => [fileInfo.dev, fileInfo.ino, fileInfo.size, fileInfo.mtime].join('-'));
-  const encoded: Uint8Array<ArrayBuffer> = new TextEncoder().encode(keys.join('\n'));
-  const arrayBuffer: ArrayBuffer = await crypto.subtle.digest(algorithm, encoded);
-  const hash: string = Array.from(new Uint8Array(arrayBuffer)).map((b) => b.toString(16).padStart(2, '0')).join('');
+const hashFiles = async (root: string, paths: string[]): Promise<string> => {
+  const lines: string[] = [];
 
-  return hash;
+  for (const path of paths) {
+    const content: Uint8Array = await Deno.readFile(path);
+
+    lines.push(`${relative(root, path).replaceAll('\\', '/')} ${await digest(content)}`);
+  }
+
+  return await digest(new TextEncoder().encode(lines.join('\n')));
 };
 
 /**
@@ -130,23 +139,13 @@ export const computeHash = async (source?: TGlobHashSource, additionalExcludes?:
   const includes: string[] = await resolveGlobs(options.include, options.root, options.globToRegExpOptions);
   const excludes: string[] = await resolveGlobs(options.exclude || [], options.root, options.globToRegExpOptions);
 
-  const files: string[] = includes
-    .filter((item: string) => excludes.indexOf(item) === -1)
-    .reduce((memo: string[], next: string) => {
-      if (memo.indexOf(next) < 0) {
-        memo.push(next);
-      }
-
-      return memo;
-    }, []);
+  const files: string[] = [...new Set(includes.filter((item: string) => !excludes.includes(item)))];
 
   if (files.length === 0) {
-    throw new Error('No files were matched using the provided globs.');
+    return undefined;
   }
 
-  files.sort();
+  files.sort((a, b) => a.localeCompare(b));
 
-  const fileInfos = await getFileInfos(files);
-
-  return await hashFiles(fileInfos);
+  return await hashFiles(options.root, files);
 };

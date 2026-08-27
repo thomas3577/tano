@@ -137,20 +137,14 @@ export type TTanoArgs = {
   action: TTanoCliAction;
 
   /**
-   * If `true`, it will be aborted at the first error.
+   * The configuration that was given on the command line. Applied again after the tanofile was imported, so that an explicit flag wins over `setup()`.
    */
-  failFast: boolean;
+  config: TTanoConfig;
 
   /**
    * The path to the tanofile.
    */
   file?: string;
-
-  /**
-   * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
-   * But if you now set `force` to true, this task will be executed anyway.
-   */
-  force: boolean;
 
   /**
    * If `true`, the tasks that would be executed are printed instead of running them.
@@ -161,11 +155,6 @@ export type TTanoArgs = {
    * If `true`, all tasks of the tanofile are printed instead of running one.
    */
   list: boolean;
-
-  /**
-   * If false, the cache mechanism is disabled.
-   */
-  noCache: boolean;
 
   /**
    * Name of the task to be executed.

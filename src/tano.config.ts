@@ -7,12 +7,24 @@
  */
 
 import { parseArgs } from '@std/cli';
-import { join } from '@std/path';
 import type { Logger } from '@std/log';
 import { getCwd, getImportUrl } from './utils.ts';
 import { logger } from './logger.ts';
 import { setup } from './config.ts';
 import type { TTanoArgs, TTanoCliAction, TTanoConfig } from './types.ts';
+
+/**
+ * Checks if a flag was actually passed on the command line.
+ *
+ * @remarks
+ * Needed because `parseArgs` fills every boolean flag with its default, which makes an unset flag indistinguishable from one that was passed as `false`. Only a flag that was really passed may override what the tanofile configured.
+ *
+ * @param {string} name - The long name of the flag.
+ * @param {string} alias - [optionalParam=undefined] The short name of the flag.
+ *
+ * @returns {boolean} if `true` the flag was passed.
+ */
+const isFlagGiven = (name: string, alias?: string): boolean => Deno.args.some((arg) => arg === `--${name}` || arg === `--no-${name}` || arg.startsWith(`--${name}=`) || (alias !== undefined && arg === `-${alias}`));
 
 /**
  * Executed on every CLI call to prepare and provide all options.
@@ -39,8 +51,6 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
       quiet: false,
       force: false,
       'fail-fast': true,
-      'log-level': 'INFO',
-      'log-output': ['console'],
       'no-cache': false,
       'log-everything': false,
       list: false,
@@ -58,30 +68,44 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   }
 
   const file: string | undefined = action === 'run' ? await getImportUrl(flags.file) : undefined;
-  const tanoCwd: string = getCwd(file);
-  const failFast: boolean = flags['fail-fast'];
-  const force: boolean = flags.force;
   const task: string = flags.task || flags._[0] as string;
-  const logFile: string = flags['log-file'] ? flags['log-file'] : join(tanoCwd, './tano.log');
-  const logLevel: string = flags['log-level'].toUpperCase();
-  const logEverything: boolean = flags['log-everything'];
-  const logOutput: string[] = flags['log-output'] as string[];
-  const quiet: boolean = flags.quiet;
-  const noCache: boolean = flags['no-cache'];
   const list: boolean = flags.list;
   const dryRun: boolean = flags['dry-run'];
 
-  const config: TTanoConfig = {
-    tanoCwd,
-    failFast,
-    force,
-    logFile,
-    logLevel,
-    logOutput,
-    logEverything,
-    noCache,
-    quiet,
-  };
+  const config: TTanoConfig = { tanoCwd: getCwd(file) };
+  const logOutput: string[] = (flags['log-output'] ?? []) as string[];
+
+  if (isFlagGiven('fail-fast')) {
+    config.failFast = flags['fail-fast'];
+  }
+
+  if (isFlagGiven('force')) {
+    config.force = flags.force;
+  }
+
+  if (isFlagGiven('no-cache')) {
+    config.noCache = flags['no-cache'];
+  }
+
+  if (isFlagGiven('log-everything')) {
+    config.logEverything = flags['log-everything'];
+  }
+
+  if (isFlagGiven('quiet', 'q')) {
+    config.quiet = flags.quiet;
+  }
+
+  if (flags['log-level'] !== undefined) {
+    config.logLevel = flags['log-level'].toUpperCase();
+  }
+
+  if (flags['log-file'] !== undefined) {
+    config.logFile = flags['log-file'];
+  }
+
+  if (logOutput.length > 0) {
+    config.logOutput = logOutput;
+  }
 
   setup(config);
 
@@ -92,12 +116,10 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
 
   const args: TTanoArgs = {
     action,
-    failFast,
+    config,
     dryRun,
     file,
     list,
-    noCache,
-    force,
     task,
   };
 

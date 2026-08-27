@@ -2,6 +2,7 @@
 
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { afterEach, describe, it } from '@std/testing/bdd';
+import { stripAnsiCode } from '@std/fmt/colors';
 import { fromFileUrl, join } from '@std/path';
 
 const cliPath: string = fromFileUrl(import.meta.resolve('../cli.ts'));
@@ -24,12 +25,12 @@ type TCliResult = {
   code: number;
 
   /**
-   * Everything the CLI process wrote to stdout.
+   * Everything the CLI process wrote to stdout, without escape codes.
    */
   stdout: string;
 
   /**
-   * Everything the CLI process wrote to stderr.
+   * Everything the CLI process wrote to stderr, without escape codes.
    */
   stderr: string;
 };
@@ -58,8 +59,8 @@ const runCli = async (tanofile: string, args: string[] = []): Promise<TCliResult
 
   return {
     code: output.code,
-    stdout: decoder.decode(output.stdout),
-    stderr: decoder.decode(output.stderr),
+    stdout: stripAnsiCode(decoder.decode(output.stdout)),
+    stderr: stripAnsiCode(decoder.decode(output.stderr)),
   };
 };
 
@@ -185,6 +186,32 @@ setup({ logLevel: 'ERROR' });
 
     assertEquals(actual.code, 1);
     assertStringIncludes(actual.stderr, `A task with the name 'nope' does not exist.`);
+  });
+
+  it(`Should let a CLI flag win over setup() in the tanofile.`, async () => {
+    const tanofile = `
+setup({ logLevel: 'ERROR' });
+task('t', ['deno', 'eval', 'console.log("OUT")']);
+`;
+    const actual = await runCli(tanofile, ['t', '-l', 'DEBUG']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, `Starting 't'`);
+  });
+
+  it(`Should apply failFast from setup() in the tanofile.`, async () => {
+    const actual = await runCli(`setup({ failFast: false });${tanofileWithTwoFailingTasks}`, ['all']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stdout, 'B_RAN');
+    assertStringIncludes(actual.stderr, 'Failed tasks: a, c');
+  });
+
+  it(`Should let --fail-fast win over failFast from setup().`, async () => {
+    const actual = await runCli(`setup({ failFast: false });${tanofileWithTwoFailingTasks}`, ['all', '--fail-fast']);
+
+    assertEquals(actual.code, 1);
+    assertEquals(actual.stdout.includes('B_RAN'), false);
   });
 
   it(`Should keep the diagnostics out of stdout when a task fails.`, async () => {

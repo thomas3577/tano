@@ -29,11 +29,7 @@ class Handler implements TTanoHandler {
   #measure: null | PerformanceMeasure = null;
   #changes: null | TChanges = null;
   #abort: boolean = false;
-  #options: TTaskRunOptions = {
-    failFast: true,
-    force: false,
-    noCache: false,
-  };
+  #options: TTaskRunOptions = {};
 
   /**
    * Gets the timestamp when the handler was created.
@@ -128,10 +124,12 @@ class Handler implements TTanoHandler {
    * @returns {Promise<void>} A promise that resolves to void.
    */
   async run(taskName: string = 'default', options?: TTaskRunOptions): Promise<void> {
+    const { failFast, force, noCache } = config();
+
     this.#options = {
-      failFast: options?.failFast ?? this.#options.failFast,
-      force: options?.force ?? this.#options.force,
-      noCache: options?.noCache ?? this.#options.noCache,
+      failFast: options?.failFast ?? failFast,
+      force: options?.force ?? force,
+      noCache: options?.noCache ?? noCache,
     };
 
     await this.#preRun(taskName);

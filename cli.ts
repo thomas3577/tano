@@ -24,7 +24,7 @@ if (import.meta.main) {
       console.log(`v${VERSION}`);
       break;
     case 'upgrade':
-      await task('upgrade', 'deno install --allow-run -RWEN --unstable-kv -f -g -n tano jsr:@dx/tano/cli').run();
+      await task('upgrade', 'deno install --allow-run -RWEN -f -g -n tano jsr:@dx/tano/cli').run();
       break;
     default:
       Deno.exitCode = await cli(args);

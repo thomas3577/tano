@@ -91,11 +91,10 @@ const hashFiles = async (root: string, paths: string[]): Promise<string> => {
  * Parsed `source` and converts a strict glob-hash options object.
  *
  * @param {TGlobHashSource} source - A boolean, string, array of string or the GlobHashSource.
- * @param {Array<string>} additionalExcludes - Additional excludes only for internals.
  *
  * @returns {TGlobHashOptionsStrict} An object of type GlobHashOptionsStrict.
  */
-const parseOptions = (source?: TGlobHashSource, additionalExcludes?: string[]): undefined | TGlobHashOptionsStrict => {
+const parseOptions = (source?: TGlobHashSource): undefined | TGlobHashOptionsStrict => {
   if (!source) {
     return undefined;
   }
@@ -117,7 +116,7 @@ const parseOptions = (source?: TGlobHashSource, additionalExcludes?: string[]): 
   const options: TGlobHashOptionsStrict = source as TGlobHashOptionsStrict;
 
   options.root = resolve(normalize(source?.root || '.'));
-  options.exclude = [...(options.exclude || []), ...(additionalExcludes || [])];
+  options.exclude = options.exclude || [];
 
   return options;
 };
@@ -126,12 +125,11 @@ const parseOptions = (source?: TGlobHashSource, additionalExcludes?: string[]): 
  * Creates a hash by glob options.
  *
  * @param {TGlobHashSource} source - A string, Array of string or the GlobHashOptions.
- * @param {Array<string>} additionalExcludes - Additional excludes only for internals.
  *
  * @returns {string} A computed hash
  */
-export const computeHash = async (source?: TGlobHashSource, additionalExcludes?: string[]): Promise<undefined | string> => {
-  const options: undefined | TGlobHashOptionsStrict = parseOptions(source, additionalExcludes);
+export const computeHash = async (source?: TGlobHashSource): Promise<undefined | string> => {
+  const options: undefined | TGlobHashOptionsStrict = parseOptions(source);
   if (!options) {
     return undefined;
   }

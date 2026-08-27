@@ -7,8 +7,8 @@
     "./cli": "./cli.ts"
   },
   "tasks": {
-    "test": "deno test --allow-run -RWE --unstable-kv",
-    "run": "cd ./examples && deno run --allow-run -RWE --unstable-kv ../cli.ts --no-cache=true --file ./tanofile.ts",
+    "test": "deno test --allow-run -RWE",
+    "run": "cd ./examples && deno run --allow-run -RWE ../cli.ts --no-cache=true --file ./tanofile.ts",
     "check": "deno fmt --check && deno lint && deno check && deno task test && deno task run && deno publish --dry-run",
     "update": "deno outdated --update --latest"
   },

@@ -22,7 +22,34 @@ afterEach(async () => {
 });
 
 describe('TanoCache', () => {
-  it('should persist and read task data from kv', async () => {
+  it('should return empty data when there is no cache yet', async () => {
+    const dir = await createTempDir();
+    const cache = new TanoCache(dir);
+
+    assertEquals(await cache.read(), { tasks: {} });
+  });
+
+  it('should store the data as readable json', async () => {
+    const dir = await createTempDir();
+    const cache = new TanoCache(dir);
+
+    await cache.write({
+      tasks: {
+        'my-task': {
+          lastRun: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+          lastStatus: 'failed',
+          hash: 'abc123',
+        },
+      },
+    });
+
+    const content = await Deno.readTextFile(cache.path);
+
+    assertEquals(JSON.parse(content).tasks['my-task'].lastStatus, 'failed');
+    assertEquals(cache.path.endsWith('cache.json'), true);
+  });
+
+  it('should persist and read task data', async () => {
     const dir = await createTempDir();
     const cache = new TanoCache(dir);
 

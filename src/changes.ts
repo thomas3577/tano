@@ -39,6 +39,13 @@ export class ChangesMock implements TChanges {
   /**
    * Only a mock implementation.
    */
+  async save(): Promise<void> {
+    return await Promise.resolve();
+  }
+
+  /**
+   * Only a mock implementation.
+   */
   dispose(): void {
     return;
   }
@@ -71,7 +78,7 @@ export class Changes implements TChanges {
       return true;
     }
 
-    const hash = await computeHash(source, [this.#cache.path]);
+    const hash = await computeHash(source);
     const lastHash = await this.#getHash(taskName);
 
     return lastHash === undefined || lastHash !== hash;
@@ -94,15 +101,22 @@ export class Changes implements TChanges {
     this.#data = data;
 
     const lastRun: string = timestamp.toISOString();
-    const hash: undefined | string = await computeHash(source, [this.#cache.path]);
+    const hash: undefined | string = await computeHash(source);
 
     data.tasks[taskName] = {
       lastRun,
       lastStatus: status,
       hash,
     };
+  }
 
-    await this.#cache.write(data);
+  /**
+   * Writes everything that was collected during the run to the cache.
+   */
+  async save(): Promise<void> {
+    if (this.#data) {
+      await this.#cache.write(this.#data);
+    }
   }
 
   /**

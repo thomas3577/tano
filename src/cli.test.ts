@@ -25,6 +25,11 @@ type TCliResult = {
   code: number;
 
   /**
+   * The temporary directory the tanofile was written to.
+   */
+  dir: string;
+
+  /**
    * Everything the CLI process wrote to stdout, without escape codes.
    */
   stdout: string;
@@ -40,10 +45,11 @@ type TCliResult = {
  *
  * @param {string} tanofile - The body of the tanofile. `needs` and `task` are already imported.
  * @param {Array<string>} args - Additional CLI args.
+ * @param {boolean} useCache - [optionalParam=false] If `true`, the run is not started with `--no-cache`.
  *
  * @returns {Promise<TCliResult>} Exit code and output of the run.
  */
-const runCli = async (tanofile: string, args: string[] = []): Promise<TCliResult> => {
+const runCli = async (tanofile: string, args: string[] = [], useCache: boolean = false): Promise<TCliResult> => {
   const dir: string = await Deno.makeTempDir({ prefix: 'tano-cli-test-' });
   dirs.push(dir);
 
@@ -51,7 +57,7 @@ const runCli = async (tanofile: string, args: string[] = []): Promise<TCliResult
   await Deno.writeTextFile(file, `import { needs, setup, task } from '${modUrl}';\n${tanofile}\n`);
 
   const command: Deno.Command = new Deno.Command(Deno.execPath(), {
-    args: ['run', '--allow-run', '-RWE', '--unstable-kv', cliPath, '--no-cache', '--file', file, ...args],
+    args: ['run', '--allow-run', '-RWE', cliPath, ...(useCache ? [] : ['--no-cache']), '--file', file, ...args],
   });
 
   const output: Deno.CommandOutput = await command.output();
@@ -59,6 +65,7 @@ const runCli = async (tanofile: string, args: string[] = []): Promise<TCliResult
 
   return {
     code: output.code,
+    dir,
     stdout: stripAnsiCode(decoder.decode(output.stdout)),
     stderr: stripAnsiCode(decoder.decode(output.stderr)),
   };
@@ -220,6 +227,27 @@ task('t', ['deno', 'eval', 'console.log("OUT")']);
     assertEquals(actual.code, 1);
     assertEquals(actual.stdout.includes('Aborted with errors.'), false);
     assertStringIncludes(actual.stderr, 'Command failed with exit code 3');
+  });
+
+  it(`Should write a readable json cache without needing an unstable flag.`, async () => {
+    const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['t'], true);
+
+    assertEquals(actual.code, 0);
+
+    const content: string = await Deno.readTextFile(join(actual.dir, '.tano', 'cache.json'));
+
+    assertEquals(Object.keys(JSON.parse(content).tasks), ['t']);
+    assertStringIncludes(content, `"lastStatus": "success"`);
+  });
+
+  it(`Should record a failed task in the cache.`, async () => {
+    const actual = await runCli(`task('boom', ['deno', 'eval', 'Deno.exit(1)']);`, ['boom'], true);
+
+    assertEquals(actual.code, 1);
+
+    const content: string = await Deno.readTextFile(join(actual.dir, '.tano', 'cache.json'));
+
+    assertEquals(JSON.parse(content).tasks.boom.lastStatus, 'failed');
   });
 
   it(`Should print the help even when quiet.`, async () => {

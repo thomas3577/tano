@@ -13,7 +13,7 @@ Yes, you don't need this task runner either, but it works (maybe) and it was fun
 ## Install
 
 ```bash
-deno install --allow-run -RWE --unstable-kv -g -n tano jsr:@dx/tano/cli
+deno install --allow-run -RWE -g -n tano jsr:@dx/tano/cli
 ```
 
 **Note:**
@@ -26,12 +26,6 @@ Upgrades the dx cli.
 
 ```bash
 tano --upgrade
-```
-
-## Help
-
-```bash
-tano --help
 ```
 
 ## Preparation

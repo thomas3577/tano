@@ -32,6 +32,11 @@ export type TChanges = {
   update(taskName: string, timestamp: Date, status: TTaskStatus, source?: TGlobHashSource): Promise<void>;
 
   /**
+   * Writes everything that was collected during the run to the cache.
+   */
+  save(): Promise<void>;
+
+  /**
    * Gets information about the last run.
    *
    * @param {string} taskName - Name of the desired task.

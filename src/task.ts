@@ -218,8 +218,10 @@ export class Task implements TTaskParams {
     this.#preRun();
 
     await this.#run(this.#type, this.#executor, this.#options)
-      .catch((err) => {
+      .catch(async (err) => {
         this.#updateStatus('failed', err);
+
+        await this.#handler.changes?.update(this.#name, new Date(), this.#status, this.#options?.source);
 
         this.#log.error(`${bold(red('Error'))} '${gray('{name}')}': ${err}`, {
           name: this.#name,
@@ -272,8 +274,6 @@ export class Task implements TTaskParams {
     });
 
     await this.#handler.changes?.update(this.#name, new Date(), this.#status, options?.source);
-
-    this.#handler.changes?.dispose();
   }
 
   async #run(type: TTaskType, executor: TExecutor, options: TOptions): Promise<void> {

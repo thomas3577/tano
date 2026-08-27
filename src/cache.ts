@@ -1,35 +1,16 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
- * Experimental cache to keep the hash of all affected files of a task.
+ * Cache to keep the hash of all affected files of a task.
  * This allows a decision to be made at the next run as to whether a task needs to be executed again or not.
  *
  * @module
  */
 
-import { format, join } from '@std/path';
-import { exists } from '@std/fs';
-import type { TTanoRunData, TTaskRunData } from './types.ts';
+import { join } from '@std/path';
+import type { TTanoRunData } from './types.ts';
 
-const TASK_PREFIX: Deno.KvKeyPart = 'task';
-
-/**
- * Creates the directory to the tano cache.
- *
- * @param {string} dir - The directory in which the database is located.
- *
- * @returns {Promise<void>}
- */
-const createDir = async (dir: string): Promise<void> => await Deno.mkdir(dir, { recursive: true });
-
-/**
- * Converts a KvKey in a Taskname.
- *
- * @param {Deno.KvKey} key - The key from which the task name is to be taken.
- *
- * @returns {string} - The Taskname
- */
-const toTaskName = (key: Deno.KvKey): undefined | string => key.at(1) as string;
+const empty = (): TTanoRunData => ({ tasks: {} });
 
 /**
  * The tano cache.
@@ -37,7 +18,6 @@ const toTaskName = (key: Deno.KvKey): undefined | string => key.at(1) as string;
 export class TanoCache {
   readonly #dir: string;
   readonly #path: string;
-  #db: Deno.Kv | null = null;
 
   /**
    * Constructor of tano cache.
@@ -46,87 +26,69 @@ export class TanoCache {
    */
   constructor(cwd: string) {
     this.#dir = join(cwd, '.tano');
-    this.#path = format({
-      root: '/',
-      dir: this.#dir,
-      name: 'cache',
-      ext: '.db',
-    });
+    this.#path = join(this.#dir, 'cache.json');
   }
 
   /**
-   * The path where the database is stored.
+   * The path where the cache is stored.
    *
-   * @returns {string} The database path.
+   * @returns {string} The cache path.
    */
   get path(): string {
     return this.#path;
   }
 
   /**
-   * Reads the tano run data from Kv.
+   * Reads the tano run data.
+   *
+   * @remarks
+   * A missing or unreadable cache is not an error. It only means that every task counts as changed.
    *
    * @returns {Promise<TTanoRunData>} The tano run data.
    */
   async read(): Promise<TTanoRunData> {
-    const data: TTanoRunData = {
-      tasks: {},
-    };
+    try {
+      const data: TTanoRunData = JSON.parse(await Deno.readTextFile(this.#path));
 
-    const db: Deno.Kv = await this.#openKy();
-    const tasks: Record<string, TTaskRunData> = {};
-    const entries: Deno.KvListIterator<TTaskRunData> = db.list<TTaskRunData>({ prefix: [TASK_PREFIX] });
-
-    for await (const entry of entries) {
-      const taskName: undefined | string = toTaskName(entry.key);
-      if (taskName) {
-        tasks[taskName] = entry.value as TTaskRunData;
-      }
+      return data.tasks ? data : empty();
+    } catch {
+      return empty();
     }
-
-    data.tasks = tasks;
-
-    return data;
   }
 
   /**
-   * Writes tano run data to Kv.
+   * Writes the tano run data.
+   *
+   * @remarks
+   * Written to a temporary file and renamed, so that an interrupted run cannot leave a half written cache behind.
    *
    * @param {TTanoRunData} data - The tano run data.
    *
    * @returns {Promise<void>}
    */
   async write(data?: TTanoRunData): Promise<void> {
-    const db: Deno.Kv = await this.#openKy();
+    const temp: string = `${this.#path}.${crypto.randomUUID()}.tmp`;
 
-    for (const [key, value] of Object.entries(data?.tasks || {})) {
-      try {
-        await db.set([TASK_PREFIX, key], value);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : `${err}`;
+    try {
+      await Deno.mkdir(this.#dir, { recursive: true });
+      await Deno.writeTextFile(temp, `${JSON.stringify(data ?? empty(), null, 2)}\n`);
+      await Deno.rename(temp, this.#path);
+    } catch (err: unknown) {
+      await Deno.remove(temp).catch(() => undefined);
 
-        throw new Error(`Failed to persist cache for task '${key}': ${msg}`);
-      }
+      const msg = err instanceof Error ? err.message : `${err}`;
+
+      throw new Error(`Failed to persist the cache '${this.#path}': ${msg}`);
     }
   }
 
   /**
    * Disposes of resources held by the object.
+   *
+   * @remarks
+   * Nothing is held open, the method only keeps the contract of the changes type.
    */
   dispose(): void {
-    this.#db?.close();
-    this.#db = null;
-  }
-
-  async #openKy(): Promise<Deno.Kv> {
-    if (!await exists(this.#dir)) {
-      await createDir(this.#dir);
-    }
-
-    if (!this.#db) {
-      this.#db = await Deno.openKv(this.#path);
-    }
-
-    return this.#db;
+    return;
   }
 }

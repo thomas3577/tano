@@ -162,6 +162,8 @@ class Handler implements TTanoHandler {
         throw new Error(`Failed tasks: ${failed.join(', ')}`);
       }
     } finally {
+      await this.changes?.save();
+
       this.#postRun(taskNames.length === 0 || this.#abort || failed.length > 0);
     }
   }

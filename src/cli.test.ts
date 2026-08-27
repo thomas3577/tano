@@ -47,7 +47,7 @@ const runCli = async (tanofile: string, args: string[] = []): Promise<TCliResult
   dirs.push(dir);
 
   const file: string = join(dir, 'tanofile.ts');
-  await Deno.writeTextFile(file, `import { needs, task } from '${modUrl}';\n${tanofile}\n`);
+  await Deno.writeTextFile(file, `import { needs, setup, task } from '${modUrl}';\n${tanofile}\n`);
 
   const command: Deno.Command = new Deno.Command(Deno.execPath(), {
     args: ['run', '--allow-run', '-RWE', '--unstable-kv', cliPath, '--no-cache', '--file', file, ...args],
@@ -150,6 +150,19 @@ task('default', needs('build'));
     assertStringIncludes(actual.stdout, '  1. audit\n  2. build\n  3. default\n');
     assertEquals(actual.stdout.includes('AUDIT_RAN'), false);
     assertEquals(actual.stdout.includes('BUILD_RAN'), false);
+  });
+
+  it(`Should apply a log level that the tanofile sets after its tasks.`, async () => {
+    const tanofile = `
+task('t', ['deno', 'eval', 'console.log("TASK_OUT")']);
+setup({ logLevel: 'ERROR' });
+`;
+    const actual = await runCli(tanofile, ['t']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'TASK_OUT');
+    assertEquals(actual.stdout.includes(`Starting 't'`), false);
+    assertEquals(actual.stdout.includes('Finished after'), false);
   });
 
   it(`Should not leak tano configuration into the environment of a task.`, async () => {

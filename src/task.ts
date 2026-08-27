@@ -36,7 +36,6 @@ import type { TCommand, TCommandOptions, TExecutor, TOptions, TTanoHandler, TTas
  * ```
  */
 export class Task implements TTaskParams {
-  readonly #log: Logger = logger();
   readonly #created: Date = new Date();
   readonly #handler: TTanoHandler = handler;
   readonly #name: string;
@@ -239,6 +238,10 @@ export class Task implements TTaskParams {
     this.#starting = null;
     this.#finished = null;
     this.#updateStatus('ready');
+  }
+
+  get #log(): Logger {
+    return logger();
   }
 
   #preRun(): void {

@@ -12,7 +12,6 @@ import type { Logger } from '@std/log';
 import { getCwd, getImportUrl } from './utils.ts';
 import { logger } from './logger.ts';
 import { setup } from './config.ts';
-import { handler } from './handler.ts';
 import type { TTanoArgs, TTanoCliAction, TTanoConfig } from './types.ts';
 
 /**
@@ -87,8 +86,6 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   setup(config);
 
   const log: Logger = logger();
-
-  handler.updateLogger();
 
   log.debug(`Config      ${JSON.stringify(config)}`);
   log.debug('');

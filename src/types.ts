@@ -656,9 +656,4 @@ export type TTanoHandler = {
    * @param fn - The event listener to remove.
    */
   offChanged(fn: EventListenerOrEventListenerObject): void;
-
-  /**
-   * Hack: Updates the logger of this handler.
-   */
-  updateLogger(): void;
 };

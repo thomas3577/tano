@@ -24,7 +24,6 @@ class Handler implements TTanoHandler {
   readonly #cache: Map<string, Task> = new Map();
   readonly #eventTarget = new EventTarget();
 
-  #log: Logger = logger();
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
@@ -230,11 +229,8 @@ class Handler implements TTanoHandler {
     this.#eventTarget.removeEventListener('changed', fn);
   }
 
-  /**
-   * Hack: Updates the logger of this handler.
-   */
-  updateLogger(): void {
-    this.#log = logger();
+  get #log(): Logger {
+    return logger();
   }
 
   async #preRun(taskName: string): Promise<void> {

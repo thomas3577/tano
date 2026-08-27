@@ -11,7 +11,7 @@ import { gray, white } from '@std/fmt/colors';
 import { BaseHandler, ConsoleHandler, FileHandler, getLogger, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
 import { consoleMock } from './console.ts';
-import { config } from './config.ts';
+import { config, configVersion } from './config.ts';
 import type { TLogHandler, TLogStream } from './types.ts';
 
 const log = console.log;
@@ -19,6 +19,9 @@ const stream: TextEncoderStream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
 const levelName: LevelName = 'DEBUG';
+
+let instance: null | Logger = null;
+let instanceVersion: number = -1;
 
 class StreamHandler extends BaseHandler {
   log(_: string): void {}
@@ -126,6 +129,10 @@ export const logStream: TLogStream = {
  * @returns {Logger}
  */
 export const logger = (): Logger => {
+  if (instance && instanceVersion === configVersion()) {
+    return instance;
+  }
+
   const { quiet, logLevel, logOutput } = config();
   const level: LevelName = logLevel.toUpperCase() as LevelName;
   const handlers: TLogHandler[] = logOutput as TLogHandler[];
@@ -160,5 +167,8 @@ export const logger = (): Logger => {
 
   setup(logConfig);
 
-  return getLogger();
+  instance = getLogger();
+  instanceVersion = configVersion();
+
+  return instance;
 };

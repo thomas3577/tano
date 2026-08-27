@@ -24,6 +24,7 @@ const defaults: TTanoConfigStrict = {
 };
 
 let current: TTanoConfigStrict = { ...defaults };
+let version: number = 0;
 
 /**
  * Gets the current tano configuration, with all defaults applied.
@@ -31,6 +32,16 @@ let current: TTanoConfigStrict = { ...defaults };
  * @returns {TTanoConfigStrict} The current configuration.
  */
 export const config = (): TTanoConfigStrict => current;
+
+/**
+ * Gets a counter that is increased whenever the configuration changes.
+ *
+ * @remarks
+ * Lets a consumer cache something derived from the configuration and notice when it went stale, without this module having to know about that consumer.
+ *
+ * @returns {number} The current version of the configuration.
+ */
+export const configVersion = (): number => version;
 
 /**
  * Possibility to setup the tano configuration. Just add to your `tanofile.ts`.
@@ -51,6 +62,7 @@ export const config = (): TTanoConfigStrict => current;
  */
 export const setup = (config: TTanoConfig): void => {
   current = { ...current, ...config };
+  version++;
 };
 
 /**
@@ -61,4 +73,5 @@ export const setup = (config: TTanoConfig): void => {
  */
 export const resetConfig = (): void => {
   current = { ...defaults };
+  version++;
 };

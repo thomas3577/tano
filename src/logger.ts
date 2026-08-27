@@ -8,13 +8,11 @@
 
 import { format } from '@std/datetime/format';
 import { gray, white } from '@std/fmt/colors';
-import { BaseHandler, ConsoleHandler, FileHandler, getLogger, setup } from '@std/log';
+import { BaseHandler, ConsoleHandler, FileHandler, getLogger, LogLevels, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
-import { consoleMock } from './console.ts';
 import { config, configVersion } from './config.ts';
 import type { TLogHandler, TLogStream } from './types.ts';
 
-const log = console.log;
 const stream: TextEncoderStream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
@@ -34,6 +32,25 @@ class StreamHandler extends BaseHandler {
   }
 }
 
+/**
+ * A console handler that writes errors to stderr instead of stdout, so that a redirect of one stream does not swallow the other.
+ */
+class TanoConsoleHandler extends ConsoleHandler {
+  override handle(logRecord: LogRecord): void {
+    if (this.level > logRecord.level) {
+      return;
+    }
+
+    const msg: string = this.format(logRecord);
+
+    if (logRecord.level >= LogLevels.ERROR) {
+      console.error(msg);
+    } else {
+      console.log(msg);
+    }
+  }
+}
+
 const interpolate = (msg: string, params?: unknown): string => {
   if (params && typeof params === 'object') {
     for (const [key, value] of Object.entries(params)) {
@@ -44,8 +61,8 @@ const interpolate = (msg: string, params?: unknown): string => {
   return msg;
 };
 
-let consoleHandler: ConsoleHandler;
-const getConsoleHandler = (): ConsoleHandler => {
+let consoleHandler: TanoConsoleHandler;
+const getConsoleHandler = (): TanoConsoleHandler => {
   if (!consoleHandler) {
     const consoleHandlerOptions: ConsoleHandlerOptions = {
       formatter: (logRecord: LogRecord): string => {
@@ -62,8 +79,7 @@ const getConsoleHandler = (): ConsoleHandler => {
       },
     };
 
-    consoleHandler = new ConsoleHandler(levelName, consoleHandlerOptions);
-    consoleHandler.log = log;
+    consoleHandler = new TanoConsoleHandler(levelName, consoleHandlerOptions);
   }
 
   return consoleHandler;
@@ -135,10 +151,7 @@ export const logger = (): Logger => {
 
   const { quiet, logLevel, logOutput } = config();
   const level: LevelName = logLevel.toUpperCase() as LevelName;
-  const handlers: TLogHandler[] = logOutput as TLogHandler[];
-
-  // deno-lint-ignore no-global-assign
-  console = quiet ? consoleMock : console;
+  const handlers: TLogHandler[] = (quiet ? logOutput.filter((handler) => handler !== 'console') : logOutput) as TLogHandler[];
 
   const logConfig: LogConfig = {
     handlers: {},

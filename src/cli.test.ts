@@ -24,7 +24,7 @@ type TCliResult = {
   code: number;
 
   /**
-   * Everything the CLI process wrote to stdout. Note that the logger writes all levels to stdout, errors included.
+   * Everything the CLI process wrote to stdout.
    */
   stdout: string;
 
@@ -82,28 +82,28 @@ describe('cli', () => {
     const actual = await runCli(`task('boom', ['deno', 'eval', 'Deno.exit(3)']);`, ['boom']);
 
     assertEquals(actual.code, 1);
-    assertStringIncludes(actual.stdout, 'Aborted with errors.');
+    assertStringIncludes(actual.stderr, 'Aborted with errors.');
   });
 
   it(`Should exit with 1 if the tanofile can not be loaded.`, async () => {
     const actual = await runCli(`task('ok', <<< this is not typescript >>>);`, ['ok']);
 
     assertEquals(actual.code, 1);
-    assertStringIncludes(actual.stdout, 'Failed to load tanofile');
+    assertStringIncludes(actual.stderr, 'Failed to load tanofile');
   });
 
   it(`Should exit with 1 if the task does not exist.`, async () => {
     const actual = await runCli(`task('ok', ['deno', 'eval', 'console.log("TASK_OK")']);`, ['nope']);
 
     assertEquals(actual.code, 1);
-    assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
+    assertStringIncludes(actual.stderr, `A task with the name 'nope' does not exist.`);
   });
 
   it(`Should exit with 1 and run nothing if a needed task does not exist.`, async () => {
     const actual = await runCli(`task('ok', needs('nope'), ['deno', 'eval', 'console.log("TASK_OK")']);`, ['ok']);
 
     assertEquals(actual.code, 1);
-    assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
+    assertStringIncludes(actual.stderr, `A task with the name 'nope' does not exist.`);
     assertEquals(actual.stdout.includes('TASK_OK'), false);
   });
 
@@ -112,7 +112,7 @@ describe('cli', () => {
 
     assertEquals(actual.code, 1);
     assertStringIncludes(actual.stdout, 'B_RAN');
-    assertStringIncludes(actual.stdout, 'Failed tasks: a, c');
+    assertStringIncludes(actual.stderr, 'Failed tasks: a, c');
   });
 
   it(`Should treat --no-fail-fast like --fail-fast=false.`, async () => {
@@ -120,7 +120,7 @@ describe('cli', () => {
 
     assertEquals(actual.code, 1);
     assertStringIncludes(actual.stdout, 'B_RAN');
-    assertStringIncludes(actual.stdout, 'Failed tasks: a, c');
+    assertStringIncludes(actual.stderr, 'Failed tasks: a, c');
   });
 
   it(`Should list all tasks sorted by name and run nothing.`, async () => {
@@ -184,6 +184,29 @@ setup({ logLevel: 'ERROR' });
     const actual = await runCli(`task('ok', ['deno', 'eval', '1']);`, ['nope', '--dry-run']);
 
     assertEquals(actual.code, 1);
-    assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
+    assertStringIncludes(actual.stderr, `A task with the name 'nope' does not exist.`);
+  });
+
+  it(`Should keep the diagnostics out of stdout when a task fails.`, async () => {
+    const actual = await runCli(`task('boom', ['deno', 'eval', 'Deno.exit(3)']);`, ['boom']);
+
+    assertEquals(actual.code, 1);
+    assertEquals(actual.stdout.includes('Aborted with errors.'), false);
+    assertStringIncludes(actual.stderr, 'Command failed with exit code 3');
+  });
+
+  it(`Should print the help even when quiet.`, async () => {
+    const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['--help', '-q']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'USAGE:');
+  });
+
+  it(`Should silence its own diagnostics but not a code task when quiet.`, async () => {
+    const actual = await runCli(`task('t', () => console.log('CODE_OUT'));`, ['t', '-q']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'CODE_OUT');
+    assertEquals(actual.stdout.includes(`Starting 't'`), false);
   });
 });

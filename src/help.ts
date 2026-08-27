@@ -61,8 +61,10 @@ export const help = (): void => {
       -V, --version
               Print version information
 
-          --fail-fast
-              Aborts all tasks at the first error. Default is 'true'
+          --fail-fast, --no-fail-fast
+              Aborts all tasks at the first error. Default is 'true'.
+              With '--no-fail-fast' every task is attempted and all
+              failed tasks are listed at the end.
 
           --force
               Also executes the tasks that have not been changed since the last run.

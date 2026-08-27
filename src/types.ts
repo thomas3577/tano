@@ -574,6 +574,9 @@ export type TTanoHandler = {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
+   * @remarks
+   * Rejects if a task name does not exist or if a task failed. With `failFast` disabled every task is attempted first and the error lists all failed tasks.
+   *
    * @param {string} taskName - [optionalParam='default'] Name of the task.
    * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *

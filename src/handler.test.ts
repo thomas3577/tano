@@ -118,7 +118,11 @@ describe('handler', () => {
     task('pre-task-two', `pwsh -c echo 'if you see the second pre-task, something went wrong'`);
     task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c echo 'if you see me, something went wrong'`);
 
-    await handler.run('default', { failFast: false });
+    await assertRejects(
+      async () => await handler.run('default', { failFast: false }),
+      Error,
+      'Failed tasks: pre-task-one',
+    );
 
     assertEquals(handler.executed, 3);
   });

@@ -112,6 +112,9 @@ class Handler implements TTanoHandler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
+   * @remarks
+   * Rejects if a task name does not exist or if a task failed. With `failFast` disabled every task is attempted first and the error lists all failed tasks.
+   *
    * @param {string} taskName - [optionalParam='default'] Name of the task.
    * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
@@ -119,32 +122,43 @@ class Handler implements TTanoHandler {
    */
   async run(taskName: string = 'default', options?: TTaskRunOptions): Promise<void> {
     this.#options = {
-      failFast: options?.failFast !== undefined ? options?.failFast : this.#options.failFast,
-      force: options?.force !== undefined ? options?.force : this.#options.force,
-      noCache: options?.noCache !== undefined ? options?.noCache : this.#options.noCache,
+      failFast: options?.failFast ?? this.#options.failFast,
+      force: options?.force ?? this.#options.force,
+      noCache: options?.noCache ?? this.#options.noCache,
     };
 
     await this.#preRun(taskName);
 
-    const taskNames: Array<string> = this.#getPlan(taskName);
+    const failed: Array<string> = [];
+    let taskNames: Array<string> = [];
 
-    this.#abort = false;
+    try {
+      taskNames = this.#getPlan(taskName);
 
-    for (const tn of taskNames) {
-      if (this.#abort) {
-        break;
+      this.#abort = false;
+
+      for (const tn of taskNames) {
+        if (this.#abort) {
+          break;
+        }
+
+        await this.#cache.get(tn)?.runThis(this.#options.force)
+          .catch((err) => {
+            failed.push(tn);
+
+            if (this.#options.failFast) {
+              this.abort();
+              throw err;
+            }
+          });
       }
 
-      await this.#cache.get(tn)?.runThis(this.#options.force)
-        .catch((err) => {
-          if (this.#options.failFast) {
-            this.abort();
-            throw err;
-          }
-        });
+      if (failed.length > 0) {
+        throw new Error(`Failed tasks: ${failed.join(', ')}`);
+      }
+    } finally {
+      this.#postRun(taskNames.length === 0 || this.#abort || failed.length > 0);
     }
-
-    this.#postRun(!taskNames || taskNames.length === 0 || this.#abort);
   }
 
   /**

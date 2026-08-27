@@ -7,6 +7,12 @@ import { fromFileUrl, join } from '@std/path';
 const cliPath: string = fromFileUrl(import.meta.resolve('../cli.ts'));
 const modUrl: string = import.meta.resolve('../mod.ts');
 const dirs: string[] = [];
+const tanofileWithTwoFailingTasks: string = `
+task('a', ['deno', 'eval', 'Deno.exit(1)']);
+task('b', ['deno', 'eval', 'console.log("B_RAN")']);
+task('c', ['deno', 'eval', 'Deno.exit(1)']);
+task('all', needs('a', 'b', 'c'));
+`;
 
 /**
  * Exit code and output of a tano CLI run.
@@ -99,5 +105,21 @@ describe('cli', () => {
     assertEquals(actual.code, 1);
     assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
     assertEquals(actual.stdout.includes('TASK_OK'), false);
+  });
+
+  it(`Should run the remaining tasks and list all failed ones if fail-fast is off.`, async () => {
+    const actual = await runCli(tanofileWithTwoFailingTasks, ['all', '--fail-fast=false']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stdout, 'B_RAN');
+    assertStringIncludes(actual.stdout, 'Failed tasks: a, c');
+  });
+
+  it(`Should treat --no-fail-fast like --fail-fast=false.`, async () => {
+    const actual = await runCli(tanofileWithTwoFailingTasks, ['all', '--no-fail-fast']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stdout, 'B_RAN');
+    assertStringIncludes(actual.stdout, 'Failed tasks: a, c');
   });
 });

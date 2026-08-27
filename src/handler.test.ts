@@ -31,13 +31,17 @@ describe('handler', () => {
     assertEquals(handler.executed, 0);
   });
 
-  it(`Should run no task (because no default-task and no task set.).`, async () => {
+  it(`Should throws an error if no default-task and no task set.`, async () => {
     task('myTask', `pwsh -c echo 'First Task'`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
 
-    await handler.run(undefined);
+    await assertRejects(
+      async () => await handler.run(undefined),
+      Error,
+      `A task with the name 'default' does not exist.`,
+    );
 
     assertEquals(handler.executed, 0);
   });

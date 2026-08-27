@@ -85,4 +85,19 @@ describe('cli', () => {
     assertEquals(actual.code, 1);
     assertStringIncludes(actual.stdout, 'Failed to load tanofile');
   });
+
+  it(`Should exit with 1 if the task does not exist.`, async () => {
+    const actual = await runCli(`task('ok', ['deno', 'eval', 'console.log("TASK_OK")']);`, ['nope']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
+  });
+
+  it(`Should exit with 1 and run nothing if a needed task does not exist.`, async () => {
+    const actual = await runCli(`task('ok', needs('nope'), ['deno', 'eval', 'console.log("TASK_OK")']);`, ['ok']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stdout, `A task with the name 'nope' does not exist.`);
+    assertEquals(actual.stdout.includes('TASK_OK'), false);
+  });
 });

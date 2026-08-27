@@ -286,9 +286,7 @@ class Handler implements TTanoHandler {
       taskNames.push(taskName);
       planned.add(taskName);
     } else {
-      this.#log.warn('A task with the name {name} does not exist.', {
-        name: `'${taskName}'`,
-      });
+      throw new Error(`A task with the name '${taskName}' does not exist.`);
     }
 
     return taskNames;

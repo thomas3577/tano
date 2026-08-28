@@ -26,7 +26,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2.0.5
         with:
-          deno-version: v2.9.5
+          deno-version: v2.9.6
 
       - name: Verify formatting
         run: deno fmt --check
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2.0.5
         with:
-          deno-version: v2.9.5
+          deno-version: v2.9.6
 
       - name: Publish package
         run: deno publish

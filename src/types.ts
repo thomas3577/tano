@@ -325,6 +325,14 @@ export type TTaskOptions = Deno.CommandOptions & {
    * If `true`, the output of the task will be logged.
    */
   logThis?: boolean;
+
+  /**
+   * Milliseconds after which the task is stopped and counts as failed.
+   *
+   * @remarks
+   * A command task and code that runs in its own process are really stopped. A code function runs inside the tano process, and JavaScript cannot stop a running function, so the task fails at the timeout while the function itself keeps going — and its pending work still delays the exit of tano. Use `repl` or a code file if a code task has to be stoppable.
+   */
+  timeout?: number;
 };
 
 /**

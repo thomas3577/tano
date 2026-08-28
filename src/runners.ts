@@ -8,6 +8,7 @@
 
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
+import { abortable } from '@std/async/abortable';
 import { config } from './config.ts';
 import { tokenize } from './tokenize.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
@@ -43,7 +44,7 @@ const toLineStream = (onLine: (line: string) => void): WritableStream<Uint8Array
   });
 };
 
-const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess => {
+const getProcess = (command: TCommand, options?: TCommandOptions, signal?: AbortSignal): Deno.ChildProcess => {
   if (command == null) {
     throw new Error('Command is required.');
   }
@@ -63,6 +64,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
     args,
     cwd: options?.cwd || Deno.cwd(),
     env: options?.env,
+    signal,
     stdout: options?.stdout || 'piped',
     stderr: options?.stderr || 'piped',
     stdin: options?.stdin || 'piped',
@@ -100,7 +102,13 @@ export const runCode = async (code: TCode, options?: TCodeOptions, taskName?: st
     } else {
       log.debug('Run code function.');
 
-      await executeCodeFunction(code)
+      // JavaScript cannot stop a running function, so a timeout can only fail the task. The function itself keeps going.
+      const run = (promise: Promise<unknown>): Promise<unknown> =>
+        options?.timeout === undefined ? promise : abortable(promise, AbortSignal.timeout(options.timeout)).catch((err: unknown) => {
+          throw err instanceof DOMException && err.name === 'TimeoutError' ? new Error(`Timed out after ${options.timeout}ms.`) : err;
+        });
+
+      await run(executeCodeFunction(code))
         .then((output) => {
           if (!output) {
             return;
@@ -157,7 +165,11 @@ export const runCommand = async (command: TCommand, options?: TCommandOptions, t
 
   // Only when tasks run at the same time, because then the lines of several processes end up mixed together.
   const prefix: string = taskName !== undefined && concurrency > 1 ? `${taskName} | ` : '';
-  const process: Deno.ChildProcess = getProcess(command, options);
+  const commandText: string = Array.isArray(command) ? command.join(' ') : command;
+  const timeout: undefined | number = typeof options?.timeout === 'number' ? options.timeout : undefined;
+  const timeoutSignal: undefined | AbortSignal = timeout === undefined ? undefined : AbortSignal.timeout(timeout);
+  const signals: Array<AbortSignal> = [options?.signal, timeoutSignal].filter((signal): signal is AbortSignal => signal !== undefined);
+  const process: Deno.ChildProcess = getProcess(command, options, signals.length > 0 ? AbortSignal.any(signals) : undefined);
 
   // Output pipe
   process.stdout.pipeTo(
@@ -206,8 +218,8 @@ export const runCommand = async (command: TCommand, options?: TCommandOptions, t
   const status: Deno.CommandStatus = await process.status;
 
   if (status.code !== 0) {
-    const commandText = Array.isArray(command) ? command.join(' ') : command;
-    const error = `Command failed with exit code ${status.code}: ${commandText}`;
+    // The child is killed through the signal, so it only reports a non-zero exit. The timeout is the more useful reason to name.
+    const error = timeoutSignal?.aborted ? `Timed out after ${timeout}ms: ${commandText}` : `Command failed with exit code ${status.code}: ${commandText}`;
 
     if (logThis) {
       log.error(error);

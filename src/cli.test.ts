@@ -327,6 +327,36 @@ task('all', needs('a', 'b'));
     assertEquals(actual.stderr.includes('Uncaught'), false);
   });
 
+  it(`Should stop a task that runs into its timeout.`, async () => {
+    const slow = `['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 3000)); console.log("SLOW_DONE")']`;
+    const actual = await runCli(`task('slow', ${slow}, { timeout: 300 });`, ['slow']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stderr, 'Timed out after 300ms');
+    assertEquals(actual.stdout.includes('SLOW_DONE'), false);
+  });
+
+  it(`Should fail a code task at its timeout, even though the function cannot be stopped.`, async () => {
+    const actual = await runCli(`task('slow', async () => { await new Promise((resolve) => setTimeout(resolve, 1500)); }, { timeout: 300 });`, ['slow']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stderr, 'Timed out after 300ms.');
+  });
+
+  it(`Should stop a task when the signal from its options is aborted.`, async () => {
+    const tanofile = `
+const controller = new AbortController();
+
+setTimeout(() => controller.abort(), 200);
+
+task('slow', ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 3000)); console.log("SLOW_DONE")'], { signal: controller.signal });
+`;
+    const actual = await runCli(tanofile, ['slow']);
+
+    assertEquals(actual.code, 1);
+    assertEquals(actual.stdout.includes('SLOW_DONE'), false);
+  });
+
   it(`Should print the help even when quiet.`, async () => {
     const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['--help', '-q']);
 

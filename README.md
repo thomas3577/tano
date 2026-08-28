@@ -28,6 +28,29 @@ Upgrades the dx cli.
 tano --upgrade
 ```
 
+Every release is documented in the [changelog](CHANGELOG.md), including what breaks.
+
+## Upgrading from 0.5
+
+`0.6.0` fixed a number of defects, and four of those change what an unchanged tanofile does. The [changelog](CHANGELOG.md#breaking) lists all eleven breaking changes; these are the ones that need no action from you to bite:
+
+**Quotes in a string command are now consumed by tano, not by the child process.** A command that relied on the child re-parsing them has to quote the inner command:
+
+```ts
+task('t', `pwsh -c echo 'Task 06'`); // 0.5
+task('t', `pwsh -c "echo 'Task 06'"`); // 0.6
+```
+
+Unquoted shell operators (`&`, `|`, `;`, `<`, `>`, `` ` ``, `$(`) now throw instead of being passed on as literal arguments. Use `needs` to chain tasks, a code task instead of a pipe, quotes to pass an operator as a literal argument, or the array form.
+
+**A flag on the command line now wins over `setup()` in the tanofile.** It used to be the other way round. If your tanofile sets `logLevel`, `quiet` or `logOutput` and you also pass the flag, the flag now decides.
+
+**`source: true` covers subdirectories.** `globstar` defaulted to `false`, so `**` behaved like `*` and every subdirectory was invisible to the hash. Tasks that were wrongly skipped now run, which makes a run take longer than before — that is the fix working, not a regression.
+
+**A failing run exits with `1`.** Every run used to exit with `0`. A pipeline that was green because tano never failed will now go red.
+
+The cache is not migrated. The first run after the update rebuilds it and leaves the old `.tano/cache.db` behind, which you can delete.
+
 ## Preparation
 
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.

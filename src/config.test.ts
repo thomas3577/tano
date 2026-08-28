@@ -20,6 +20,7 @@ describe(`config`, () => {
       logEverything: false,
       noCache: false,
       quiet: false,
+      concurrency: 1,
     });
   });
 

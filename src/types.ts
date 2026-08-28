@@ -216,6 +216,14 @@ export type TTanoConfig = {
    * If `true`, the console output is quiet.
    */
   quiet?: boolean;
+
+  /**
+   * How many tasks of the same level may run at the same time. Default is `1`.
+   *
+   * @remarks
+   * Tasks only run at the same time if they do not depend on each other. Anything above `1` requires that every ordering a tanofile relies on is declared with `needs`.
+   */
+  concurrency?: number;
 };
 
 /**

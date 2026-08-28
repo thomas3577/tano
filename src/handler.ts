@@ -8,6 +8,7 @@
 
 import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
+import { pooledMap } from '@std/async/pool';
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { config } from './config.ts';
@@ -135,27 +136,22 @@ class Handler implements TTanoHandler {
     await this.#preRun(taskName);
 
     const failed: Array<string> = [];
-    let taskNames: Array<string> = [];
+    const concurrency: number = Math.max(1, config().concurrency);
+
+    let planned: number = 0;
 
     try {
-      taskNames = this.#getPlan(taskName);
+      const levels: Array<Array<string>> = this.#getLevels(taskName);
 
+      planned = levels.reduce((count, level) => count + level.length, 0);
       this.#abort = false;
 
-      for (const tn of taskNames) {
+      for (const level of levels) {
         if (this.#abort) {
           break;
         }
 
-        await this.#cache.get(tn)?.runThis(this.#options.force)
-          .catch((err) => {
-            failed.push(tn);
-
-            if (this.#options.failFast) {
-              this.abort();
-              throw err;
-            }
-          });
+        await this.#runLevel(level, concurrency, failed);
       }
 
       if (failed.length > 0) {
@@ -164,7 +160,7 @@ class Handler implements TTanoHandler {
     } finally {
       await this.changes?.save();
 
-      this.#postRun(taskNames.length === 0 || this.#abort || failed.length > 0);
+      this.#postRun(planned === 0 || this.#abort || failed.length > 0);
     }
   }
 
@@ -285,6 +281,36 @@ class Handler implements TTanoHandler {
 
     if (dispose) {
       this.dispose();
+    }
+  }
+
+  async #runLevel(level: Array<string>, concurrency: number, failed: Array<string>): Promise<void> {
+    let firstError: unknown = undefined;
+
+    // The mapper never throws, because a throw would make pooledMap collect the errors into an AggregateError and hide the one the task reported.
+    const results: AsyncIterableIterator<void> = pooledMap(concurrency, level, async (taskName: string): Promise<void> => {
+      if (this.#abort) {
+        return;
+      }
+
+      await this.#cache.get(taskName)?.runThis(this.#options.force)
+        .catch((err) => {
+          failed.push(taskName);
+
+          if (this.#options.failFast) {
+            firstError = firstError ?? err;
+
+            this.abort();
+          }
+        });
+    });
+
+    for await (const _ of results) {
+      // pooledMap only advances while its results are consumed.
+    }
+
+    if (firstError !== undefined) {
+      throw firstError;
     }
   }
 

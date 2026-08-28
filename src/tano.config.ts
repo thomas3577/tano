@@ -42,7 +42,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
       V: 'version',
       U: 'upgrade',
     },
-    string: ['file', 'task', 'log-level', 'log-file'],
+    string: ['file', 'task', 'log-level', 'log-file', 'concurrency'],
     collect: ['log-output'],
     boolean: ['help', 'quiet', 'fail-fast', 'version', 'upgrade', 'force', 'no-cache', 'log-everything', 'list', 'dry-run'],
     negatable: ['fail-fast'],
@@ -105,6 +105,16 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
 
   if (logOutput.length > 0) {
     config.logOutput = logOutput;
+  }
+
+  if (flags.concurrency !== undefined) {
+    const concurrency: number = Number(flags.concurrency);
+
+    if (!Number.isInteger(concurrency) || concurrency < 1) {
+      throw new Error(`'--concurrency' must be a positive integer, got '${flags.concurrency}'.`);
+    }
+
+    config.concurrency = concurrency;
   }
 
   setup(config);

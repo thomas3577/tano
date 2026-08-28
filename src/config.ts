@@ -18,6 +18,7 @@ const defaults: TTanoConfigStrict = {
   logFile: '',
   logLevel: 'INFO',
   logOutput: ['console'],
+  concurrency: 1,
   logEverything: false,
   noCache: false,
   quiet: false,

@@ -50,6 +50,11 @@ export const help = (): void => {
           --list
               Prints all tasks of the tanofile instead of running one.
 
+          --concurrency <N>
+              How many independent tasks may run at the same time.
+              Default is '1'. Anything above that requires every
+              ordering to be declared with 'needs'.
+
           --dry-run
               Prints the tasks that would be executed, in order, without
               running them.

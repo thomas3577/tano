@@ -290,6 +290,35 @@ task('t', ['deno', 'eval', 'console.log("OUT")']);
     assertEquals(await overlaps(actual.dir), false);
   });
 
+  it(`Should prefix the output with the task name when running in parallel.`, async () => {
+    const tanofile = `
+task('a', ['deno', 'eval', 'console.log("from-a")']);
+task('b', ['deno', 'eval', 'console.log("from-b")']);
+task('all', needs('a', 'b'));
+`;
+    const actual = await runCli(tanofile, ['all', '--concurrency', '2']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'a | from-a');
+    assertStringIncludes(actual.stdout, 'b | from-b');
+  });
+
+  it(`Should leave the output unprefixed when running one task at a time.`, async () => {
+    const actual = await runCli(`task('a', ['deno', 'eval', 'console.log("from-a")']);`, ['a']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'from-a');
+    assertEquals(actual.stdout.includes('a | from-a'), false);
+  });
+
+  it(`Should keep a long line whole for the logger even when it arrives in pieces.`, async () => {
+    const code = `const out = 'X'.repeat(200000); console.log('head-' + out + '-tail');`;
+    const actual = await runCli(`task('big', ['deno', 'eval', ${JSON.stringify(code)}], { logThis: true });`, ['big']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, `head-${'X'.repeat(200000)}-tail`);
+  });
+
   it(`Should report a bad --concurrency value without a stack trace.`, async () => {
     const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['t', '--concurrency', 'abc']);
 

@@ -12,6 +12,37 @@ import { config } from './config.ts';
 import { tokenize } from './tokenize.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
 
+/**
+ * Builds a writable stream that hands complete lines to `onLine`.
+ *
+ * @remarks
+ * A chunk does not have to end at a line break, so a partial line is kept until the rest arrives. Without that, a long line reaches the logger and the `output` callback in pieces. The decoder is asked to stream as well, so a multi byte character split across two chunks survives.
+ *
+ * @param {Function} onLine - Called once per complete line, without its line break.
+ *
+ * @returns {WritableStream<Uint8Array>} The stream to pipe a process output into.
+ */
+const toLineStream = (onLine: (line: string) => void): WritableStream<Uint8Array> => {
+  const decoder: TextDecoder = new TextDecoder();
+
+  let rest: string = '';
+
+  return new WritableStream({
+    write(chunk: Uint8Array): void {
+      const lines: string[] = (rest + decoder.decode(chunk, { stream: true })).split(/\r?\n/);
+
+      rest = lines.pop() ?? '';
+
+      lines.forEach(onLine);
+    },
+    close(): void {
+      if (rest.length > 0) {
+        onLine(rest);
+      }
+    },
+  });
+};
+
 const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess => {
   if (command == null) {
     throw new Error('Command is required.');
@@ -48,10 +79,11 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
  *
  * @param {TCode} code - The code which should be executed.
  * @param {TCodeOptions} options - [optionalParam=undefined] Options.
+ * @param {string} taskName - [optionalParam=undefined] Name of the task, used to prefix its output while tasks run at the same time.
  *
  * @returns {Promise<void>}
  */
-export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void> => {
+export const runCode = async (code: TCode, options?: TCodeOptions, taskName?: string): Promise<void> => {
   const logThis: boolean = options?.logThis ?? config().logEverything;
   const log: Logger = logger();
 
@@ -64,7 +96,7 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
       const funcAsString: string = code.toString();
       const command: TCommand = ['deno', 'repl', '--eval', `(${funcAsString})(); close();`];
 
-      await runCommand(command, options as TCommandOptions);
+      await runCommand(command, options as TCommandOptions, taskName);
     } else {
       log.debug('Run code function.');
 
@@ -100,7 +132,7 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
     const file: string = code.file instanceof URL ? code.file.toString() : code.file;
     const command: TCommand = ['deno', 'run', ...(options?.args || []), file];
 
-    await runCommand(command, options as TCommandOptions);
+    await runCommand(command, options as TCommandOptions, taskName);
   }
 
   log.debug('Run code completed.');
@@ -111,68 +143,61 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
  *
  * @param {TCommand} command - The command which should be executed. A string is split into `args` by {@linkcode tokenize}, where quotes group their content and unquoted shell operators are rejected. Use the array form to pass pre-split arguments.
  * @param {TCommandOptions} options - [optionalParam=undefined] Options.
+ * @param {string} taskName - [optionalParam=undefined] Name of the task, used to prefix its output while tasks run at the same time.
  *
  * @returns {Promise<number>}
  */
-export const runCommand = async (command: TCommand, options?: TCommandOptions): Promise<void> => {
+export const runCommand = async (command: TCommand, options?: TCommandOptions, taskName?: string): Promise<void> => {
   const logThis: boolean = options?.logThis ?? config().logEverything;
   const log: Logger = logger();
 
   log.debug('Run command...');
 
-  const textDecoder = new TextDecoder();
-  const quiet: boolean = config().quiet;
+  const { quiet, concurrency } = config();
+
+  // Only when tasks run at the same time, because then the lines of several processes end up mixed together.
+  const prefix: string = taskName !== undefined && concurrency > 1 ? `${taskName} | ` : '';
   const process: Deno.ChildProcess = getProcess(command, options);
 
   // Output pipe
   process.stdout.pipeTo(
-    new WritableStream({
-      write(chunk: Uint8Array): void {
-        if (!quiet && !logThis) {
-          Deno.stdout.writeSync(chunk);
-        }
+    toLineStream((line: string): void => {
+      if (!quiet && !logThis) {
+        console.log(line.length > 0 ? `${prefix}${line}` : line);
+      }
 
-        const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
-        for (const line of lines) {
-          if (line?.length < 1) {
-            continue;
-          }
+      if (line.length < 1) {
+        return;
+      }
 
-          if (logThis) {
-            log.info(line);
-          }
+      if (logThis) {
+        log.info(line);
+      }
 
-          if (typeof options?.output === 'function') {
-            options?.output(undefined, line);
-          }
-        }
-      },
+      if (typeof options?.output === 'function') {
+        options?.output(undefined, line);
+      }
     }),
   );
 
   // Error pipe
   process.stderr.pipeTo(
-    new WritableStream({
-      write(chunk: Uint8Array): void {
-        if (!quiet) {
-          Deno.stderr.writeSync(chunk);
-        }
+    toLineStream((line: string): void => {
+      if (!quiet) {
+        console.error(line.length > 0 ? `${prefix}${line}` : line);
+      }
 
-        const lines: string[] = textDecoder.decode(chunk).split(/\r?\n/);
-        for (const line of lines) {
-          if (line?.length < 1) {
-            continue;
-          }
+      if (line.length < 1) {
+        return;
+      }
 
-          if (logThis) {
-            log.error(line);
-          }
+      if (logThis) {
+        log.error(line);
+      }
 
-          if (typeof options?.output === 'function') {
-            options?.output(line, undefined);
-          }
-        }
-      },
+      if (typeof options?.output === 'function') {
+        options?.output(line, undefined);
+      }
     }),
   );
 

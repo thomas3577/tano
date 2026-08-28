@@ -279,10 +279,10 @@ export class Task implements TTaskParams {
   async #run(type: TTaskType, executor: TExecutor, options: TOptions): Promise<void> {
     switch (type) {
       case 'command':
-        await runCommand(toCommand(executor), options as TCommandOptions);
+        await runCommand(toCommand(executor), options as TCommandOptions, this.#name);
         break;
       case 'code':
-        await runCode(toCode(executor), options);
+        await runCode(toCode(executor), options, this.#name);
         break;
     }
   }

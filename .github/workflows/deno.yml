@@ -1,6 +1,9 @@
-name: Publish
+name: CI
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
@@ -8,7 +11,38 @@ on:
       - "*"
 
 jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2.0.5
+        with:
+          deno-version: v2.9.6
+
+      - name: Verify formatting
+        run: deno fmt --check
+
+      - name: Run linter
+        run: deno lint
+
+      - name: Type check
+        run: deno check
+
+      - name: Run tests
+        run: deno task test
+
   publish:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
 
     permissions:
@@ -22,17 +56,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2.0.5
         with:
-          deno-version: v2.9.5
-
-      - name: Verify formatting
-        run: deno fmt --check
-
-      - name: Run linter
-        run: deno lint
-
-      - name: Run tests
-        run: deno run test
+          deno-version: v2.9.6
 
       - name: Publish package
-        if: startsWith(github.ref, 'refs/tags/')
         run: deno publish

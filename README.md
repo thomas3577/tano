@@ -13,7 +13,7 @@ Yes, you don't need this task runner either, but it works (maybe) and it was fun
 ## Install
 
 ```bash
-deno install --allow-run -RWE --unstable-kv -g -n tano jsr:@dx/tano/cli
+deno install --allow-run -RWE -g -n tano jsr:@dx/tano/cli
 ```
 
 **Note:**
@@ -28,12 +28,6 @@ Upgrades the dx cli.
 tano --upgrade
 ```
 
-## Help
-
-```bash
-tano --help
-```
-
 ## Preparation
 
 Create a TypeScript file with the name `tanofile.ts` and import the 'task' function and create your tasks.
@@ -43,6 +37,12 @@ import { needs, task } from 'jsr:@dx/tano';
 
 task('pre-task', `echo 'These were ...'`);
 task('default', needs('pre-task'), `echo '...two tasks.'`);
+```
+
+Tasks can carry a description, which `tano --list` shows:
+
+```ts
+task('build', `deno check`, { description: 'Type checks everything' });
 ```
 
 ## Using
@@ -64,6 +64,48 @@ tano --task my-task
 ```bash
 tano my-task
 ```
+
+**List all tasks of the tanofile:**
+
+```bash
+tano --list
+```
+
+**Show what a task would run, without running it:**
+
+```bash
+tano --dry-run my-task
+```
+
+A run that fails exits with `1`, so tano can be used in a pipeline.
+
+## Commands
+
+tano runs commands without a shell. A string command is split into arguments, where single and double quotes group their content and a backslash is an ordinary character, so Windows paths can be written as they are:
+
+```ts
+task('t', `deno run "C:\\Program Files\\build.ts"`);
+```
+
+Shell operators are not available, because there is no shell. Use `needs` to chain tasks, a code task instead of a pipe, or pass the command as an array of arguments:
+
+```ts
+task('t', ['sh', '-c', 'ls -la | wc -l']);
+```
+
+## Configuration
+
+`setup` sets the configuration from within the tanofile:
+
+```ts
+import { setup } from 'jsr:@dx/tano';
+
+setup({
+  logLevel: 'DEBUG',
+});
+```
+
+A flag passed on the command line wins over `setup`, which in turn wins over the built-in defaults.
 
 ## Help
 

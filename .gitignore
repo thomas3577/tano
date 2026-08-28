@@ -1,3 +1,4 @@
 .tano
 coverage
 *.log
+docs/superpowers/

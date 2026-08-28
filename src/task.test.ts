@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf, assertNotEquals } from '@std/assert';
 import { afterEach, describe, it } from '@std/testing/bdd';
@@ -22,7 +22,7 @@ describe(Task.name, () => {
   it(`Should run the command line.`, async () => {
     const needs: string[] = [];
 
-    const actual: Task = new Task('task-test-02', needs, `pwsh -c echo 'Runs my task'`);
+    const actual: Task = new Task('task-test-02', needs, `pwsh -c "echo 'Runs my task'"`);
 
     assertNotEquals(actual, null);
     assertInstanceOf(actual, Task);

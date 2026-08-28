@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module contains types.
@@ -30,6 +30,11 @@ export type TChanges = {
    * @param {TGlobHashSource} source - Global hash source of the files.
    */
   update(taskName: string, timestamp: Date, status: TTaskStatus, source?: TGlobHashSource): Promise<void>;
+
+  /**
+   * Writes everything that was collected during the run to the cache.
+   */
+  save(): Promise<void>;
 
   /**
    * Gets information about the last run.
@@ -137,9 +142,9 @@ export type TTanoArgs = {
   action: TTanoCliAction;
 
   /**
-   * If `true`, it will be aborted at the first error.
+   * The configuration that was given on the command line. Applied again after the tanofile was imported, so that an explicit flag wins over `setup()`.
    */
-  failFast: boolean;
+  config: TTanoConfig;
 
   /**
    * The path to the tanofile.
@@ -147,15 +152,14 @@ export type TTanoArgs = {
   file?: string;
 
   /**
-   * If you have set `source` in a task, and this `source` indicates that no files have changed since the last `run`, this task will be skipped.
-   * But if you now set `force` to true, this task will be executed anyway.
+   * If `true`, the tasks that would be executed are printed instead of running them.
    */
-  force: boolean;
+  dryRun: boolean;
 
   /**
-   * If false, the cache mechanism is disabled.
+   * If `true`, all tasks of the tanofile are printed instead of running one.
    */
-  noCache: boolean;
+  list: boolean;
 
   /**
    * Name of the task to be executed.
@@ -213,6 +217,14 @@ export type TTanoConfig = {
    */
   quiet?: boolean;
 };
+
+/**
+ * Same like {@linkcode TTanoConfig} but with all defaults applied, so every property is set.
+ *
+ * @remarks
+ * An empty `tanoCwd` means the current working directory.
+ */
+export type TTanoConfigStrict = Required<TTanoConfig>;
 
 /**
  * Options for a task run.
@@ -275,6 +287,11 @@ export type TTanoRunData = {
  * These are the additional task run options (besides the `RunOptions`)
  */
 export type TTaskOptions = Deno.CommandOptions & {
+  /**
+   * A short description of what this task does. Shown by `tano --list`.
+   */
+  description?: string;
+
   /**
    * You can specify a function that returns a boolean. As a condition whether a task must be executed or skipped. If `true`, the task is executed.
    */
@@ -380,7 +397,7 @@ export type TCodeFile = {
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: 1 + 2 === 3
  * });
  * ```
@@ -394,7 +411,7 @@ export type TConditionType1 = boolean;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: () => 1 + 1 === 3
  * });
  * ```
@@ -403,7 +420,7 @@ export type TConditionType1 = boolean;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: () => Promise.resolve(1 === 1)
  * });
  * ```
@@ -417,7 +434,7 @@ export type TConditionType2 = () => boolean | Promise<boolean>;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: (done) => done(1 === 1)
  * });
  * ```
@@ -431,7 +448,7 @@ export type TConditionType3 = (done: (result: boolean) => void) => void;
  * ```ts
  * import { task } from 'jsr:@dx/tano';
  *
- * task('myTask', `pwsh -c echo 'BEEP'`, {
+ * task('myTask', `pwsh -c "echo 'BEEP'"`, {
  *   condition: 1 + 2 === 3
  * });
  * ```
@@ -554,6 +571,11 @@ export type TTanoHandler = {
   count: number;
 
   /**
+   * Gets all tasks that are in the cache.
+   */
+  tasks: Array<Task>;
+
+  /**
    * Gets the number of executed tasks.
    */
   executed: number;
@@ -573,6 +595,9 @@ export type TTanoHandler = {
   /**
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
+   *
+   * @remarks
+   * Rejects if a task name does not exist or if a task failed. With `failFast` disabled every task is attempted first and the error lists all failed tasks.
    *
    * @param {string} taskName - [optionalParam='default'] Name of the task.
    * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
@@ -625,9 +650,4 @@ export type TTanoHandler = {
    * @param fn - The event listener to remove.
    */
   offChanged(fn: EventListenerOrEventListenerObject): void;
-
-  /**
-   * Hack: Updates the logger of this handler.
-   */
-  updateLogger(): void;
 };

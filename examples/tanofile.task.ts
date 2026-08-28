@@ -1,8 +1,8 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { needs, task } from '../mod.ts';
 import type { Task } from '../mod.ts';
 
-task('My task 06', `pwsh -c echo 'Task 06'`);
+task('My task 06', `pwsh -c "echo 'Task 06'"`);
 
-export const task07: Task = task('My task 07', needs('My task 06'), `pwsh -c echo 'Task 07'`);
+export const task07: Task = task('My task 07', needs('My task 06'), `pwsh -c "echo 'Task 07'"`);

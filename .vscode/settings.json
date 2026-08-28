@@ -5,7 +5,6 @@
   "editor.defaultFormatter": "denoland.vscode-deno",
   "deno.lint": true,
   "deno.enable": true,
-  "deno.unstable": ["kv"],
   "deno.config": "./deno.json",
   "deno.codeLens.references": false,
   "deno.codeLens.referencesAllFunctions": false,
@@ -13,7 +12,6 @@
   "deno.testing.args": [
     "--allow-run",
     "-RWE",
-    "--unstable-kv"
   ],
   "search.exclude": {
     "**/deno.lock": true

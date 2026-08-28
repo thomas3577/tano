@@ -10,7 +10,6 @@
         "run",
         "--allow-run",
         "-RWE",
-        "--unstable-kv",
         "--inspect-brk",
         "../tano.ts",
         "--file",
@@ -29,7 +28,6 @@
         "run",
         "--allow-run",
         "-RWE",
-        "--unstable-kv",
         "--inspect-brk",
         "../tano.ts",
         "--upgrade",
@@ -46,7 +44,6 @@
         "test",
         "--allow-run",
         "-RWE",
-        "--unstable-kv",
         "--inspect-brk",
         "./src/**/*.test.ts"
       ],
@@ -63,7 +60,6 @@
         "test",
         "--allow-run",
         "-RWE",
-        "--unstable-kv",
         "--inspect-brk",
         "${file}"
       ],

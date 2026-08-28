@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module provides the task handler class and an initial instance.
@@ -10,6 +10,7 @@ import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
+import { config } from './config.ts';
 import type { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
@@ -23,17 +24,12 @@ class Handler implements TTanoHandler {
   readonly #cache: Map<string, Task> = new Map();
   readonly #eventTarget = new EventTarget();
 
-  #log: Logger = logger();
   #starting: null | PerformanceMark = null;
   #finished: null | PerformanceMark = null;
   #measure: null | PerformanceMeasure = null;
   #changes: null | TChanges = null;
   #abort: boolean = false;
-  #options: TTaskRunOptions = {
-    failFast: true,
-    force: false,
-    noCache: false,
-  };
+  #options: TTaskRunOptions = {};
 
   /**
    * Gets the timestamp when the handler was created.
@@ -71,6 +67,13 @@ class Handler implements TTanoHandler {
   }
 
   /**
+   * Gets all tasks that are in the cache.
+   */
+  get tasks(): Array<Task> {
+    return Array.from(this.#cache.values());
+  }
+
+  /**
    * Gets the number of executed tasks.
    */
   get executed(): number {
@@ -85,7 +88,7 @@ class Handler implements TTanoHandler {
       if (this.#options.noCache === true) {
         this.#changes = new ChangesMock();
       } else {
-        this.#changes = new Changes(Deno.env.get('TANO_CWD'));
+        this.#changes = new Changes(config().tanoCwd);
       }
     }
 
@@ -112,39 +115,57 @@ class Handler implements TTanoHandler {
    * Runs the Task.
    * In the process, all dependent tasks `needs` are executed beforehand.
    *
+   * @remarks
+   * Rejects if a task name does not exist or if a task failed. With `failFast` disabled every task is attempted first and the error lists all failed tasks.
+   *
    * @param {string} taskName - [optionalParam='default'] Name of the task.
    * @param {TTaskRunOptions} options - [optionalParam={ failFast: true, force: false, noCache: false }]
    *
    * @returns {Promise<void>} A promise that resolves to void.
    */
   async run(taskName: string = 'default', options?: TTaskRunOptions): Promise<void> {
+    const { failFast, force, noCache } = config();
+
     this.#options = {
-      failFast: options?.failFast !== undefined ? options?.failFast : this.#options.failFast,
-      force: options?.force !== undefined ? options?.force : this.#options.force,
-      noCache: options?.noCache !== undefined ? options?.noCache : this.#options.noCache,
+      failFast: options?.failFast ?? failFast,
+      force: options?.force ?? force,
+      noCache: options?.noCache ?? noCache,
     };
 
     await this.#preRun(taskName);
 
-    const taskNames: Array<string> = this.#getPlan(taskName);
+    const failed: Array<string> = [];
+    let taskNames: Array<string> = [];
 
-    this.#abort = false;
+    try {
+      taskNames = this.#getPlan(taskName);
 
-    for (const tn of taskNames) {
-      if (this.#abort) {
-        break;
+      this.#abort = false;
+
+      for (const tn of taskNames) {
+        if (this.#abort) {
+          break;
+        }
+
+        await this.#cache.get(tn)?.runThis(this.#options.force)
+          .catch((err) => {
+            failed.push(tn);
+
+            if (this.#options.failFast) {
+              this.abort();
+              throw err;
+            }
+          });
       }
 
-      await this.#cache.get(tn)?.runThis(this.#options.force)
-        .catch((err) => {
-          if (this.#options.failFast) {
-            this.abort();
-            throw err;
-          }
-        });
-    }
+      if (failed.length > 0) {
+        throw new Error(`Failed tasks: ${failed.join(', ')}`);
+      }
+    } finally {
+      await this.changes?.save();
 
-    this.#postRun(!taskNames || taskNames.length === 0 || this.#abort);
+      this.#postRun(taskNames.length === 0 || this.#abort || failed.length > 0);
+    }
   }
 
   /**
@@ -208,11 +229,8 @@ class Handler implements TTanoHandler {
     this.#eventTarget.removeEventListener('changed', fn);
   }
 
-  /**
-   * Hack: Updates the logger of this handler.
-   */
-  updateLogger(): void {
-    this.#log = logger();
+  get #log(): Logger {
+    return logger();
   }
 
   async #preRun(taskName: string): Promise<void> {
@@ -286,9 +304,7 @@ class Handler implements TTanoHandler {
       taskNames.push(taskName);
       planned.add(taskName);
     } else {
-      this.#log.warn('A task with the name {name} does not exist.', {
-        name: `'${taskName}'`,
-      });
+      throw new Error(`A task with the name '${taskName}' does not exist.`);
     }
 
     return taskNames;

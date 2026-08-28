@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
@@ -105,6 +105,16 @@ describe(runCommand.name, () => {
   it(`if runCommand('deno eval "console.log(1+1)"')`, async () => {
     const command = 'deno eval "console.log(1+1)"';
 
+    const actual = await runCommand(command as unknown as TCommand)
+      .then(() => true)
+      .catch(() => false);
+
+    assertEquals(actual, true);
+  });
+
+  it(`if runCommand('deno lint && deno test')`, async () => {
+    const command = 'deno lint && deno test';
+
     let message = '';
     const actual = await runCommand(command as unknown as TCommand)
       .then(() => false)
@@ -114,7 +124,7 @@ describe(runCommand.name, () => {
       });
 
     assertEquals(actual, true);
-    assertStringIncludes(message, 'Please pass command as an array of arguments.');
+    assertStringIncludes(message, `Unquoted shell operator '&'`);
   });
 });
 

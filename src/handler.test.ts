@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { afterEach, beforeAll, describe, it } from '@std/testing/bdd';
@@ -17,33 +17,37 @@ describe('handler', () => {
   });
 
   it(`Should have one task.`, () => {
-    task('myTask', `pwsh -c echo 'First Task'`);
+    task('myTask', `pwsh -c "echo 'First Task'"`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
   });
 
   it(`Should have two task.`, () => {
-    task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
-    task('pre-task', `pwsh -c echo 'First Task'`);
+    task('default', needs('pre-task'), `pwsh -c "echo 'Second Task'"`);
+    task('pre-task', `pwsh -c "echo 'First Task'"`);
 
     assertEquals(handler.count, 2);
     assertEquals(handler.executed, 0);
   });
 
-  it(`Should run no task (because no default-task and no task set.).`, async () => {
-    task('myTask', `pwsh -c echo 'First Task'`);
+  it(`Should throws an error if no default-task and no task set.`, async () => {
+    task('myTask', `pwsh -c "echo 'First Task'"`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
 
-    await handler.run(undefined);
+    await assertRejects(
+      async () => await handler.run(undefined),
+      Error,
+      `A task with the name 'default' does not exist.`,
+    );
 
     assertEquals(handler.executed, 0);
   });
 
   it(`Should run one task.`, async () => {
-    task('myTask', `pwsh -c echo 'First Task'`);
+    task('myTask', `pwsh -c "echo 'First Task'"`);
 
     assertEquals(handler.count, 1);
     assertEquals(handler.executed, 0);
@@ -54,8 +58,8 @@ describe('handler', () => {
   });
 
   it(`Should throws an error if trying to runs two times.`, async () => {
-    task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
-    task('pre-task', `pwsh -c echo 'First Task'`);
+    task('default', needs('pre-task'), `pwsh -c "echo 'Second Task'"`);
+    task('pre-task', `pwsh -c "echo 'First Task'"`);
 
     assertEquals(handler.count, 2);
     assertEquals(handler.executed, 0);
@@ -73,8 +77,8 @@ describe('handler', () => {
   });
 
   it(`Should runs two times.`, async () => {
-    task('default', needs('pre-task'), `pwsh -c echo 'Second Task'`);
-    task('pre-task', `pwsh -c echo 'First Task'`);
+    task('default', needs('pre-task'), `pwsh -c "echo 'Second Task'"`);
+    task('pre-task', `pwsh -c "echo 'First Task'"`);
 
     assertEquals(handler.count, 2);
     assertEquals(handler.executed, 0);
@@ -98,8 +102,8 @@ describe('handler', () => {
       task('pre-task-one', () => {
         throw new Error('ERROR! ERROR! ERROR!');
       });
-      task('pre-task-two', `pwsh -c echo 'if you see the second pre-task, something went wrong'`);
-      task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c echo 'if you see me, something went wrong'`);
+      task('pre-task-two', `pwsh -c "echo 'if you see the second pre-task, something went wrong'"`);
+      task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c "echo 'if you see me, something went wrong'"`);
 
       await handler.run();
     } catch (err: unknown) {
@@ -111,10 +115,14 @@ describe('handler', () => {
     task('pre-task-one', () => {
       throw new Error('ERROR! ERROR! ERROR!');
     });
-    task('pre-task-two', `pwsh -c echo 'if you see the second pre-task, something went wrong'`);
-    task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c echo 'if you see me, something went wrong'`);
+    task('pre-task-two', `pwsh -c "echo 'if you see the second pre-task, something went wrong'"`);
+    task('default', needs('pre-task-one', 'pre-task-two'), `pwsh -c "echo 'if you see me, something went wrong'"`);
 
-    await handler.run('default', { failFast: false });
+    await assertRejects(
+      async () => await handler.run('default', { failFast: false }),
+      Error,
+      'Failed tasks: pre-task-one',
+    );
 
     assertEquals(handler.executed, 3);
   });

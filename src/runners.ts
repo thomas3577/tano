@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module contains runners for code and commands.
@@ -8,9 +8,9 @@
 
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
+import { config } from './config.ts';
+import { tokenize } from './tokenize.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
-
-const hasUnsupportedStringCommandSyntax = (value: string): boolean => /"|\\[\s"'\\]/.test(value);
 
 const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildProcess => {
   if (command == null) {
@@ -21,13 +21,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
     throw new Error('Command must be a string or an array of strings.');
   }
 
-  const isCommandArray = Array.isArray(command);
-
-  if (!isCommandArray && hasUnsupportedStringCommandSyntax(command)) {
-    throw new Error('String commands do not support shell quoting or escaping. Please pass command as an array of arguments.');
-  }
-
-  const args: string[] = isCommandArray ? [...command] : command.split(' ');
+  const args: string[] = Array.isArray(command) ? [...command] : tokenize(command);
   const executable = args.shift();
 
   if (!executable || executable.trim().length < 1) {
@@ -58,7 +52,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions): Deno.ChildPro
  * @returns {Promise<void>}
  */
 export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void> => {
-  const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
+  const logThis: boolean = options?.logThis ?? config().logEverything;
   const log: Logger = logger();
 
   log.debug('Run code...');
@@ -115,19 +109,19 @@ export const runCode = async (code: TCode, options?: TCodeOptions): Promise<void
 /**
  * Runs a command.
  *
- * @param {TCommand} command - The command which should be executed. If this is a string, it is split by spaces into `args` and must not contain shell-style quoting/escaping. Use the array form to pass pre-split arguments safely.
+ * @param {TCommand} command - The command which should be executed. A string is split into `args` by {@linkcode tokenize}, where quotes group their content and unquoted shell operators are rejected. Use the array form to pass pre-split arguments.
  * @param {TCommandOptions} options - [optionalParam=undefined] Options.
  *
  * @returns {Promise<number>}
  */
 export const runCommand = async (command: TCommand, options?: TCommandOptions): Promise<void> => {
-  const logThis: boolean = options?.logThis ?? Deno.env.get('LOG_EVERYTHING') === 'true';
+  const logThis: boolean = options?.logThis ?? config().logEverything;
   const log: Logger = logger();
 
   log.debug('Run command...');
 
   const textDecoder = new TextDecoder();
-  const quiet: boolean = Deno.env.get('QUIET') === 'true';
+  const quiet: boolean = config().quiet;
   const process: Deno.ChildProcess = getProcess(command, options);
 
   // Output pipe

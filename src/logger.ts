@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module contains the logger function to create a new logger.
@@ -7,17 +7,20 @@
  */
 
 import { format } from '@std/datetime/format';
-import { gray, white } from '@std/fmt/colors';
-import { BaseHandler, ConsoleHandler, FileHandler, getLogger, setup } from '@std/log';
+import { join } from '@std/path';
+import { gray, stripAnsiCode, white } from '@std/fmt/colors';
+import { BaseHandler, ConsoleHandler, FileHandler, getLogger, LogLevels, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
-import { consoleMock } from './console.ts';
+import { config, configVersion } from './config.ts';
 import type { TLogHandler, TLogStream } from './types.ts';
 
-const log = console.log;
 const stream: TextEncoderStream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
 const writer: WritableStreamDefaultWriter<string> = stream.writable.getWriter();
 const levelName: LevelName = 'DEBUG';
+
+let instance: null | Logger = null;
+let instanceVersion: number = -1;
 
 class StreamHandler extends BaseHandler {
   log(_: string): void {}
@@ -27,6 +30,25 @@ class StreamHandler extends BaseHandler {
 
     await writer.ready;
     await writer.write(chunk);
+  }
+}
+
+/**
+ * A console handler that writes errors to stderr instead of stdout, so that a redirect of one stream does not swallow the other.
+ */
+class TanoConsoleHandler extends ConsoleHandler {
+  override handle(logRecord: LogRecord): void {
+    if (this.level > logRecord.level) {
+      return;
+    }
+
+    const msg: string = this.format(logRecord);
+
+    if (logRecord.level >= LogLevels.ERROR) {
+      console.error(msg);
+    } else {
+      console.log(msg);
+    }
   }
 }
 
@@ -40,8 +62,20 @@ const interpolate = (msg: string, params?: unknown): string => {
   return msg;
 };
 
-let consoleHandler: ConsoleHandler;
-const getConsoleHandler = (): ConsoleHandler => {
+/**
+ * Builds the message for a handler that is not a terminal.
+ *
+ * @remarks
+ * Colours are applied at the call site, so the raw message carries escape codes that only make sense on a console. A file or a stream consumer gets the plain text with its placeholders filled in.
+ *
+ * @param {LogRecord} logRecord - The record to build the message for.
+ *
+ * @returns {string} The interpolated message without escape codes.
+ */
+const plainMessage = (logRecord: LogRecord): string => stripAnsiCode(interpolate(logRecord.msg, logRecord.args?.at(0)));
+
+let consoleHandler: TanoConsoleHandler;
+const getConsoleHandler = (): TanoConsoleHandler => {
   if (!consoleHandler) {
     const consoleHandlerOptions: ConsoleHandlerOptions = {
       formatter: (logRecord: LogRecord): string => {
@@ -58,8 +92,7 @@ const getConsoleHandler = (): ConsoleHandler => {
       },
     };
 
-    consoleHandler = new ConsoleHandler(levelName, consoleHandlerOptions);
-    consoleHandler.log = log;
+    consoleHandler = new TanoConsoleHandler(levelName, consoleHandlerOptions);
   }
 
   return consoleHandler;
@@ -71,7 +104,7 @@ const getStreamHandler = (): StreamHandler => {
     const streamHandlerOptions: BaseHandlerOptions = {
       formatter: (logRecord: LogRecord): string => {
         const datetime: string = logRecord.datetime.toISOString();
-        const msg: string = interpolate(logRecord.msg, logRecord.args?.at(0));
+        const msg: string = plainMessage(logRecord);
         const args = logRecord.args;
         const result: string = JSON.stringify({ ...logRecord, datetime, msg, args });
 
@@ -89,7 +122,8 @@ let fileHandler: FileHandler;
 const getFileHandler = (): FileHandler => {
   if (!fileHandler) {
     const fileHandlerOptions: FileHandlerOptions = {
-      filename: Deno.env.get('LOG_FILE') || './tano.log',
+      filename: config().logFile || join(config().tanoCwd || Deno.cwd(), 'tano.log'),
+      formatter: (logRecord: LogRecord): string => `${logRecord.levelName} ${plainMessage(logRecord)}`,
     };
 
     fileHandler = new FileHandler(levelName, fileHandlerOptions);
@@ -125,14 +159,15 @@ export const logStream: TLogStream = {
  * @returns {Logger}
  */
 export const logger = (): Logger => {
-  const quiet: boolean = Deno.env.get('QUIET') === 'true';
-  const level: LevelName = Deno.env.get('LOG_LEVEL')?.toUpperCase() as LevelName || 'INFO';
-  const handlers: TLogHandler[] = Deno.env.get('LOG_OUTPUT')?.split(',').map((item) => item.trim()) as TLogHandler[] || ['console'] as TLogHandler[];
+  if (instance && instanceVersion === configVersion()) {
+    return instance;
+  }
 
-  // deno-lint-ignore no-global-assign
-  console = quiet ? consoleMock : console;
+  const { quiet, logLevel, logOutput } = config();
+  const level: LevelName = logLevel.toUpperCase() as LevelName;
+  const handlers: TLogHandler[] = (quiet ? logOutput.filter((handler) => handler !== 'console') : logOutput) as TLogHandler[];
 
-  const config: LogConfig = {
+  const logConfig: LogConfig = {
     handlers: {},
     loggers: {
       default: {
@@ -143,21 +178,24 @@ export const logger = (): Logger => {
   };
 
   if (handlers.includes('console')) {
-    config.handlers = config.handlers ?? {};
-    config.handlers['console'] = getConsoleHandler();
+    logConfig.handlers = logConfig.handlers ?? {};
+    logConfig.handlers['console'] = getConsoleHandler();
   }
 
   if (handlers.includes('stream')) {
-    config.handlers = config.handlers ?? {};
-    config.handlers['stream'] = getStreamHandler();
+    logConfig.handlers = logConfig.handlers ?? {};
+    logConfig.handlers['stream'] = getStreamHandler();
   }
 
   if (handlers.includes('file')) {
-    config.handlers = config.handlers ?? {};
-    config.handlers['file'] = getFileHandler();
+    logConfig.handlers = logConfig.handlers ?? {};
+    logConfig.handlers['file'] = getFileHandler();
   }
 
-  setup(config);
+  setup(logConfig);
 
-  return getLogger();
+  instance = getLogger();
+  instanceVersion = configVersion();
+
+  return instance;
 };

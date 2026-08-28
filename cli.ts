@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This is the initial module to start the Tano CLI.
@@ -24,10 +24,10 @@ if (import.meta.main) {
       console.log(`v${VERSION}`);
       break;
     case 'upgrade':
-      await task('upgrade', 'deno install --allow-run -RWEN --unstable-kv -f -g -n tano jsr:@dx/tano/cli').run();
+      await task('upgrade', 'deno install --allow-run -RWEN -f -g -n tano jsr:@dx/tano/cli').run();
       break;
     default:
-      await cli(args);
+      Deno.exitCode = await cli(args);
       break;
   }
 }

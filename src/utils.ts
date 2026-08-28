@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module contains functions for type checks, type conversions and other helpers.
@@ -233,33 +233,36 @@ export const toCode = (param?: TExecutor): TCode => {
 };
 
 /**
+ * Checks if a string starts with a URL scheme.
+ *
+ * @remarks
+ * A single character in front of the colon is a Windows drive letter and not a scheme. Without that distinction `new URL('C:/tanofile.ts')` succeeds with the protocol `c:` and the path is never resolved as a file.
+ *
+ * @param {string} value - A path or URL to check.
+ *
+ * @returns {boolean} if `true` the string starts with a URL scheme.
+ */
+const hasUrlScheme = (value: string): boolean => /^[a-zA-Z][a-zA-Z\d+\-.]+:/.test(value);
+
+/**
  * Gets a valid import url.
  * @param {string} fileOrUrl - A path or URL to a tanofile.
  *
  * @returns A valid import url.
  */
 export const getImportUrl = async (fileOrUrl: string): Promise<string> => {
-  let importUrl: null | URL = null;
-
-  try {
-    importUrl = new URL(fileOrUrl);
-  } catch (_: unknown) {
-    const importFile: string = fileOrUrl;
-    const importPath: string = isAbsolute(importFile) ? importFile : join(Deno.cwd(), importFile);
-
-    try {
-      const stat: null | Deno.FileInfo = await Deno.stat(importPath).catch(() => (null));
-      if (!stat?.isFile) {
-        throw new Error(`The path '${importPath}' is not a file.`);
-      }
-    } catch (err: unknown) {
-      throw err;
-    }
-
-    importUrl = toFileUrl(importPath);
+  if (hasUrlScheme(fileOrUrl)) {
+    return new URL(fileOrUrl).toString();
   }
 
-  return importUrl.toString();
+  const importPath: string = isAbsolute(fileOrUrl) ? fileOrUrl : join(Deno.cwd(), fileOrUrl);
+  const stat: null | Deno.FileInfo = await Deno.stat(importPath).catch(() => (null));
+
+  if (!stat?.isFile) {
+    throw new Error(`The path '${importPath}' is not a file.`);
+  }
+
+  return toFileUrl(importPath).toString();
 };
 
 /**
@@ -278,17 +281,4 @@ export const getCwd = (importUrl?: string): string => {
   const importDirectory: string = dirname(importPath);
 
   return importDirectory;
-};
-
-/**
- * Converts a string to snake case.
- *
- * @param {string} value - The string to convert.
- *
- * @returns {string | undefined} The converted string.
- */
-export const toSnakeCase = (value: string): string | undefined => {
-  const words = value.match(/[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)/g);
-
-  return words?.join('_');
 };

@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
@@ -518,7 +518,7 @@ describe(getImportUrl.name, () => {
     const fileOrUrl = await Deno.realPath('./examples/tanofile.ts');
     const actual = await getImportUrl(fileOrUrl);
 
-    assertEquals(actual.endsWith('tanofile.ts'), true);
+    assertEquals(actual, toFileUrl(fileOrUrl).toString());
   });
 });
 

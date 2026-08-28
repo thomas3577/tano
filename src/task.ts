@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module contains the Task class.
@@ -36,7 +36,6 @@ import type { TCommand, TCommandOptions, TExecutor, TOptions, TTanoHandler, TTas
  * ```
  */
 export class Task implements TTaskParams {
-  readonly #log: Logger = logger();
   readonly #created: Date = new Date();
   readonly #handler: TTanoHandler = handler;
   readonly #name: string;
@@ -219,8 +218,10 @@ export class Task implements TTaskParams {
     this.#preRun();
 
     await this.#run(this.#type, this.#executor, this.#options)
-      .catch((err) => {
+      .catch(async (err) => {
         this.#updateStatus('failed', err);
+
+        await this.#handler.changes?.update(this.#name, new Date(), this.#status, this.#options?.source);
 
         this.#log.error(`${bold(red('Error'))} '${gray('{name}')}': ${err}`, {
           name: this.#name,
@@ -239,6 +240,10 @@ export class Task implements TTaskParams {
     this.#starting = null;
     this.#finished = null;
     this.#updateStatus('ready');
+  }
+
+  get #log(): Logger {
+    return logger();
   }
 
   #preRun(): void {
@@ -269,8 +274,6 @@ export class Task implements TTaskParams {
     });
 
     await this.#handler.changes?.update(this.#name, new Date(), this.#status, options?.source);
-
-    this.#handler.changes?.dispose();
   }
 
   async #run(type: TTaskType, executor: TExecutor, options: TOptions): Promise<void> {

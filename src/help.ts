@@ -1,4 +1,4 @@
-// Copyright 2018-2025 the tano authors. All rights reserved. MIT license.
+// Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 /**
  * This module provides the help message for the CLI.
@@ -47,6 +47,13 @@ export const help = (): void => {
       -t, --task <TASK_NAME>
               As an alternative to set the task name.
 
+          --list
+              Prints all tasks of the tanofile instead of running one.
+
+          --dry-run
+              Prints the tasks that would be executed, in order, without
+              running them.
+
       -l, --log-level <LOG_LEVEL>
               To change the log level. Default is 'INFO'.
               See https://deno.land/std@log/levels.ts
@@ -61,8 +68,10 @@ export const help = (): void => {
       -V, --version
               Print version information
 
-          --fail-fast
-              Aborts all tasks at the first error. Default is 'true'
+          --fail-fast, --no-fail-fast
+              Aborts all tasks at the first error. Default is 'true'.
+              With '--no-fail-fast' every task is attempted and all
+              failed tasks are listed at the end.
 
           --force
               Also executes the tasks that have not been changed since the last run.

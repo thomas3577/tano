@@ -55,6 +55,10 @@ export const help = (): void => {
               Default is '1'. Anything above that requires every
               ordering to be declared with 'needs'.
 
+          --watch, --watch=<GLOB>
+              Runs the task again whenever a file below the tanofile
+              changes. With a glob, only changes matching it count.
+
           --dry-run
               Prints the tasks that would be executed, in order, without
               running them.

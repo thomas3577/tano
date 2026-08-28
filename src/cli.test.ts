@@ -327,6 +327,112 @@ task('all', needs('a', 'b'));
     assertEquals(actual.stderr.includes('Uncaught'), false);
   });
 
+  it(`Should stop a task that runs into its timeout.`, async () => {
+    const slow = `['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 3000)); console.log("SLOW_DONE")']`;
+    const actual = await runCli(`task('slow', ${slow}, { timeout: 300 });`, ['slow']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stderr, 'Timed out after 300ms');
+    assertEquals(actual.stdout.includes('SLOW_DONE'), false);
+  });
+
+  it(`Should fail a code task at its timeout, even though the function cannot be stopped.`, async () => {
+    const actual = await runCli(`task('slow', async () => { await new Promise((resolve) => setTimeout(resolve, 1500)); }, { timeout: 300 });`, ['slow']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stderr, 'Timed out after 300ms.');
+  });
+
+  it(`Should stop a task when the signal from its options is aborted.`, async () => {
+    const tanofile = `
+const controller = new AbortController();
+
+setTimeout(() => controller.abort(), 200);
+
+task('slow', ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 3000)); console.log("SLOW_DONE")'], { signal: controller.signal });
+`;
+    const actual = await runCli(tanofile, ['slow']);
+
+    assertEquals(actual.code, 1);
+    assertEquals(actual.stdout.includes('SLOW_DONE'), false);
+  });
+
+  // Windows has no real signals: Deno.kill terminates the process instead of delivering SIGINT, so the handler could never run. A real Ctrl+C in a console does reach it.
+  const itWithSignals = Deno.build.os === 'windows' ? it.ignore : it;
+
+  itWithSignals(`Should stop the tasks and exit with 130 on SIGINT.`, async () => {
+    const dir: string = await Deno.makeTempDir({ prefix: 'tano-cli-test-' });
+    dirs.push(dir);
+
+    const file: string = join(dir, 'tanofile.ts');
+    await Deno.writeTextFile(file, `import { task } from '${modUrl}';\ntask('slow', ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 8000)); console.log("SLOW_DONE")']);\n`);
+
+    const child: Deno.ChildProcess = new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-run', '-RWE', cliPath, '--no-cache', '--file', file, 'slow'],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+
+    // Long enough for deno to start and the task to be spawned, far short of the eight seconds the task sleeps.
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    Deno.kill(child.pid, 'SIGINT');
+
+    const output: Deno.CommandOutput = await child.output();
+    const decoder: TextDecoder = new TextDecoder();
+
+    assertEquals(output.code, 130);
+    assertEquals(stripAnsiCode(decoder.decode(output.stdout)).includes('SLOW_DONE'), false);
+  });
+
+  it(`Should run again when a watched file changes.`, async () => {
+    const dir: string = await Deno.makeTempDir({ prefix: 'tano-cli-test-' });
+    dirs.push(dir);
+
+    const marker: string = join(dir, 'runs.txt');
+    const watched: string = join(dir, 'watched.txt');
+
+    await Deno.writeTextFile(watched, 'one');
+    await Deno.writeTextFile(
+      join(dir, 'tanofile.ts'),
+      [
+        `import { task } from '${modUrl}';`,
+        `task('mark', ['deno', 'eval', 'await Deno.writeTextFile(Deno.args[0], "x", { append: true })', ${JSON.stringify(marker)}]);`,
+      ].join('\n'),
+    );
+
+    const child: Deno.ChildProcess = new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-run', '-RWE', cliPath, '--no-cache', '--file', join(dir, 'tanofile.ts'), 'mark', '--watch'],
+      stdout: 'null',
+      stderr: 'null',
+    }).spawn();
+
+    const runs = async (): Promise<number> => (await Deno.readTextFile(marker).catch(() => '')).length;
+    const until = async (count: number): Promise<boolean> => {
+      for (let attempt = 0; attempt < 100; attempt++) {
+        if (await runs() >= count) {
+          return true;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      return false;
+    };
+
+    const ranOnce: boolean = await until(1);
+
+    await Deno.writeTextFile(watched, 'two');
+
+    const ranTwice: boolean = await until(2);
+
+    child.kill();
+    await child.status;
+
+    assertEquals(ranOnce, true);
+    assertEquals(ranTwice, true);
+  });
+
   it(`Should print the help even when quiet.`, async () => {
     const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['--help', '-q']);
 

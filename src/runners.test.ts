@@ -3,6 +3,7 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
 import { executeCodeFunction, executeCondition, runCode, runCommand } from './runners.ts';
+import { abortRun, resetRun } from './abort.ts';
 import type { TCode, TCodeFunction, TCommand, TCondition } from './types.ts';
 
 describe(runCode.name, () => {
@@ -125,6 +126,26 @@ describe(runCommand.name, () => {
 
     assertEquals(actual, true);
     assertStringIncludes(message, `Unquoted shell operator '&'`);
+  });
+
+  it(`if runCommand is aborted while it runs`, async () => {
+    const command = ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 3000)); console.log("NOT_REACHED")'];
+
+    resetRun();
+
+    const started = Date.now();
+    const promise = runCommand(command as unknown as TCommand);
+
+    setTimeout(() => abortRun(), 200);
+
+    const actual = await promise
+      .then(() => true)
+      .catch(() => false);
+
+    resetRun();
+
+    assertEquals(actual, false);
+    assertEquals(Date.now() - started < 2000, true);
   });
 });
 

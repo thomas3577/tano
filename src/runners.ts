@@ -9,6 +9,7 @@
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { abortable } from '@std/async/abortable';
+import { runSignal } from './abort.ts';
 import { config } from './config.ts';
 import { tokenize } from './tokenize.ts';
 import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
@@ -168,8 +169,8 @@ export const runCommand = async (command: TCommand, options?: TCommandOptions, t
   const commandText: string = Array.isArray(command) ? command.join(' ') : command;
   const timeout: undefined | number = typeof options?.timeout === 'number' ? options.timeout : undefined;
   const timeoutSignal: undefined | AbortSignal = timeout === undefined ? undefined : AbortSignal.timeout(timeout);
-  const signals: Array<AbortSignal> = [options?.signal, timeoutSignal].filter((signal): signal is AbortSignal => signal !== undefined);
-  const process: Deno.ChildProcess = getProcess(command, options, signals.length > 0 ? AbortSignal.any(signals) : undefined);
+  const signals: Array<AbortSignal> = [runSignal(), options?.signal, timeoutSignal].filter((signal): signal is AbortSignal => signal !== undefined);
+  const process: Deno.ChildProcess = getProcess(command, options, AbortSignal.any(signals));
 
   // Output pipe
   process.stdout.pipeTo(

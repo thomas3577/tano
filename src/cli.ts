@@ -6,17 +6,43 @@ import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { listPlan, listTasks } from './list.ts';
 import { setup } from './config.ts';
+import { abortRun } from './abort.ts';
 import type { TTanoArgs } from './types.ts';
+
+/**
+ * The exit code a shell expects after a run was interrupted, `128` plus the number of `SIGINT`.
+ */
+const INTERRUPTED = 130;
 
 /**
  * Loads the tanofile and runs the requested task.
  *
+ * @remarks
+ * Listens for `SIGINT` while a task runs, so that Ctrl+C stops the spawned processes instead of leaving them behind. A second `SIGINT` gives up waiting and ends tano right away.
+ *
  * @param {TTanoArgs} args - The tano args.
  *
- * @returns {Promise<number>} The exit code. `0` if the run succeeded, `1` if it was aborted with errors.
+ * @returns {Promise<number>} The exit code. `0` if the run succeeded, `1` if it was aborted with errors, `130` if it was interrupted.
  */
 export const cli = async (args: TTanoArgs): Promise<number> => {
   const log: Logger = logger();
+
+  let interrupted: boolean = false;
+
+  const onInterrupt = (): void => {
+    if (interrupted) {
+      Deno.exit(INTERRUPTED);
+    }
+
+    interrupted = true;
+
+    log.warn(bold('Interrupted, stopping tasks...'));
+
+    abortRun();
+    handler.abort();
+  };
+
+  Deno.addSignalListener('SIGINT', onInterrupt);
 
   try {
     log.info(`Using       ${args.file}`);
@@ -50,9 +76,15 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
 
     return 0;
   } catch (err: unknown) {
+    if (interrupted) {
+      return INTERRUPTED;
+    }
+
     log.error(bold('Aborted with errors.'));
     log.error(err);
 
     return 1;
+  } finally {
+    Deno.removeSignalListener('SIGINT', onInterrupt);
   }
 };

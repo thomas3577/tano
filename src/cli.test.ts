@@ -357,6 +357,34 @@ task('slow', ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve
     assertEquals(actual.stdout.includes('SLOW_DONE'), false);
   });
 
+  // Windows has no real signals: Deno.kill terminates the process instead of delivering SIGINT, so the handler could never run. A real Ctrl+C in a console does reach it.
+  const itWithSignals = Deno.build.os === 'windows' ? it.ignore : it;
+
+  itWithSignals(`Should stop the tasks and exit with 130 on SIGINT.`, async () => {
+    const dir: string = await Deno.makeTempDir({ prefix: 'tano-cli-test-' });
+    dirs.push(dir);
+
+    const file: string = join(dir, 'tanofile.ts');
+    await Deno.writeTextFile(file, `import { task } from '${modUrl}';\ntask('slow', ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve, 8000)); console.log("SLOW_DONE")']);\n`);
+
+    const child: Deno.ChildProcess = new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-run', '-RWE', cliPath, '--no-cache', '--file', file, 'slow'],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+
+    // Long enough for deno to start and the task to be spawned, far short of the eight seconds the task sleeps.
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    Deno.kill(child.pid, 'SIGINT');
+
+    const output: Deno.CommandOutput = await child.output();
+    const decoder: TextDecoder = new TextDecoder();
+
+    assertEquals(output.code, 130);
+    assertEquals(stripAnsiCode(decoder.decode(output.stdout)).includes('SLOW_DONE'), false);
+  });
+
   it(`Should print the help even when quiet.`, async () => {
     const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['--help', '-q']);
 

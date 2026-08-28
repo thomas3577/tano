@@ -202,6 +202,20 @@ class Handler implements TTanoHandler {
   }
 
   /**
+   * Gets the tasks to be executed, grouped into levels that can run at the same time.
+   *
+   * @remarks
+   * Two tasks of the same level cannot depend on each other, because a dependency between them would put them at different depths. Every level therefore only has to wait for the level before it.
+   *
+   * @param {string} taskName - Name of the entry task.
+   *
+   * @returns {Array<Array<string>>} - The levels, in the order in which they have to run.
+   */
+  getLevels(taskName: string): Array<Array<string>> {
+    return this.#getLevels(taskName);
+  }
+
+  /**
    * Disposes the handler.
    */
   dispose(): void {
@@ -272,6 +286,28 @@ class Handler implements TTanoHandler {
     if (dispose) {
       this.dispose();
     }
+  }
+
+  #getLevels(taskName: string): Array<Array<string>> {
+    const plan: Array<string> = this.#getPlan(taskName);
+    const depths: Map<string, number> = new Map();
+    const levels: Array<Array<string>> = [];
+
+    // The plan is in dependency order, so every `needs` of a task already has its depth.
+    for (const name of plan) {
+      const task: undefined | Task = this.#cache.get(name);
+      const depth: number = Math.max(-1, ...(task?.needs ?? []).map((need) => depths.get(need) ?? -1)) + 1;
+
+      depths.set(name, depth);
+    }
+
+    for (const name of plan) {
+      const depth: number = depths.get(name) as number;
+
+      levels[depth] = [...(levels[depth] ?? []), name];
+    }
+
+    return levels;
   }
 
   #getPlan(

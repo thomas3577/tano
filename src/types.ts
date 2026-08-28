@@ -631,6 +631,15 @@ export type TTanoHandler = {
   getPlan(taskName: string): Array<string>;
 
   /**
+   * Gets the tasks to be executed, grouped into levels that can run at the same time.
+   *
+   * @param {string} taskName - Name of the entry task.
+   *
+   * @returns {Array<Array<string>>} - The levels, in the order in which they have to run.
+   */
+  getLevels(taskName: string): Array<Array<string>>;
+
+  /**
    * Disposes the handler.
    */
   dispose(): void;

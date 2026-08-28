@@ -142,6 +142,29 @@ describe('handler', () => {
     assertEquals(handler.executed, 4);
   });
 
+  it(`Should group independent tasks into levels`, () => {
+    task('shared', () => {});
+    task('task-a', needs('shared'), () => {});
+    task('task-b', needs('shared'), () => {});
+    task('default', needs('task-a', 'task-b'), () => {});
+
+    assertEquals(handler.getLevels('default'), [['shared'], ['task-a', 'task-b'], ['default']]);
+  });
+
+  it(`Should put a task after the deepest of its needs`, () => {
+    task('a', () => {});
+    task('b', needs('a'), () => {});
+    task('default', needs('a', 'b'), () => {});
+
+    assertEquals(handler.getLevels('default'), [['a'], ['b'], ['default']]);
+  });
+
+  it(`Should return a single level for a task without needs`, () => {
+    task('lonely', () => {});
+
+    assertEquals(handler.getLevels('lonely'), [['lonely']]);
+  });
+
   it(`Should fail on circular dependencies`, async () => {
     task('task-a', needs('task-b'), () => {});
     task('task-b', needs('task-a'), () => {});

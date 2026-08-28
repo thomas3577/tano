@@ -155,6 +155,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@^1.0.19",
+      "jsr:@std/async@^1.5.0",
       "jsr:@std/cli@^1.0.32",
       "jsr:@std/datetime@~0.225.7",
       "jsr:@std/fmt@^1.0.10",

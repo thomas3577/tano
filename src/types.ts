@@ -216,6 +216,14 @@ export type TTanoConfig = {
    * If `true`, the console output is quiet.
    */
   quiet?: boolean;
+
+  /**
+   * How many tasks of the same level may run at the same time. Default is `1`.
+   *
+   * @remarks
+   * Tasks only run at the same time if they do not depend on each other. Anything above `1` requires that every ordering a tanofile relies on is declared with `needs`.
+   */
+  concurrency?: number;
 };
 
 /**
@@ -629,6 +637,15 @@ export type TTanoHandler = {
    * @returns {Array<string>} - List of the names of all executed tasks
    */
   getPlan(taskName: string): Array<string>;
+
+  /**
+   * Gets the tasks to be executed, grouped into levels that can run at the same time.
+   *
+   * @param {string} taskName - Name of the entry task.
+   *
+   * @returns {Array<Array<string>>} - The levels, in the order in which they have to run.
+   */
+  getLevels(taskName: string): Array<Array<string>>;
 
   /**
    * Disposes the handler.

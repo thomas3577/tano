@@ -79,6 +79,21 @@ tano --dry-run my-task
 
 A run that fails exits with `1`, so tano can be used in a pipeline.
 
+**Run independent tasks at the same time:**
+
+```bash
+tano --concurrency 4
+```
+
+Tasks that do not depend on each other run together, up to the given number. The default is `1`. Anything above that requires every ordering your tanofile relies on to be declared with `needs` — while tasks run at the same time, their output is prefixed with the task name so it stays readable:
+
+```text
+docs | rendering page 1
+build | compiling module 1
+build | compiling module 2
+docs | rendering page 2
+```
+
 ## Commands
 
 tano runs commands without a shell. A string command is split into arguments, where single and double quotes group their content and a backslash is an ordinary character, so Windows paths can be written as they are:

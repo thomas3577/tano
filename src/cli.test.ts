@@ -15,6 +15,32 @@ task('c', ['deno', 'eval', 'Deno.exit(1)']);
 task('all', needs('a', 'b', 'c'));
 `;
 
+const tanofileWithTwoTimedTasks: string = `
+const code = 'const started = Date.now(); await new Promise((resolve) => setTimeout(resolve, 300)); await Deno.writeTextFile(Deno.args[0], started + " " + Date.now());';
+
+task('a', ['deno', 'eval', code, import.meta.dirname + '/a.txt']);
+task('b', ['deno', 'eval', code, import.meta.dirname + '/b.txt']);
+task('all', needs('a', 'b'));
+`;
+
+/**
+ * Reads the two intervals the timed tasks wrote and reports whether they overlap.
+ *
+ * @remarks
+ * Overlapping intervals mean the tasks ran at the same time. Each task sleeps far longer than a process takes to start, so the answer does not depend on timing luck.
+ *
+ * @param {string} dir - The directory the tanofile was written to.
+ *
+ * @returns {Promise<boolean>} if `true` the two tasks overlapped in time.
+ */
+const overlaps = async (dir: string): Promise<boolean> => {
+  const read = async (name: string): Promise<Array<number>> => (await Deno.readTextFile(join(dir, name))).split(' ').map(Number);
+  const [aStarted, aEnded] = await read('a.txt');
+  const [bStarted, bEnded] = await read('b.txt');
+
+  return aStarted < bEnded && bStarted < aEnded;
+};
+
 /**
  * Exit code and output of a tano CLI run.
  */
@@ -248,6 +274,57 @@ task('t', ['deno', 'eval', 'console.log("OUT")']);
     const content: string = await Deno.readTextFile(join(actual.dir, '.tano', 'cache.json'));
 
     assertEquals(JSON.parse(content).tasks.boom.lastStatus, 'failed');
+  });
+
+  it(`Should run independent tasks at the same time with --concurrency.`, async () => {
+    const actual = await runCli(tanofileWithTwoTimedTasks, ['all', '--concurrency', '2']);
+
+    assertEquals(actual.code, 0);
+    assertEquals(await overlaps(actual.dir), true);
+  });
+
+  it(`Should run one task after the other by default.`, async () => {
+    const actual = await runCli(tanofileWithTwoTimedTasks, ['all']);
+
+    assertEquals(actual.code, 0);
+    assertEquals(await overlaps(actual.dir), false);
+  });
+
+  it(`Should prefix the output with the task name when running in parallel.`, async () => {
+    const tanofile = `
+task('a', ['deno', 'eval', 'console.log("from-a")']);
+task('b', ['deno', 'eval', 'console.log("from-b")']);
+task('all', needs('a', 'b'));
+`;
+    const actual = await runCli(tanofile, ['all', '--concurrency', '2']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'a | from-a');
+    assertStringIncludes(actual.stdout, 'b | from-b');
+  });
+
+  it(`Should leave the output unprefixed when running one task at a time.`, async () => {
+    const actual = await runCli(`task('a', ['deno', 'eval', 'console.log("from-a")']);`, ['a']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, 'from-a');
+    assertEquals(actual.stdout.includes('a | from-a'), false);
+  });
+
+  it(`Should keep a long line whole for the logger even when it arrives in pieces.`, async () => {
+    const code = `const out = 'X'.repeat(200000); console.log('head-' + out + '-tail');`;
+    const actual = await runCli(`task('big', ['deno', 'eval', ${JSON.stringify(code)}], { logThis: true });`, ['big']);
+
+    assertEquals(actual.code, 0);
+    assertStringIncludes(actual.stdout, `head-${'X'.repeat(200000)}-tail`);
+  });
+
+  it(`Should report a bad --concurrency value without a stack trace.`, async () => {
+    const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['t', '--concurrency', 'abc']);
+
+    assertEquals(actual.code, 1);
+    assertStringIncludes(actual.stderr, `'--concurrency' must be a positive integer, got 'abc'.`);
+    assertEquals(actual.stderr.includes('Uncaught'), false);
   });
 
   it(`Should print the help even when quiet.`, async () => {

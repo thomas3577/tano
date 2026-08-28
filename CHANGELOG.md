@@ -31,6 +31,16 @@ A reliability release. tano could not be used in CI, because a failing run still
 
 ### Added
 
+- `--concurrency <N>` and `setup({ concurrency })` run independent tasks at the same time. Tasks are grouped into levels, where a level only has to wait for the level before it, and each level runs with the given concurrency. The default is `1`, so nothing changes unless it is asked for — anything above that requires every ordering a tanofile relies on to be declared with `needs`. While tasks run at the same time their output is prefixed with the task name:
+
+  ```text
+  docs | rendering page 1
+  build | compiling module 1
+  build | compiling module 2
+  docs | rendering page 2
+  ```
+
+- `handler.getLevels()` returns the tasks to be executed, grouped into levels that can run at the same time.
 - `--list` prints all tasks of a tanofile, sorted by name, with the new optional `description` from the task options.
 - `--dry-run` prints the tasks that would run, in order, without running them. No user code is executed.
 - `--no-fail-fast` now actually negates the flag. It used to be parsed as a separate, unread argument.
@@ -40,6 +50,8 @@ A reliability release. tano could not be used in CI, because a failing run still
 
 ### Fixed
 
+- A long line of task output reached the logger and the `output` callback in pieces, because the output was split per chunk instead of per line. A multi-byte character split across two chunks could be mangled for the same reason.
+- An invalid argument — a `--file` path that is not a file, a `--concurrency` value that is not a positive integer — printed an unhandled rejection with a stack trace instead of the message.
 - An absolute path passed to `--file` failed on Windows. A drive letter was parsed as a URL scheme, so `new URL('C:/tanofile.ts')` succeeded with the protocol `c:` and the path was never resolved as a file.
 - `setup({ failFast })`, `setup({ force })` and `setup({ noCache })` did nothing. The reads moved from the environment to the run options in early 2024 while the writes stayed behind.
 - `setup({ logLevel })` was ignored unless it ran before the tasks were declared, and never applied to the handler's own output.

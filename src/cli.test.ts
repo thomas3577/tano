@@ -385,6 +385,54 @@ task('slow', ['deno', 'eval', 'await new Promise((resolve) => setTimeout(resolve
     assertEquals(stripAnsiCode(decoder.decode(output.stdout)).includes('SLOW_DONE'), false);
   });
 
+  it(`Should run again when a watched file changes.`, async () => {
+    const dir: string = await Deno.makeTempDir({ prefix: 'tano-cli-test-' });
+    dirs.push(dir);
+
+    const marker: string = join(dir, 'runs.txt');
+    const watched: string = join(dir, 'watched.txt');
+
+    await Deno.writeTextFile(watched, 'one');
+    await Deno.writeTextFile(
+      join(dir, 'tanofile.ts'),
+      [
+        `import { task } from '${modUrl}';`,
+        `task('mark', ['deno', 'eval', 'await Deno.writeTextFile(Deno.args[0], "x", { append: true })', ${JSON.stringify(marker)}]);`,
+      ].join('\n'),
+    );
+
+    const child: Deno.ChildProcess = new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-run', '-RWE', cliPath, '--no-cache', '--file', join(dir, 'tanofile.ts'), 'mark', '--watch'],
+      stdout: 'null',
+      stderr: 'null',
+    }).spawn();
+
+    const runs = async (): Promise<number> => (await Deno.readTextFile(marker).catch(() => '')).length;
+    const until = async (count: number): Promise<boolean> => {
+      for (let attempt = 0; attempt < 100; attempt++) {
+        if (await runs() >= count) {
+          return true;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      return false;
+    };
+
+    const ranOnce: boolean = await until(1);
+
+    await Deno.writeTextFile(watched, 'two');
+
+    const ranTwice: boolean = await until(2);
+
+    child.kill();
+    await child.status;
+
+    assertEquals(ranOnce, true);
+    assertEquals(ranTwice, true);
+  });
+
   it(`Should print the help even when quiet.`, async () => {
     const actual = await runCli(`task('t', ['deno', 'eval', '1']);`, ['--help', '-q']);
 

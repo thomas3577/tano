@@ -1,12 +1,13 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
-import { bold } from '@std/fmt/colors';
+import { bold, green } from '@std/fmt/colors';
 import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { listPlan, listTasks } from './list.ts';
-import { setup } from './config.ts';
+import { config, setup } from './config.ts';
 import { abortRun } from './abort.ts';
+import { watch } from './watch.ts';
 import type { TTanoArgs } from './types.ts';
 
 /**
@@ -27,6 +28,8 @@ const INTERRUPTED = 130;
 export const cli = async (args: TTanoArgs): Promise<number> => {
   const log: Logger = logger();
 
+  const watching: AbortController = new AbortController();
+
   let interrupted: boolean = false;
 
   const onInterrupt = (): void => {
@@ -40,6 +43,7 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
 
     abortRun();
     handler.abort();
+    watching.abort();
   };
 
   Deno.addSignalListener('SIGINT', onInterrupt);
@@ -70,6 +74,27 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
       listPlan(taskName, handler.getPlan(taskName));
 
       return 0;
+    }
+
+    if (args.watch) {
+      const root: string = config().tanoCwd || Deno.cwd();
+
+      log.info(bold(green(`Watching ${args.watchGlob ?? root}`)));
+
+      await watch(root, args.watchGlob, watching.signal, async () => {
+        handler.reset();
+
+        await handler.run(args.task).catch((err: unknown) => {
+          if (interrupted) {
+            return;
+          }
+
+          log.error(bold('Aborted with errors.'));
+          log.error(err);
+        });
+      });
+
+      return interrupted ? INTERRUPTED : 0;
     }
 
     await handler.run(args.task);

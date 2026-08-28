@@ -19,7 +19,25 @@ import type { TGlobHashOptionsStrict, TGlobHashSource } from './types.ts';
  * @remarks
  * A recursive glob would otherwise reach the git index, installed packages and tano's own cache. All three change without the sources of a task changing, which would make the hash useless.
  */
-const skip: RegExp[] = [/[\\/]\.git([\\/]|$)/, /[\\/]node_modules([\\/]|$)/, /[\\/]\.tano([\\/]|$)/];
+export const skipped: RegExp[] = [/[\\/]\.git([\\/]|$)/, /[\\/]node_modules([\\/]|$)/, /[\\/]\.tano([\\/]|$)/];
+
+/**
+ * Turns a glob into a regular expression that matches absolute paths.
+ *
+ * @remarks
+ * A relative glob is taken relative to the root, an absolute one as it is. Shared with the watcher so that both use the same convention.
+ *
+ * @param {string} glob - The glob rule.
+ * @param {string} root - The directory a relative glob is relative to.
+ * @param {GlobOptions} options - [optionalParam=undefined] Options for the GlobToRegExp.
+ *
+ * @returns {RegExp} The expression to test a path against.
+ */
+export const toRegExp = (glob: string, root: string, options?: GlobOptions): RegExp => {
+  const globToRegExpOptions: GlobOptions = options ?? { globstar: true, caseInsensitive: false };
+
+  return globToRegExp(isAbsolute(glob) ? normalizeGlob(glob) : joinGlobs([root, glob], globToRegExpOptions), globToRegExpOptions);
+};
 
 /**
  * Hashes bytes with SHA-256.
@@ -50,9 +68,9 @@ const resolveGlobs = async (globs: string[], root: string, globToRegExpOptions?:
   };
 
   const files: string[] = [];
-  const match: RegExp[] = globs.map((glob) => globToRegExp(isAbsolute(glob) ? normalizeGlob(glob) : joinGlobs([root, glob], globToRegExpOptions), globToRegExpOptions));
+  const match: RegExp[] = globs.map((glob) => toRegExp(glob, root, globToRegExpOptions));
 
-  const options: WalkOptions = { match, skip };
+  const options: WalkOptions = { match, skip: skipped };
   const iterator: AsyncIterableIterator<WalkEntry> = walk(root, options);
 
   for await (const entry of iterator) {

@@ -165,6 +165,16 @@ export type TTanoArgs = {
    * Name of the task to be executed.
    */
   task: string;
+
+  /**
+   * If `true`, the task is run again whenever a watched file changes.
+   */
+  watch: boolean;
+
+  /**
+   * Only report changes matching this glob. Given as `--watch=<glob>`.
+   */
+  watchGlob?: string;
 };
 
 /**

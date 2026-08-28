@@ -44,7 +44,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
     },
     string: ['file', 'task', 'log-level', 'log-file', 'concurrency'],
     collect: ['log-output'],
-    boolean: ['help', 'quiet', 'fail-fast', 'version', 'upgrade', 'force', 'no-cache', 'log-everything', 'list', 'dry-run'],
+    boolean: ['help', 'quiet', 'fail-fast', 'version', 'upgrade', 'force', 'no-cache', 'log-everything', 'list', 'dry-run', 'watch'],
     negatable: ['fail-fast'],
     default: {
       file: 'tanofile.ts',
@@ -55,6 +55,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
       'log-everything': false,
       list: false,
       'dry-run': false,
+      watch: false,
     },
   });
 
@@ -71,6 +72,10 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
   const task: string = flags.task || flags._[0] as string;
   const list: boolean = flags.list;
   const dryRun: boolean = flags['dry-run'];
+  const watch: boolean = flags.watch;
+
+  // Declared as a boolean so that `--watch build` keeps `build` as the task name instead of swallowing it as the glob. The narrowing glob is only read from the `--watch=<glob>` form.
+  const watchGlob: undefined | string = Deno.args.find((arg) => arg.startsWith('--watch='))?.slice('--watch='.length);
 
   const config: TTanoConfig = { tanoCwd: getCwd(file) };
   const logOutput: string[] = (flags['log-output'] ?? []) as string[];
@@ -131,6 +136,8 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
     file,
     list,
     task,
+    watch,
+    watchGlob,
   };
 
   return args;

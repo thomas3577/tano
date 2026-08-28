@@ -40,6 +40,9 @@ A reliability release. tano could not be used in CI, because a failing run still
   docs | rendering page 2
   ```
 
+- `--watch` runs the task again whenever a file below the tanofile changes, or only on changes matching `--watch=<glob>`. Which tasks actually run again is left to the source cache, which already skips what has not changed.
+- `timeout` in the task options stops a task after the given number of milliseconds. A command task and code in its own process are really stopped; a code function runs inside the tano process, where JavaScript cannot stop a running function, so there the timeout only fails the task.
+- Ctrl+C stops the tasks that are running instead of leaving the spawned processes behind, and exits with `130`. A second Ctrl+C gives up waiting and ends tano right away.
 - `handler.getLevels()` returns the tasks to be executed, grouped into levels that can run at the same time.
 - `--list` prints all tasks of a tanofile, sorted by name, with the new optional `description` from the task options.
 - `--dry-run` prints the tasks that would run, in order, without running them. No user code is executed.
@@ -50,6 +53,7 @@ A reliability release. tano could not be used in CI, because a failing run still
 
 ### Fixed
 
+- The `signal` from the task options was never passed on to the spawned process. `TTaskOptions` extends `Deno.CommandOptions` and therefore always offered it, but aborting it did nothing.
 - A long line of task output reached the logger and the `output` callback in pieces, because the output was split per chunk instead of per line. A multi-byte character split across two chunks could be mangled for the same reason.
 - An invalid argument — a `--file` path that is not a file, a `--concurrency` value that is not a positive integer — printed an unhandled rejection with a stack trace instead of the message.
 - An absolute path passed to `--file` failed on Windows. A drive letter was parsed as a URL scheme, so `new URL('C:/tanofile.ts')` succeeded with the protocol `c:` and the path was never resolved as a file.

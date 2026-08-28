@@ -94,6 +94,21 @@ build | compiling module 2
 docs | rendering page 2
 ```
 
+**Run a task again whenever something changes:**
+
+```bash
+tano --watch my-task
+tano --watch='src/**' my-task
+```
+
+Without a glob everything below the tanofile is watched. Which tasks actually run again is decided by `source`, so declaring it keeps a watch run cheap.
+
+Ctrl+C stops the running tasks instead of leaving the spawned processes behind. A task can also carry its own limit:
+
+```ts
+task('flaky', `deno run ./fetch.ts`, { timeout: 30_000 });
+```
+
 ## Commands
 
 tano runs commands without a shell. A string command is split into arguments, where single and double quotes group their content and a backslash is an ordinary character, so Windows paths can be written as they are:

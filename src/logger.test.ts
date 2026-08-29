@@ -1,90 +1,85 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals, assertInstanceOf } from '@std/assert';
-import { afterEach, describe, it } from '@std/testing/bdd';
 import { gray } from '@std/fmt/colors';
 import { Logger, LogLevels } from '@std/log';
 import type { LogRecord } from '@std/log';
 import { logger, logStream } from './logger.ts';
 import { resetConfig, setup } from './config.ts';
 
-afterEach(() => {
+Deno.test.afterEach(() => {
   resetConfig();
 });
 
-describe(`logger`, () => {
-  it(`Should create a instance of Logger`, () => {
-    const actual: Logger = logger();
+Deno.test(`logger > Should create a instance of Logger`, () => {
+  const actual: Logger = logger();
 
-    assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 1);
-    assertEquals(actual.level, LogLevels.INFO);
-  });
-
-  it(`Should have log level 'ERROR' (1)`, () => {
-    setup({ logLevel: 'ERROR' });
-
-    const actual: Logger = logger();
-
-    assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 1);
-    assertEquals(actual.level, LogLevels.ERROR);
-  });
-
-  it(`Should have log level 'ERROR' (1) for a lowercase log level`, () => {
-    setup({ logLevel: 'error' });
-
-    const actual: Logger = logger();
-
-    assertInstanceOf(actual, Logger);
-    assertEquals(actual.handlers.length, 1);
-    assertEquals(actual.level, LogLevels.ERROR);
-  });
+  assertInstanceOf(actual, Logger);
+  assertEquals(actual.handlers.length, 1);
+  assertEquals(actual.level, LogLevels.INFO);
 });
 
-describe(`logStream`, () => {
-  it('Should stream the log output', async () => {
-    setup({ logLevel: 'debug', logOutput: ['console', 'stream'] });
+Deno.test(`logger > Should have log level 'ERROR' (1)`, () => {
+  setup({ logLevel: 'ERROR' });
 
-    const actual: Logger = logger();
-    const reader = logStream.readable.getReader();
+  const actual: Logger = logger();
 
-    let log: LogRecord = {
-      msg: 'msg',
-      args: [],
-      level: LogLevels.INFO,
-      loggerName: 'loggerName',
-      levelName: '',
-      datetime: new Date(),
-    } as unknown as LogRecord;
+  assertInstanceOf(actual, Logger);
+  assertEquals(actual.handlers.length, 1);
+  assertEquals(actual.level, LogLevels.ERROR);
+});
 
-    assertEquals(actual.handlers.length, 2);
+Deno.test(`logger > Should have log level 'ERROR' (1) for a lowercase log level`, () => {
+  setup({ logLevel: 'error' });
 
-    (async () => {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          break;
-        }
+  const actual: Logger = logger();
 
-        log = JSON.parse(value);
+  assertInstanceOf(actual, Logger);
+  assertEquals(actual.handlers.length, 1);
+  assertEquals(actual.level, LogLevels.ERROR);
+});
+
+Deno.test(`logStream > Should stream the log output`, async () => {
+  setup({ logLevel: 'debug', logOutput: ['console', 'stream'] });
+
+  const actual: Logger = logger();
+  const reader = logStream.readable.getReader();
+
+  let log: LogRecord = {
+    msg: 'msg',
+    args: [],
+    level: LogLevels.INFO,
+    loggerName: 'loggerName',
+    levelName: '',
+    datetime: new Date(),
+  } as unknown as LogRecord;
+
+  assertEquals(actual.handlers.length, 2);
+
+  (async () => {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
       }
-    })();
 
-    actual.info('Hello, world!');
+      log = JSON.parse(value);
+    }
+  })();
 
-    await new Promise((resolve) => setTimeout(resolve, 250));
+  actual.info('Hello, world!');
 
-    assertEquals(log.msg, 'Hello, world!');
-    assertEquals(log.levelName, 'INFO');
-    assertEquals(log.loggerName, 'default');
+  await new Promise((resolve) => setTimeout(resolve, 250));
 
-    actual.info(`Starting '${gray('{name}')}'...`, { name: 'my-task' });
+  assertEquals(log.msg, 'Hello, world!');
+  assertEquals(log.levelName, 'INFO');
+  assertEquals(log.loggerName, 'default');
 
-    await new Promise((resolve) => setTimeout(resolve, 250));
+  actual.info(`Starting '${gray('{name}')}'...`, { name: 'my-task' });
 
-    assertEquals(log.msg, `Starting 'my-task'...`);
+  await new Promise((resolve) => setTimeout(resolve, 250));
 
-    await reader.cancel();
-  });
+  assertEquals(log.msg, `Starting 'my-task'...`);
+
+  await reader.cancel();
 });

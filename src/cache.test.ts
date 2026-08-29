@@ -1,7 +1,6 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { assertEquals } from '@std/assert';
-import { afterEach, describe, it } from '@std/testing/bdd';
 import { TanoCache } from './cache.ts';
 import type { TTanoRunData } from './types.ts';
 
@@ -14,60 +13,58 @@ const createTempDir = async (): Promise<string> => {
   return dir;
 };
 
-afterEach(async () => {
+Deno.test.afterEach(async () => {
   while (dirs.length > 0) {
     const dir = dirs.pop() as string;
     await Deno.remove(dir, { recursive: true });
   }
 });
 
-describe('TanoCache', () => {
-  it('should return empty data when there is no cache yet', async () => {
-    const dir = await createTempDir();
-    const cache = new TanoCache(dir);
+Deno.test('TanoCache > should return empty data when there is no cache yet', async () => {
+  const dir = await createTempDir();
+  const cache = new TanoCache(dir);
 
-    assertEquals(await cache.read(), { tasks: {} });
-  });
+  assertEquals(await cache.read(), { tasks: {} });
+});
 
-  it('should store the data as readable json', async () => {
-    const dir = await createTempDir();
-    const cache = new TanoCache(dir);
+Deno.test('TanoCache > should store the data as readable json', async () => {
+  const dir = await createTempDir();
+  const cache = new TanoCache(dir);
 
-    await cache.write({
-      tasks: {
-        'my-task': {
-          lastRun: new Date('2026-01-01T00:00:00.000Z').toISOString(),
-          lastStatus: 'failed',
-          hash: 'abc123',
-        },
+  await cache.write({
+    tasks: {
+      'my-task': {
+        lastRun: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+        lastStatus: 'failed',
+        hash: 'abc123',
       },
-    });
-
-    const content = await Deno.readTextFile(cache.path);
-
-    assertEquals(JSON.parse(content).tasks['my-task'].lastStatus, 'failed');
-    assertEquals(cache.path.endsWith('cache.json'), true);
+    },
   });
 
-  it('should persist and read task data', async () => {
-    const dir = await createTempDir();
-    const cache = new TanoCache(dir);
+  const content = await Deno.readTextFile(cache.path);
 
-    const expected: TTanoRunData = {
-      tasks: {
-        'my-task': {
-          lastRun: new Date('2026-01-01T00:00:00.000Z').toISOString(),
-          lastStatus: 'success',
-          hash: 'abc123',
-        },
+  assertEquals(JSON.parse(content).tasks['my-task'].lastStatus, 'failed');
+  assertEquals(cache.path.endsWith('cache.json'), true);
+});
+
+Deno.test('TanoCache > should persist and read task data', async () => {
+  const dir = await createTempDir();
+  const cache = new TanoCache(dir);
+
+  const expected: TTanoRunData = {
+    tasks: {
+      'my-task': {
+        lastRun: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+        lastStatus: 'success',
+        hash: 'abc123',
       },
-    };
+    },
+  };
 
-    await cache.write(expected);
-    const actual = await cache.read();
+  await cache.write(expected);
+  const actual = await cache.read();
 
-    assertEquals(actual, expected);
+  assertEquals(actual, expected);
 
-    cache.dispose();
-  });
+  cache.dispose();
 });

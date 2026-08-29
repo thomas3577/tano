@@ -34,5 +34,8 @@
     "tano",
     "tanofile",
     "xtask"
+  ],
+  "cSpell.ignoreRegExpList": [
+    "(?<!\\\\)\\\\[tnrbfv0]"
   ]
 }

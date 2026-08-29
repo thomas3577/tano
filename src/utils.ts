@@ -246,6 +246,7 @@ const hasUrlScheme = (value: string): boolean => /^[a-zA-Z][a-zA-Z\d+\-.]+:/.tes
 
 /**
  * Gets a valid import url.
+ *
  * @param {string} fileOrUrl - A path or URL to a tanofile.
  *
  * @returns A valid import url.

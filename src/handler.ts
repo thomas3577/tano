@@ -16,7 +16,7 @@ import { resetRun } from './abort.ts';
 import type { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
-import type { TChanges, TTanoHandler, TTaskRunData, TTaskRunOptions } from './types.ts';
+import type { TChanges, TTanoHandler, TTaskInfo, TTaskRunData, TTaskRunOptions } from './types.ts';
 
 /**
  * The task handler.
@@ -187,6 +187,21 @@ class Handler implements TTanoHandler {
   clear(): void {
     this.#cache.forEach((task: Task) => task.offChanged(this.#emitChanges.bind(this)));
     this.#cache.clear();
+  }
+
+  /**
+   * Gets all tasks as plain data, sorted by name.
+   *
+   * @returns {Array<TTaskInfo>} - Description of every task that is in the cache.
+   */
+  list(): Array<TTaskInfo> {
+    return this.tasks
+      .map((task: Task) => ({
+        name: task.name,
+        description: task.options?.description,
+        needs: [...task.needs],
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   /**

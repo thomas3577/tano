@@ -10,24 +10,20 @@
  */
 
 import { basename } from '@std/path';
-import type { Task } from './task.ts';
+import type { TTaskInfo } from './types.ts';
 
 /**
- * Prints all tasks of a tanofile, sorted by name, with their description if they have one.
+ * Prints all tasks of a tanofile, in the given order, with their description if they have one.
  *
- * @param {Array<Task>} tasks - The tasks to print.
+ * @param {Array<TTaskInfo>} tasks - The tasks to print.
  * @param {string} file - Path or URL of the tanofile the tasks came from.
  */
-export const listTasks = (tasks: Array<Task>, file: string): void => {
-  const names: Array<string> = tasks.map((task) => task.name).sort((a, b) => a.localeCompare(b));
-  const width: number = Math.max(...names.map((name) => name.length), 0);
-  const descriptions: Map<string, undefined | string> = new Map(tasks.map((task) => [task.name, task.options?.description]));
+export const listTasks = (tasks: Array<TTaskInfo>, file: string): void => {
+  const width: number = Math.max(...tasks.map((task) => task.name.length), 0);
 
   console.log(`\nTasks in ${basename(file)}:\n`);
 
-  for (const name of names) {
-    const description: undefined | string = descriptions.get(name);
-
+  for (const { name, description } of tasks) {
     console.log(`  ${description ? name.padEnd(width + 3) + description : name}`);
   }
 

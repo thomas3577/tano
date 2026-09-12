@@ -6,4 +6,4 @@ export { handler } from './src/handler.ts';
 export { Task } from './src/task.ts';
 export { logger, logStream } from './src/logger.ts';
 export { config, setup } from './src/config.ts';
-export type { TCode, TCodeFile, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TExecutor, TExecutorOrOptions, TGlobHashSource, TLogHandler, TLogStream, TNeeds, TNeedsOrExecutor, TOptions, TTanoConfig, TTanoConfigStrict, TTanoHandler, TTaskDefinition, TTaskParams, TTaskRunOptions, TTaskStatus } from './src/types.ts';
+export type { TCode, TCodeFile, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TExecutor, TExecutorOrOptions, TGlobHashSource, TLogHandler, TLogStream, TNeeds, TNeedsOrExecutor, TOptions, TTanoConfig, TTanoConfigStrict, TTanoHandler, TTaskDefinition, TTaskInfo, TTaskParams, TTaskRunOptions, TTaskStatus } from './src/types.ts';

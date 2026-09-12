@@ -94,6 +94,15 @@ tano my-task
 tano --list
 ```
 
+The same list is available in code, sorted by name, as plain data:
+
+```ts
+import { handler } from 'jsr:@dx/tano';
+import './tanofile.ts';
+
+handler.list(); // [{ name: 'build', description: 'Type checks everything', needs: [] }]
+```
+
 **Show what a task would run, without running it:**
 
 ```bash

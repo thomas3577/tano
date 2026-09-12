@@ -63,7 +63,7 @@ export const cli = async (args: TTanoArgs): Promise<number> => {
     setup(args.config);
 
     if (args.list) {
-      listTasks(handler.tasks, args.file as string);
+      listTasks(handler.list(), args.file as string);
 
       return 0;
     }

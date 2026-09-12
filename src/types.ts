@@ -568,6 +568,26 @@ export type TTaskDefinition = {
 };
 
 /**
+ * Describes a task without exposing the task itself.
+ */
+export type TTaskInfo = {
+  /**
+   * Name of the task.
+   */
+  name: string;
+
+  /**
+   * Description of the task, if it has one.
+   */
+  description: undefined | string;
+
+  /**
+   * Names of the tasks the task depends on.
+   */
+  needs: Array<string>;
+};
+
+/**
  * Type of Tano handler
  */
 export type TTanoHandler = {
@@ -646,6 +666,13 @@ export type TTanoHandler = {
    * Clears the cache. The handler will then have no more tasks to execute.
    */
   clear(): void;
+
+  /**
+   * Gets all tasks as plain data, sorted by name.
+   *
+   * @returns {Array<TTaskInfo>} - Description of every task that is in the cache.
+   */
+  list(): Array<TTaskInfo>;
 
   /**
    * Gets a list of all tasks to be executed in the correct order.

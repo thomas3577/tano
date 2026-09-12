@@ -176,4 +176,35 @@ describe('handler', () => {
       'Circular dependency detected',
     );
   });
+
+  it(`Should list all tasks sorted by name`, () => {
+    task('zeta', () => {});
+    task('alpha', () => {});
+    task('beta', () => {});
+
+    assertEquals(handler.list().map((info) => info.name), ['alpha', 'beta', 'zeta']);
+  });
+
+  it(`Should list the description and the needs of a task`, () => {
+    task('build', needs('clean'), `deno eval 1`, { description: 'Builds the project.' });
+    task('clean', () => {});
+
+    assertEquals(handler.list(), [
+      { name: 'build', description: 'Builds the project.', needs: ['clean'] },
+      { name: 'clean', description: undefined, needs: [] },
+    ]);
+  });
+
+  it(`Should not leak the needs of a task`, () => {
+    task('build', needs('clean'), () => {});
+    task('clean', () => {});
+
+    handler.list()[0].needs.push('injected');
+
+    assertEquals(handler.list()[0].needs, ['clean']);
+  });
+
+  it(`Should list nothing without tasks`, () => {
+    assertEquals(handler.list(), []);
+  });
 });

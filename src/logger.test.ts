@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe(`logger`, () => {
   it(`Should create a instance of Logger`, () => {
-    const actual: Logger = logger();
+    const actual = logger() as Logger;
 
     assertInstanceOf(actual, Logger);
     assertEquals(actual.handlers.length, 1);
@@ -24,7 +24,7 @@ describe(`logger`, () => {
   it(`Should have log level 'ERROR' (1)`, () => {
     setup({ logLevel: 'ERROR' });
 
-    const actual: Logger = logger();
+    const actual = logger() as Logger;
 
     assertInstanceOf(actual, Logger);
     assertEquals(actual.handlers.length, 1);
@@ -34,7 +34,7 @@ describe(`logger`, () => {
   it(`Should have log level 'ERROR' (1) for a lowercase log level`, () => {
     setup({ logLevel: 'error' });
 
-    const actual: Logger = logger();
+    const actual = logger() as Logger;
 
     assertInstanceOf(actual, Logger);
     assertEquals(actual.handlers.length, 1);
@@ -46,7 +46,7 @@ describe(`logStream`, () => {
   it('Should stream the log output', async () => {
     setup({ logLevel: 'debug', logOutput: ['console', 'stream'] });
 
-    const actual: Logger = logger();
+    const actual = logger() as Logger;
     const reader = logStream.readable.getReader();
 
     let log: LogRecord = {

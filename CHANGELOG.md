@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+Prepares the API for 1.0: the public API no longer exposes types from the unstable `@std/log`.
+
+### Breaking
+
+- **`logger()` returns a `TLogger`** instead of a `Logger` from `@std/log`. `TLogger` only has `debug`, `info`, `warn` and `error`. Code that used other members of the `@std/log` logger, or typed the result as `Logger` from `@std/log`, has to switch to `TLogger`:
+
+  ```ts
+  import type { Logger } from '@std/log'; // before
+  import type { TLogger } from 'jsr:@dx/tano'; // now
+  ```
+
+- **`TExecutorOrOptions` and `TNeedsOrExecutor` are no longer exported.** They were only used by the implementation of `task()` and `xtask()`, whose public signature is `TTaskDefinition`.
+
 ### Added
 
 - **`handler.list()`** returns every task of the tanofile as plain data (`name`, `description`, `needs`), sorted by name. It is the programmatic counterpart of `tano --list`.

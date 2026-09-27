@@ -1,7 +1,7 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
-import type { Logger } from '@std/log';
 import { logger, needs, setup, task, xtask } from '../mod.ts';
+import type { TLogger } from '../mod.ts';
 import { task07 } from './tanofile.task.ts';
 
 setup({
@@ -37,13 +37,13 @@ task(
     }, {
       args: ['--allow-write'],
       output: (_, result) => {
-        const log: Logger = logger();
+        const log: TLogger = logger();
         log.info(_);
         log.info(result);
       },
     }),
     task('My task 09', async () => {
-      const log: Logger = logger();
+      const log: TLogger = logger();
       const deno = await Deno.readTextFile('../deno.json');
 
       log.info(deno);
@@ -131,7 +131,7 @@ task(
 
 task('output-01', `pwsh -c "echo 'OUTPUT'"`, {
   output: (_, result) => {
-    const log: Logger = logger();
+    const log: TLogger = logger();
     log.info('Output 01', result);
   },
 });

@@ -12,7 +12,7 @@ import { gray, stripAnsiCode, white } from '@std/fmt/colors';
 import { BaseHandler, ConsoleHandler, FileHandler, getLogger, LogLevels, setup } from '@std/log';
 import type { BaseHandlerOptions, ConsoleHandlerOptions, FileHandlerOptions, LevelName, LogConfig, Logger, LogRecord } from '@std/log';
 import { config, configVersion } from './config.ts';
-import type { TLogHandler, TLogStream } from './types.ts';
+import type { TLogger, TLogHandler, TLogStream } from './types.ts';
 
 const stream: TextEncoderStream = new TextEncoderStream();
 const readable: ReadableStream<string> = stream.readable.pipeThrough(new TextDecoderStream());
@@ -156,9 +156,9 @@ export const logStream: TLogStream = {
  * log.info('Hello World!');
  * ```
  *
- * @returns {Logger}
+ * @returns {TLogger}
  */
-export const logger = (): Logger => {
+export const logger = (): TLogger => {
   if (instance && instanceVersion === configVersion()) {
     return instance;
   }

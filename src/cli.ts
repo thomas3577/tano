@@ -1,14 +1,13 @@
 // Copyright 2018-2026 the tano authors. All rights reserved. MIT license.
 
 import { bold, green } from '@std/fmt/colors';
-import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { listPlan, listTasks } from './list.ts';
 import { config, setup } from './config.ts';
 import { abortRun } from './abort.ts';
 import { watch } from './watch.ts';
-import type { TTanoArgs } from './types.ts';
+import type { TLogger, TTanoArgs } from './types.ts';
 
 /**
  * The exit code a shell expects after a run was interrupted, `128` plus the number of `SIGINT`.
@@ -26,7 +25,7 @@ const INTERRUPTED = 130;
  * @returns {Promise<number>} The exit code. `0` if the run succeeded, `1` if it was aborted with errors, `130` if it was interrupted.
  */
 export const cli = async (args: TTanoArgs): Promise<number> => {
-  const log: Logger = logger();
+  const log: TLogger = logger();
 
   const watching: AbortController = new AbortController();
 

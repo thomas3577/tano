@@ -7,11 +7,10 @@
  */
 
 import { parseArgs } from '@std/cli';
-import type { Logger } from '@std/log';
 import { getCwd, getImportUrl } from './utils.ts';
 import { logger } from './logger.ts';
 import { setup } from './config.ts';
-import type { TTanoArgs, TTanoCliAction, TTanoConfig } from './types.ts';
+import type { TLogger, TTanoArgs, TTanoCliAction, TTanoConfig } from './types.ts';
 
 /**
  * Checks if a flag was actually passed on the command line.
@@ -124,7 +123,7 @@ export const parseTanoArgs = async (): Promise<TTanoArgs> => {
 
   setup(config);
 
-  const log: Logger = logger();
+  const log: TLogger = logger();
 
   log.debug(`Config      ${JSON.stringify(config)}`);
   log.debug('');

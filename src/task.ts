@@ -16,12 +16,11 @@
 
 import { bold, gray, green, red } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
-import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { handler } from './handler.ts';
 import { isCode, isCommand, toCode, toCommand } from './utils.ts';
 import { executeCondition, runCode, runCommand } from './runners.ts';
-import type { TCommand, TCommandOptions, TExecutor, TOptions, TTanoHandler, TTaskParams, TTaskRunOptions, TTaskStatus, TTaskType } from './types.ts';
+import type { TCommand, TCommandOptions, TExecutor, TLogger, TOptions, TTanoHandler, TTaskParams, TTaskRunOptions, TTaskStatus, TTaskType } from './types.ts';
 
 /**
  * A class to create a Task.
@@ -242,7 +241,7 @@ export class Task implements TTaskParams {
     this.#updateStatus('ready');
   }
 
-  get #log(): Logger {
+  get #log(): TLogger {
     return logger();
   }
 

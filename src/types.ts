@@ -128,6 +128,34 @@ export type TLogStream = {
 };
 
 /**
+ * The logger returned by {@linkcode logger}.
+ *
+ * @remarks
+ * Placeholders like `{name}` in the message are replaced with the matching property of `params`.
+ */
+export type TLogger = {
+  /**
+   * Logs a message with level `DEBUG`.
+   */
+  debug(msg: unknown, params?: unknown): void;
+
+  /**
+   * Logs a message with level `INFO`.
+   */
+  info(msg: unknown, params?: unknown): void;
+
+  /**
+   * Logs a message with level `WARN`.
+   */
+  warn(msg: unknown, params?: unknown): void;
+
+  /**
+   * Logs a message with level `ERROR`.
+   */
+  error(msg: unknown, params?: unknown): void;
+};
+
+/**
  * These are the tano actions that you can run through the CLI.
  */
 export type TTanoCliAction = 'run' | 'help' | 'version' | 'upgrade';

@@ -4,7 +4,20 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.7.0] - 2026-09-27
+
+Prepares the API for 1.0: the public API no longer exposes types from the unstable `@std/log`.
+
+### Breaking
+
+- **`logger()` returns a `TLogger`** instead of a `Logger` from `@std/log`. `TLogger` only has `debug`, `info`, `warn` and `error`. Code that used other members of the `@std/log` logger, or typed the result as `Logger` from `@std/log`, has to switch to `TLogger`:
+
+  ```ts
+  import type { Logger } from '@std/log'; // before
+  import type { TLogger } from 'jsr:@dx/tano'; // now
+  ```
+
+- **`TExecutorOrOptions` and `TNeedsOrExecutor` are no longer exported.** They were only used by the implementation of `task()` and `xtask()`, whose public signature is `TTaskDefinition`.
 
 ### Added
 
@@ -85,4 +98,5 @@ A reliability release. tano could not be used in CI, because a failing run still
 
   An install command that still passes the flag keeps working, the flag is simply unnecessary.
 
+[0.7.0]: https://github.com/thomas3577/tano/compare/0.6.1...0.7.0
 [0.6.0]: https://github.com/thomas3577/tano/compare/0.5.29...0.6.0

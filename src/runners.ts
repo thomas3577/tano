@@ -6,13 +6,12 @@
  * @module
  */
 
-import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { abortable } from '@std/async/abortable';
 import { runSignal } from './abort.ts';
 import { config } from './config.ts';
 import { tokenize } from './tokenize.ts';
-import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2 } from './types.ts';
+import type { TCode, TCodeFunction, TCodeOptions, TCommand, TCommandOptions, TCondition, TConditionType2, TLogger } from './types.ts';
 
 /**
  * Builds a writable stream that hands complete lines to `onLine`.
@@ -88,7 +87,7 @@ const getProcess = (command: TCommand, options?: TCommandOptions, signal?: Abort
  */
 export const runCode = async (code: TCode, options?: TCodeOptions, taskName?: string): Promise<void> => {
   const logThis: boolean = options?.logThis ?? config().logEverything;
-  const log: Logger = logger();
+  const log: TLogger = logger();
 
   log.debug('Run code...');
 
@@ -158,7 +157,7 @@ export const runCode = async (code: TCode, options?: TCodeOptions, taskName?: st
  */
 export const runCommand = async (command: TCommand, options?: TCommandOptions, taskName?: string): Promise<void> => {
   const logThis: boolean = options?.logThis ?? config().logEverything;
-  const log: Logger = logger();
+  const log: TLogger = logger();
 
   log.debug('Run command...');
 
@@ -247,7 +246,7 @@ export const runCommand = async (command: TCommand, options?: TCommandOptions, t
  * @returns {Promise<Boolean>} If `true`, the task will be executed. Otherwise it will be skipped.
  */
 export const executeCondition = async (condition: TCondition): Promise<boolean> => {
-  const log: Logger = logger();
+  const log: TLogger = logger();
 
   log.debug('Execute condition...');
 
@@ -280,7 +279,7 @@ export const executeCondition = async (condition: TCondition): Promise<boolean> 
  * @returns {Promise<void | T>}
  */
 export const executeCodeFunction = async <T>(code: TCodeFunction): Promise<void | T> => {
-  const log: Logger = logger();
+  const log: TLogger = logger();
 
   log.debug('Execute code function...');
 

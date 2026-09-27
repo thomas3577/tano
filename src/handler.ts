@@ -9,14 +9,13 @@
 import { bold, green } from '@std/fmt/colors';
 import { format } from '@std/fmt/duration';
 import { pooledMap } from '@std/async/pool';
-import type { Logger } from '@std/log';
 import { logger } from './logger.ts';
 import { config } from './config.ts';
 import { resetRun } from './abort.ts';
 import type { Task } from './task.ts';
 import { Changes, ChangesMock } from './changes.ts';
 import { VERSION } from './version.ts';
-import type { TChanges, TTanoHandler, TTaskInfo, TTaskRunData, TTaskRunOptions } from './types.ts';
+import type { TChanges, TLogger, TTanoHandler, TTaskInfo, TTaskRunData, TTaskRunOptions } from './types.ts';
 
 /**
  * The task handler.
@@ -257,7 +256,7 @@ class Handler implements TTanoHandler {
     this.#eventTarget.removeEventListener('changed', fn);
   }
 
-  get #log(): Logger {
+  get #log(): TLogger {
     return logger();
   }
 
